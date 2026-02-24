@@ -10,22 +10,21 @@
 
 :root {
     --bg: #000000;
-    --sf: #000a00;
-    --sf2: #001200;
-    --sf3: #001a00;
-    --bd: #0a2a0a;
+    --sf: #0a0a0a;
+    --sf2: #121212;
+    --sf3: #1a1a1a;
+    --bd: #222222;
     --tx: #ffffff;
-    --tx2: #a0c0a0;
-    --tx3: #447044;
+    --tx2: #b0b0b0;
+    --tx3: #707070;
     --ac: #00cc44;
-    --ac-glow: rgba(0, 204, 68, 0.35);
+    --ac-glow: rgba(0, 204, 68, 0.3);
     --rd: #ff4d4d;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; line-height: 1.5; height: 100vh; overflow: hidden; }
 
-/* Scrollbars */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--sf3); border-radius: 3px; }
@@ -33,7 +32,6 @@ body { background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', sa
 
 .app { display: flex; height: 100vh; }
 
-/* Sidebar */
 .sb { width: 260px; background: var(--sf); border-right: 1px solid var(--bd); display: flex; flex-direction: column; z-index: 10; }
 .sb-h { padding: 24px; border-bottom: 1px solid var(--bd); cursor: pointer; }
 .logo { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--ac); letter-spacing: -0.5px; text-shadow: 0 0 15px var(--ac-glow); font-style: italic; }
@@ -42,20 +40,17 @@ body { background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', sa
 .nav-i:hover { background: var(--sf2); color: var(--tx); }
 .nav-i.active { background: var(--ac); color: #000; font-weight: 700; box-shadow: 0 4px 12px var(--ac-glow); }
 
-/* Main Content */
 .main { flex: 1; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; position: relative; }
 .tb { height: 64px; border-bottom: 1px solid var(--bd); display: flex; align-items: center; padding: 0 24px; background: var(--sf); justify-content: space-between; }
-.user-id { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ac); background: rgba(0, 204, 68, 0.1); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(0, 204, 68, 0.2); }
+.user-id { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ac); background: rgba(0,204,68,0.1); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(0,204,68,0.2); }
 
 .content { flex: 1; overflow-y: auto; padding: 24px; position: relative; }
-.bg-glow { position: absolute; top: -5%; right: -5%; width: 35%; height: 35%; background: radial-gradient(circle, rgba(0, 204, 68, 0.08) 0%, transparent 70%); pointer-events: none; }
+.bg-glow { position: absolute; top: -5%; right: -5%; width: 35%; height: 35%; background: radial-gradient(circle, rgba(0,204,68,0.08) 0%, transparent 70%); pointer-events: none; }
 
-/* Section Views */
 .view { display: none; }
 .view.active { display: block; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Overview Cards */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 32px; }
 .card { background: var(--sf); border: 1px solid var(--bd); border-radius: 12px; padding: 20px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
 .card-h { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
@@ -63,367 +58,1325 @@ body { background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', sa
 .card-v { font-size: 18px; font-weight: 600; color: var(--ac); line-height: 1.3; }
 .card-sub { font-size: 11px; color: var(--tx2); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
 
-/* Entry Display */
+/* Entry cards */
 .entry { background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s; }
 .entry:hover { border-color: var(--tx3); }
 .entry-h { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(90deg, var(--sf) 0%, var(--sf2) 100%); }
 .entry-t { font-weight: 600; color: var(--tx); font-size: 13px; flex: 1; }
-.entry-d { font-size: 10px; color: var(--ac); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; margin-left: 12px; }
+.entry-d { font-size: 10px; color: var(--ac); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; margin-left: 12px; white-space: nowrap; }
 .entry-b { padding: 18px; display: none; border-top: 1px solid var(--bd); background: var(--sf); }
 .entry.open .entry-b { display: block; }
 
-.field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-.field { margin-bottom: 16px; }
-.f-label { font-size: 10px; font-weight: 700; color: var(--tx3); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+.field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.field { margin-bottom: 12px; }
+.f-label { font-size: 10px; font-weight: 700; color: var(--tx3); text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px; }
 .f-value { font-size: 13px; color: var(--tx2); line-height: 1.6; white-space: pre-wrap; }
+.f-full { grid-column: 1 / -1; }
 .f-link { color: var(--ac); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
 .f-link:hover { text-decoration: underline; }
 
-/* Form / Input System */
-.add-btn { background: var(--ac); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 24px; box-shadow: 0 4px 12px var(--ac-glow); transition: transform 0.2s; }
+/* Section labels within expanded entry */
+.sc-label { font-size: 10px; font-weight: 700; color: var(--ac); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 5px; border-top: 1px solid var(--bd); padding-top: 10px; }
+.sc-label:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+
+/* Add forms */
+.add-btn { background: var(--ac); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; box-shadow: 0 4px 12px var(--ac-glow); transition: transform 0.2s; }
 .add-btn:hover { transform: scale(1.02); }
 
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-.modal.open { display: flex; }
-.modal-c { background: var(--sf); border: 1px solid var(--bd); width: 90%; max-width: 600px; border-radius: 12px; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
-.modal-h { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--ac); font-family: 'Playfair Display', serif; }
-.modal-f { display: flex; flex-direction: column; gap: 16px; }
+.add-form { background: var(--sf); border: 1px solid var(--bd); border-radius: 10px; padding: 20px; margin-bottom: 24px; display: none; }
+.add-form.open { display: block; animation: fadeIn 0.2s ease; }
+.add-form h3 { font-size: 13px; font-weight: 700; color: var(--ac); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; font-family: 'IBM Plex Mono', monospace; }
 
-input, textarea, select { background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px; padding: 12px; color: var(--tx); font-family: inherit; font-size: 13px; width: 100%; outline: none; transition: border-color 0.2s; }
-input:focus, textarea:focus { border-color: var(--ac); }
-label { display: block; font-size: 11px; font-weight: 600; color: var(--tx3); margin-bottom: 6px; text-transform: uppercase; }
+.ir { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.ir input, .ir select { flex: 1; min-width: 140px; }
 
-.btn-group { display: flex; gap: 12px; margin-top: 24px; }
-.btn-save { flex: 1; background: var(--ac); color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; }
-.btn-cancel { flex: 1; background: transparent; color: var(--tx3); border: 1px solid var(--bd); padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+input, textarea, select {
+    background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px;
+    padding: 10px 12px; color: var(--tx); font-family: inherit; font-size: 13px;
+    width: 100%; outline: none; transition: border-color 0.2s; margin-bottom: 0;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--ac); }
+textarea { resize: vertical; }
+.fi { width: 100%; margin-bottom: 10px; }
 
-/* Action Buttons within Entry */
-.entry-actions { display: flex; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--bd); }
-.act-btn { background: transparent; border: none; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; transition: color 0.2s; }
-.act-edit { color: var(--ac); }
-.act-delete { color: var(--rd); }
-.act-btn:hover { opacity: 0.8; }
+label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx3); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
 
+.form-row { margin-bottom: 10px; }
+.save-row { display: flex; gap: 10px; margin-top: 14px; align-items: center; }
+.btn-save { background: var(--ac); color: #000; border: none; padding: 10px 22px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+.btn-cancel-form { background: transparent; color: var(--tx3); border: 1px solid var(--bd); padding: 10px 18px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+.saved-msg { font-size: 11px; color: var(--ac); font-family: 'IBM Plex Mono', monospace; opacity: 0; transition: opacity 0.3s; }
+.saved-msg.show { opacity: 1; }
+
+/* Lab rows */
+.lr-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+.lr-row input { flex: 1; min-width: 100px; }
+.lr-row select { flex: 1; min-width: 110px; }
+.lr-row button { background: transparent; border: 1px solid var(--rd); color: var(--rd); border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; white-space: nowrap; }
+.add-row-btn { background: transparent; border: 1px dashed var(--bd); color: var(--tx3); border-radius: 6px; padding: 8px 14px; cursor: pointer; font-size: 12px; margin-bottom: 10px; width: 100%; }
+.add-row-btn:hover { border-color: var(--ac); color: var(--ac); }
+
+/* Image URL rows */
+.img-url-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.img-url-row input { flex: 1; }
+.img-url-row button { background: transparent; border: 1px solid var(--rd); color: var(--rd); border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px; }
+
+/* Pill */
 .pill { font-size: 10px; padding: 2px 8px; border-radius: 100px; text-transform: uppercase; font-weight: 700; background: var(--bd); color: var(--tx2); }
 .pill.ac { border: 1px solid var(--ac); color: var(--ac); background: transparent; }
 .pill.fill { background: var(--ac); color: #000; }
 
+/* Entry action buttons */
+.entry-actions { display: flex; gap: 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--bd); }
+.act-btn { background: transparent; border: none; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; }
+.act-edit { color: var(--ac); }
+.act-delete { color: var(--rd); }
+
+/* Timeline entries */
+.tl-entry { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--bd); }
+.tl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.tl-dot.medical { background: var(--ac); }
+.tl-dot.loss { background: var(--rd); }
+.tl-dot.personal { background: #60a5fa; }
+.tl-date { font-size: 11px; color: var(--tx3); font-family: 'IBM Plex Mono', monospace; white-space: nowrap; min-width: 90px; }
+.tl-label { font-size: 13px; color: var(--tx2); flex: 1; }
+.tl-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.tl-act { background: transparent; border: none; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+
+/* Lab results table */
+.lab-panel { background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.lab-panel-h { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(90deg, var(--sf) 0%, var(--sf2) 100%); }
+.lab-panel-b { display: none; }
+.lab-panel.open .lab-panel-b { display: block; }
+.lab-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.lab-table th { padding: 8px 12px; text-align: left; color: var(--tx3); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--bd); font-family: 'IBM Plex Mono', monospace; }
+.lab-table td { padding: 8px 12px; border-bottom: 1px solid var(--bd); color: var(--tx2); }
+.lab-table td:first-child { color: var(--tx); font-weight: 500; }
+.flag { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; }
+.flag-H, .flag-Critical-High { background: rgba(255,100,0,0.2); color: #ff6400; }
+.flag-L, .flag-Critical-Low { background: rgba(96,165,250,0.2); color: #60a5fa; }
+.flag-Abnormal { background: rgba(0,204,68,0.2); color: var(--ac); }
+
+/* Portal messages */
+.pm-entry { background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.pm-h { padding: 12px 16px; cursor: pointer; background: linear-gradient(90deg, var(--sf) 0%, var(--sf2) 100%); }
+.pm-b { padding: 16px; display: none; border-top: 1px solid var(--bd); }
+.pm-entry.open .pm-b { display: block; }
+.pm-body { font-size: 13px; color: var(--tx2); line-height: 1.7; white-space: pre-wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--bd); }
+
+/* Dx timeline table */
+.dx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dx-table th { padding: 10px 12px; text-align: left; color: var(--ac); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--bd); font-family: 'IBM Plex Mono', monospace; }
+.dx-table td { padding: 9px 12px; border-bottom: 1px solid var(--bd); color: var(--tx2); vertical-align: top; }
+.dx-table td:first-child { color: var(--tx3); font-family: 'IBM Plex Mono', monospace; font-size: 11px; white-space: nowrap; }
+
 .empty-state { padding: 60px 0; text-align: center; color: var(--tx3); border: 1px dashed var(--bd); border-radius: 12px; }
+
+/* Edit modal overlay */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--sf); border: 1px solid var(--bd); width: 90%; max-width: 620px; border-radius: 12px; max-height: 90vh; overflow-y: auto; padding: 28px; }
+.modal-box h2 { font-size: 18px; font-weight: 700; color: var(--ac); font-family: 'Playfair Display', serif; margin-bottom: 18px; }
+.modal-acts { display: flex; gap: 10px; margin-top: 18px; }
+.modal-acts button { flex: 1; padding: 10px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+/* Search bar */
+.search-bar { margin-bottom: 16px; }
+.search-bar input { width: 100%; }
+
+/* Year spine */
+.yr-spine { position: relative; padding-left: 32px; }
+.yr-spine::before { content:''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--ac), transparent); opacity: 0.2; border-radius: 2px; }
+.yr-hdr { display: flex; align-items: center; gap: 10px; margin: 14px 0 10px; position: relative; }
+.yr-hdr::before { content:''; position: absolute; left: -27px; width: 12px; height: 12px; border-radius: 50%; background: var(--sf3); border: 2px solid var(--ac); z-index: 1; }
+.yr-hdr span { font-size: 18px; font-weight: 800; color: var(--ac); letter-spacing: -1px; font-family: monospace; padding: 2px 8px; background: rgba(0,204,68,0.06); border-radius: 4px; }
+
+/* Image strip */
+.img-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.img-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 1px solid var(--bd); }
+.img-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 300; display: flex; align-items: center; justify-content: center; }
+.img-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+.img-lightbox-close { position: absolute; top: 20px; right: 24px; color: #fff; font-size: 24px; cursor: pointer; }
 
 </style>
 </head>
 <body>
-
 <div class="app">
-    <!-- Sidebar -->
-    <div class="sb">
-        <div class="sb-h" onclick="showView('overview')">
-            <div class="logo">Killian</div>
-            <div style="font-size: 10px; color: var(--tx3); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">Patient Personal Archive</div>
+
+  <!-- Sidebar -->
+  <div class="sb">
+    <div class="sb-h" onclick="showView('overview')">
+      <div class="logo">Killian</div>
+      <div style="font-size:10px;color:var(--tx3);margin-top:4px;text-transform:uppercase;letter-spacing:1px;">Patient Personal Archive</div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-i" data-view="timeline" onclick="showView('timeline')">Timeline</div>
+      <div class="nav-i" data-view="visits" onclick="showView('visits')">Visits</div>
+      <div class="nav-i" data-view="labs" onclick="showView('labs')">Lab Results</div>
+      <div class="nav-i" data-view="imaging" onclick="showView('imaging')">Imaging</div>
+      <div class="nav-i" data-view="journal" onclick="showView('journal')">Symptom Journal</div>
+      <div class="nav-i" data-view="messages" onclick="showView('messages')">Portal Messages</div>
+      <div class="nav-i" data-view="dx" onclick="showView('dx')">Dx Timeline</div>
+    </div>
+    <div style="padding:16px;border-top:1px solid var(--bd)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;background:var(--sf2);border:1px solid var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ac);font-weight:bold;font-family:'Playfair Display';font-size:18px;">K</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;">Killian</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;">Patient #774-K</div>
         </div>
-        <div class="sb-nav">
-            <div class="nav-i" data-view="timeline" onclick="showView('timeline')">Timeline</div>
-            <div class="nav-i" data-view="visits" onclick="showView('visits')">Visits</div>
-            <div class="nav-i" data-view="labs" onclick="showView('labs')">Lab Results</div>
-            <div class="nav-i" data-view="imaging" onclick="showView('imaging')">Imaging</div>
-            <div class="nav-i" data-view="journal" onclick="showView('journal')">Symptom Journal</div>
-            <div class="nav-i" data-view="messages" onclick="showView('messages')">Portal Messages</div>
-            <div class="nav-i" data-view="dx" onclick="showView('dx')">Dx Timeline</div>
-        </div>
-        <div style="padding: 16px; border-top: 1px solid var(--bd);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 36px; height: 36px; background: var(--sf2); border: 1px solid var(--ac); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--ac); font-weight: bold; font-family: 'Playfair Display'; font-size: 18px;">K</div>
-                <div>
-                    <div style="font-weight: 600; font-size: 13px;">Killian</div>
-                    <div style="font-size: 10px; color: var(--tx3); text-transform: uppercase;">Patient #774-K</div>
-                </div>
-            </div>
-        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="bg-glow"></div>
+    <div class="tb">
+      <div id="status-text" style="font-weight:600;letter-spacing:0.5px;font-size:12px;color:var(--tx2);">SYSTEM: STABLE / UNRESTRICTED ACCESS</div>
+      <div class="user-id" id="view-indicator">LOC: DATA_NODE_01</div>
     </div>
 
-    <!-- Main -->
-    <div class="main">
-        <div class="bg-glow"></div>
-        <div class="tb">
-            <div id="status-text" style="font-weight: 600; letter-spacing: 0.5px; font-size: 12px; color: var(--tx2);">SYSTEM: STABLE / UNRESTRICTED ACCESS</div>
-            <div class="user-id" id="view-indicator">LOC: DATA_NODE_01</div>
+    <div class="content" id="main-scroll">
+
+      <!-- OVERVIEW -->
+      <div id="view-overview" class="view active">
+        <div style="margin-bottom:32px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;margin-bottom:4px;font-family:'Playfair Display',serif;">Patient Overview</h1>
+          <p style="color:var(--tx2);font-size:14px;">Master clinical summary and active care coordination.</p>
         </div>
-
-        <div class="content" id="main-scroll">
-
-            <!-- VIEW: OVERVIEW -->
-            <div id="view-overview" class="view active">
-                <div style="margin-bottom: 32px; border-left: 4px solid var(--ac); padding-left: 20px;">
-                    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 4px; font-family: 'Playfair Display', serif;">Patient Overview</h1>
-                    <p style="color: var(--tx2); font-size: 14px;">Master clinical summary and active care coordination.</p>
-                </div>
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-h">
-                            <div class="card-t">Current Diagnosis</div>
-                            <div class="pill ac">Confirmed</div>
-                        </div>
-                        <div class="card-v">—</div>
-                        <div class="card-sub">No diagnosis on file</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-h">
-                            <div class="card-t">Current Prescriptions</div>
-                            <div class="pill fill">0 Active</div>
-                        </div>
-                        <div class="card-v">—</div>
-                        <div class="card-sub">No medications on file</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-h">
-                            <div class="card-t">Primary Care Provider</div>
-                            <div class="pill">Lead Physician</div>
-                        </div>
-                        <div class="card-v" style="font-size: 16px;">—</div>
-                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--bd); display: flex; flex-direction: column; gap: 2px;">
-                            <div style="font-size: 11px; color: var(--tx2);">No provider on file</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="margin-top: 20px;">
-                    <h2 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--tx3); letter-spacing: 2px; margin-bottom: 16px;">Recent Timeline Activity</h2>
-                    <div id="recent-list"></div>
-                </div>
+        <div class="grid">
+          <div class="card">
+            <div class="card-h"><div class="card-t">Current Diagnosis</div><div class="pill ac">Confirmed</div></div>
+            <div class="card-v">Post-Viral Autonomic Dysfunction (Dysautonomia)</div>
+            <div class="card-sub">ICD-10: G90.9 · Last Verified 10.15.25</div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div class="card-t">Current Prescriptions</div><div class="pill fill">4 Active</div></div>
+            <div class="card-v">Ivabradine, Pyridostigmine, Fludrocortisone, LDN</div>
+            <div class="card-sub">Refills Available: 2 · Next Sync 11.02.25</div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div class="card-t">Primary Care Provider</div><div class="pill">Lead Physician</div></div>
+            <div class="card-v" style="font-size:16px;">Dr. Sterling Thorne</div>
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:2px;">
+              <div style="font-size:11px;color:var(--tx2);">1200 Medical Center Dr, Suite 400</div>
+              <div style="font-size:11px;color:var(--tx2);">P: (555) 012-9844 · F: (555) 012-9845</div>
             </div>
-
-            <!-- DYNAMIC VIEW TEMPLATE -->
-            <div id="view-dynamic" class="view">
-                <div style="margin-bottom: 32px; border-left: 4px solid var(--ac); padding-left: 20px;">
-                    <h1 id="view-title" style="font-size: 28px; font-weight: 700; margin-bottom: 4px; font-family: 'Playfair Display', serif;">Section</h1>
-                    <p id="view-desc" style="color: var(--tx2); font-size: 14px;">Description of section.</p>
-                </div>
-
-                <button class="add-btn" onclick="openModal()">
-                    <span style="font-size: 18px;">+</span> Add New Record
-                </button>
-
-                <div id="entry-list"></div>
-            </div>
-
+          </div>
         </div>
-    </div>
-</div>
+        <h2 style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--tx3);letter-spacing:2px;margin-bottom:16px;">Recent Activity</h2>
+        <div id="recent-list"></div>
+      </div>
 
-<!-- Modal for Input -->
-<div class="modal" id="modal">
-    <div class="modal-c">
-        <div class="modal-h" id="modal-title">New Entry</div>
-        <div class="modal-f">
-            <div>
-                <label>Date of Record</label>
-                <input type="date" id="f-date">
-            </div>
-            <div>
-                <label id="l-title">Title / Provider / Citation</label>
-                <input type="text" id="f-title" placeholder="e.g. Neurology Follow-up - Dr. Smith">
-            </div>
-            <div>
-                <label id="l-cat">Category / Type</label>
-                <input type="text" id="f-cat" placeholder="e.g. Routine Visit, Blood Work, MRI">
-            </div>
-            <div>
-                <label id="l-sum">Summary / Clinical Argument</label>
-                <input type="text" id="f-sum" placeholder="Brief one-liner summary">
-            </div>
-            <div>
-                <label id="l-desc">Findings / Description</label>
-                <textarea id="f-desc" rows="4" placeholder="Main detailed findings..."></textarea>
-            </div>
-            <div>
-                <label id="l-det">Relevance / Detailed Notes</label>
-                <textarea id="f-det" rows="3" placeholder="Additional context or patient relevance..."></textarea>
-            </div>
-            <div>
-                <label>Reference Link (URL)</label>
-                <input type="url" id="f-lnk" placeholder="https://portal-link.com/results/...">
-            </div>
+      <!-- TIMELINE -->
+      <div id="view-timeline" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Timeline</h1>
+          <p style="color:var(--tx2);font-size:14px;">Chronological history of all medical events.</p>
         </div>
-        <div class="btn-group">
-            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-            <button class="btn-save" onclick="saveEntry()">Save Record</button>
+        <button class="add-btn" onclick="toggleForm('form-timeline')"><span style="font-size:18px;">+</span> Add Event</button>
+        <div class="add-form" id="form-timeline">
+          <h3>New Timeline Event</h3>
+          <div class="ir">
+            <input type="date" id="tl-d" style="min-width:155px;">
+            <select id="tl-t" style="flex:1;">
+              <option value="medical">Medical</option>
+              <option value="loss">Loss / Death</option>
+              <option value="personal">Personal</option>
+            </select>
+            <input id="tl-lb" placeholder="What happened" style="flex:2;">
+          </div>
+          <div class="save-row">
+            <button class="btn-save" onclick="saveTL()">Save Event</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-timeline')">Cancel</button>
+            <span class="saved-msg" id="sv-tl">Saved</span>
+          </div>
         </div>
-    </div>
+        <div id="tl-list"></div>
+      </div>
+
+      <!-- VISITS -->
+      <div id="view-visits" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Medical Visits</h1>
+          <p style="color:var(--tx2);font-size:14px;">Encounters with healthcare providers.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-visits')"><span style="font-size:18px;">+</span> Add New Visit</button>
+        <div class="add-form" id="form-visits">
+          <h3>New Visit</h3>
+          <div class="ir">
+            <input type="date" id="v-d" style="min-width:155px;">
+            <input id="v-t" placeholder="Type / Reason" style="flex:1;">
+          </div>
+          <div class="ir">
+            <input id="v-f" placeholder="Facility" style="flex:1;">
+            <input id="v-dr" placeholder="Provider(s)" style="flex:1;">
+          </div>
+          <textarea class="fi" id="v-dn" rows="3" placeholder="Physician notes / reports"></textarea>
+          <textarea class="fi" id="v-lb" rows="2" placeholder="Labs"></textarea>
+          <textarea class="fi" id="v-im" rows="2" placeholder="Imaging / Diagnostics"></textarea>
+          <input class="fi" id="v-vt" placeholder="Vitals">
+          <textarea class="fi" id="v-mx" rows="2" placeholder="Medications"></textarea>
+          <textarea class="fi" id="v-dx" rows="2" placeholder="Diagnosis"></textarea>
+          <input class="fi" id="v-mr" placeholder="Medical records info">
+          <textarea class="fi" id="v-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+          <div class="save-row">
+            <button class="btn-save" onclick="saveVisit()">Save Visit</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-visits')">Cancel</button>
+            <span class="saved-msg" id="sv-v">Saved</span>
+          </div>
+        </div>
+        <div class="search-bar"><input id="v-search" placeholder="Search visits..." oninput="renderVisits()"></div>
+        <div id="v-list"></div>
+      </div>
+
+      <!-- LAB RESULTS -->
+      <div id="view-labs" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Lab Results</h1>
+          <p style="color:var(--tx2);font-size:14px;">Diagnostic laboratory testing and blood work.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-labs')"><span style="font-size:18px;">+</span> Add Lab Panel</button>
+        <div class="add-form" id="form-labs">
+          <h3>New Lab Panel</h3>
+          <div class="ir">
+            <input type="date" id="lr-d" style="min-width:155px;">
+            <input id="lr-src" placeholder="Facility / Lab source" style="flex:1;">
+          </div>
+          <div class="lbl" style="margin-bottom:8px;">Individual Results</div>
+          <div id="lr-rows"></div>
+          <button class="add-row-btn" onclick="addLRRow()">+ Add Result Row</button>
+          <div class="form-row">
+            <label>Panel Notes</label>
+            <textarea id="lr-notes" rows="2" placeholder="e.g. Fasting sample, drawn during admission..."></textarea>
+          </div>
+          <div class="save-row">
+            <button class="btn-save" onclick="saveLR()">Save Panel</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-labs')">Cancel</button>
+            <span class="saved-msg" id="sv-lr">Saved</span>
+          </div>
+        </div>
+        <div class="search-bar"><input id="lr-search" placeholder="Search lab results..." oninput="renderLabs()"></div>
+        <div id="lr-list"></div>
+      </div>
+
+      <!-- IMAGING -->
+      <div id="view-imaging" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Imaging Records</h1>
+          <p style="color:var(--tx2);font-size:14px;">MRI, CT, X-Ray and radiological documentation.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-imaging')"><span style="font-size:18px;">+</span> Add Imaging Report</button>
+        <div class="add-form" id="form-imaging">
+          <h3>New Imaging Report</h3>
+          <div class="ir">
+            <input type="date" id="i-d" style="min-width:155px;">
+            <input id="i-t" placeholder="Type (CT Head, MRI Brain...)" style="flex:1;">
+          </div>
+          <div class="ir">
+            <input id="i-f" placeholder="Facility" style="flex:1;">
+            <input id="i-dr" placeholder="Radiologist" style="flex:1;">
+          </div>
+          <textarea class="fi" id="i-rpt" rows="5" placeholder="Full imaging report"></textarea>
+          <textarea class="fi" id="i-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+          <div class="lbl" style="margin-bottom:4px;">Images (Google Drive links)</div>
+          <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">In Drive: right-click → Share → Copy link. Paste below.</div>
+          <div id="i-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('i-imgs-wrap')">+ Add Image URL</button>
+          <div class="save-row">
+            <button class="btn-save" onclick="saveImaging()">Save Report</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-imaging')">Cancel</button>
+            <span class="saved-msg" id="sv-i">Saved</span>
+          </div>
+        </div>
+        <div id="i-list"></div>
+      </div>
+
+      <!-- SYMPTOM JOURNAL -->
+      <div id="view-journal" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Symptom Journal</h1>
+          <p style="color:var(--tx2);font-size:14px;">Patient-reported symptoms, flare-ups, and observations.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-journal')"><span style="font-size:18px;">+</span> Add Entry</button>
+        <div class="add-form" id="form-journal">
+          <h3>New Journal Entry</h3>
+          <div class="ir">
+            <input type="date" id="j-d" style="min-width:155px;">
+            <input type="time" id="j-tm" style="min-width:120px;">
+            <select id="j-c" style="flex:1;">
+              <option>Cognitive</option><option>Neurological</option><option>Migraine</option>
+              <option>Sleep</option><option>Autonomic</option><option>Cardiac</option>
+              <option>Vascular</option><option>Hematological</option><option>Musculoskeletal</option>
+              <option>Pain</option><option>Weakness</option><option>Injury</option>
+              <option>Lungs</option><option>Sinus</option><option>ENT</option>
+              <option>GI</option><option>Endocrine</option><option>Metabolic</option>
+              <option>Immune</option><option>Lymphatic</option><option>Psychological</option>
+              <option>Fatigue</option><option>Renal</option><option>Reproductive</option>
+              <option>Dermatological</option><option>Ophthalmic</option><option>Dental</option>
+              <option>General</option>
+            </select>
+          </div>
+          <div class="lbl" style="margin-bottom:6px;">Weather &amp; Location</div>
+          <div class="ir" style="flex-wrap:wrap;">
+            <input id="j-loc" placeholder="Location (city, state)" style="flex:2;min-width:180px;">
+            <input id="j-temp-today" type="number" step="0.1" placeholder="Today temp (°F)" style="flex:1;min-width:130px;">
+            <input id="j-baro-today" type="number" step="0.01" placeholder="Today baro (inHg)" style="flex:1;min-width:140px;">
+            <input id="j-temp-prior" type="number" step="0.1" placeholder="Prior day temp (°F)" style="flex:1;min-width:140px;">
+            <input id="j-baro-prior" type="number" step="0.01" placeholder="Prior day baro (inHg)" style="flex:1;min-width:150px;">
+          </div>
+          <textarea class="fi" id="j-wx" rows="2" placeholder="Weather narrative (e.g. front moving in, pressure dropping...)"></textarea>
+          <textarea class="fi" id="j-tx" rows="5" placeholder="What is happening? Be specific."></textarea>
+          <div class="lbl" style="margin-bottom:4px;">Images (Google Drive links)</div>
+          <div id="j-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('j-imgs-wrap')">+ Add Image URL</button>
+          <div class="save-row">
+            <button class="btn-save" onclick="saveJournal()">Save Entry</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-journal')">Cancel</button>
+            <span class="saved-msg" id="sv-j">Saved</span>
+          </div>
+        </div>
+        <div class="search-bar" style="display:flex;gap:10px;">
+          <input id="j-search" placeholder="Search journal..." oninput="renderJournal()" style="flex:1;">
+          <select id="j-filter" onchange="renderJournal()" style="width:160px;">
+            <option value="">All Categories</option>
+            <option>Cognitive</option><option>Neurological</option><option>Migraine</option>
+            <option>Sleep</option><option>Autonomic</option><option>Cardiac</option>
+            <option>Vascular</option><option>Hematological</option><option>Musculoskeletal</option>
+            <option>Pain</option><option>Weakness</option><option>Injury</option>
+            <option>Lungs</option><option>Sinus</option><option>ENT</option>
+            <option>GI</option><option>Endocrine</option><option>Metabolic</option>
+            <option>Immune</option><option>Lymphatic</option><option>Psychological</option>
+            <option>Fatigue</option><option>Renal</option><option>Reproductive</option>
+            <option>Dermatological</option><option>Ophthalmic</option><option>Dental</option>
+            <option>General</option>
+          </select>
+        </div>
+        <div id="j-list" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- PORTAL MESSAGES -->
+      <div id="view-messages" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Portal Messages</h1>
+          <p style="color:var(--tx2);font-size:14px;">Communications between patient and clinical teams.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-messages')"><span style="font-size:18px;">+</span> Add Portal Message</button>
+        <div class="add-form" id="form-messages">
+          <h3>New Portal Message</h3>
+          <div class="ir" style="flex-wrap:wrap;">
+            <input type="date" id="pm-d" style="min-width:155px;">
+            <input id="pm-from" placeholder="From (name / role)" style="flex:1;">
+            <input id="pm-to" placeholder="To (name / role)" style="flex:1;">
+            <input id="pm-fac" placeholder="Facility / Portal" style="flex:1;">
+          </div>
+          <input class="fi" id="pm-subj" placeholder="Subject">
+          <textarea class="fi" id="pm-body" rows="5" placeholder="Message body"></textarea>
+          <div class="save-row">
+            <button class="btn-save" onclick="savePM()">Save Message</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-messages')">Cancel</button>
+            <span class="saved-msg" id="sv-pm">Saved</span>
+          </div>
+        </div>
+        <div class="search-bar"><input id="pm-search" placeholder="Search messages..." oninput="renderMessages()"></div>
+        <div id="pm-list"></div>
+      </div>
+
+      <!-- DX TIMELINE -->
+      <div id="view-dx" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Dx Timeline</h1>
+          <p style="color:var(--tx2);font-size:14px;">Progression and confirmation of clinical diagnoses.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-dx')"><span style="font-size:18px;">+</span> Add Diagnosis</button>
+        <div class="add-form" id="form-dx">
+          <h3>New Diagnosis Entry</h3>
+          <div class="ir">
+            <input type="date" id="dx-d" style="min-width:155px;">
+            <input id="dx-name" placeholder="Diagnosis name" style="flex:2;">
+            <input id="dx-code" placeholder="ICD-10 / SNOMED code" style="flex:1;">
+          </div>
+          <div class="ir">
+            <input id="dx-status" placeholder="Status (Confirmed, Suspected, Ruled Out...)" style="flex:1;">
+            <input id="dx-provider" placeholder="Diagnosing provider" style="flex:1;">
+          </div>
+          <textarea class="fi" id="dx-notes" rows="3" placeholder="Clinical notes, evidence, context..."></textarea>
+          <div class="save-row">
+            <button class="btn-save" onclick="saveDX()">Save Diagnosis</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-dx')">Cancel</button>
+            <span class="saved-msg" id="sv-dx">Saved</span>
+          </div>
+        </div>
+        <div class="search-bar"><input id="dx-search" placeholder="Search diagnoses..." oninput="renderDX()"></div>
+        <div id="dx-list"></div>
+      </div>
+
+    </div><!-- end .content -->
+  </div><!-- end .main -->
+</div><!-- end .app -->
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <div id="edit-modal-body"></div>
+  </div>
 </div>
 
 <script>
-    let currentView = 'overview';
-    let editingId = null;
-    let entries = JSON.parse(localStorage.getItem('killian_records')) || [];
+// ─── Storage ───────────────────────────────────────────────────────────────
+const KEY = 'killian_records';
+function load() { return JSON.parse(localStorage.getItem(KEY)) || {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]}; }
+function save(data) { localStorage.setItem(KEY, JSON.stringify(data)); }
 
-    const views = {
-        overview: { title: "Patient Overview", desc: "Master clinical summary and active care coordination." },
-        timeline: { title: "Complete Timeline", desc: "Chronological history of all documented medical events.", labelTitle: "Event Title", labelCat: "Event Type" },
-        visits: { title: "Medical Visits", desc: "Encounters with healthcare providers and clinical consultations.", labelTitle: "Provider / Clinic", labelCat: "Visit Type" },
-        labs: { title: "Lab Results", desc: "Diagnostic laboratory testing, blood work, and pathology reports.", labelTitle: "Test Name", labelCat: "Lab Category" },
-        imaging: { title: "Imaging Records", desc: "Radiological findings including MRI, CT, and X-Ray documentation.", labelTitle: "Study Name", labelCat: "Imaging Type" },
-        journal: { title: "Symptom Journal", desc: "Patient-reported symptoms, flare-ups, and daily observations.", labelTitle: "Symptom Cluster", labelCat: "Severity Level" },
-        messages: { title: "Portal Messages", desc: "Direct communications between patient and clinical teams.", labelTitle: "Recipient/Sender", labelCat: "Subject" },
-        dx: { title: "Dx Timeline", desc: "The progression and confirmation of clinical diagnoses.", labelTitle: "Diagnosis Name", labelCat: "Verification Status" }
-    };
+// ─── Navigation ────────────────────────────────────────────────────────────
+let currentView = 'overview';
 
-    function showView(viewId) {
-        currentView = viewId;
+function showView(v) {
+    currentView = v;
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-i').forEach(el => el.classList.remove('active'));
+    const nav = document.querySelector(`[data-view="${v}"]`);
+    if (nav) nav.classList.add('active');
+    document.getElementById('view-indicator').textContent = `LOC: ${v.toUpperCase()}_SECTION`;
+    document.getElementById('main-scroll').scrollTop = 0;
+    const viewEl = document.getElementById('view-' + v);
+    if (viewEl) viewEl.classList.add('active');
+    const renders = { overview: renderOverview, timeline: renderTimeline, visits: renderVisits, labs: renderLabs, imaging: renderImaging, journal: renderJournal, messages: renderMessages, dx: renderDX };
+    if (renders[v]) renders[v]();
+}
 
-        document.querySelectorAll('.nav-i').forEach(i => i.classList.remove('active'));
-        const nav = document.querySelector(`[data-view="${viewId}"]`);
-        if(nav) nav.classList.add('active');
+// ─── Form toggle ───────────────────────────────────────────────────────────
+function toggleForm(id) {
+    const f = document.getElementById(id);
+    f.classList.toggle('open');
+}
 
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+function flash(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2500);
+}
 
-        const indicator = document.getElementById('view-indicator');
-        indicator.textContent = `LOC: ${viewId.toUpperCase()}_SECTION`;
+function setStatus(msg) {
+    const el = document.getElementById('status-text');
+    el.textContent = msg;
+    setTimeout(() => el.textContent = 'SYSTEM: STABLE / UNRESTRICTED ACCESS', 3000);
+}
 
-        if (viewId === 'overview') {
-            document.getElementById('view-overview').classList.add('active');
-            renderRecent();
-        } else {
-            const dynamic = document.getElementById('view-dynamic');
-            dynamic.classList.add('active');
-            document.getElementById('view-title').textContent = views[viewId].title;
-            document.getElementById('view-desc').textContent = views[viewId].desc;
+// ─── Image helpers ─────────────────────────────────────────────────────────
+function addImgRow(wrapId) {
+    const wrap = document.getElementById(wrapId);
+    const row = document.createElement('div');
+    row.className = 'img-url-row';
+    row.innerHTML = '<input placeholder="Paste Google Drive share link"><button onclick="this.parentNode.remove()">remove</button>';
+    wrap.appendChild(row);
+    row.querySelector('input').focus();
+}
 
-            document.getElementById('l-title').textContent = views[viewId].labelTitle || "Title / Citation";
-            document.getElementById('l-cat').textContent = views[viewId].labelCat || "Category";
+function collectImgs(wrapId) {
+    const wrap = document.getElementById(wrapId);
+    if (!wrap) return [];
+    return [...wrap.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
+}
 
-            renderEntries(viewId);
-        }
-        document.getElementById('main-scroll').scrollTop = 0;
-    }
+function driveUrl(u) {
+    if (!u) return u;
+    const m = u.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    return m ? `https://drive.google.com/thumbnail?id=${m[1]}&sz=w800` : u;
+}
 
-    function generateEntryHTML(e) {
-        return `
-            <div class="entry" data-id="${e.id}">
-                <div class="entry-h" onclick="this.parentElement.classList.toggle('open')">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <div style="width: 2px; height: 16px; background: var(--ac);"></div>
-                        <div class="entry-t">${e.title} <span style="font-size:11px; color:var(--tx3); font-weight:400; margin-left:8px;">${e.sum || ''}</span></div>
+function showImg(url) {
+    const lb = document.createElement('div');
+    lb.className = 'img-lightbox';
+    lb.innerHTML = `<span class="img-lightbox-close" onclick="this.parentNode.remove()">&#10005;</span><img src="${url}" alt="Attachment">`;
+    lb.addEventListener('click', e => { if (e.target === lb) lb.remove(); });
+    document.body.appendChild(lb);
+}
+
+function imgStrip(imgs) {
+    if (!imgs || !imgs.length) return '';
+    return '<div class="img-strip">' + imgs.map(u => {
+        const d = driveUrl(u);
+        return `<img class="img-thumb" src="${esc(d)}" onclick="showImg('${esc(d)}')" onerror="this.style.display='none'">`;
+    }).join('') + '</div>';
+}
+
+// ─── Escape ────────────────────────────────────────────────────────────────
+function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : ''; }
+
+// ─── Year grouping ─────────────────────────────────────────────────────────
+function yrGroup(items, getDate) {
+    const byYear = {};
+    items.forEach(it => {
+        const yr = (getDate(it) || '').substring(0,4) || 'Unknown';
+        if (!byYear[yr]) byYear[yr] = [];
+        byYear[yr].push(it);
+    });
+    const years = Object.keys(byYear).filter(y => y !== 'Unknown').sort().reverse();
+    if (byYear['Unknown']) years.push('Unknown');
+    return { byYear, years };
+}
+
+function renderYrSpine(items, getDate, renderItem) {
+    if (!items.length) return '<div class="empty-state">No records yet.</div>';
+    const { byYear, years } = yrGroup(items, getDate);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(it => { h += renderItem(it); });
+    });
+    h += '</div>';
+    return h;
+}
+
+// ─── Edit modal ────────────────────────────────────────────────────────────
+function openEditModal(html) {
+    document.getElementById('edit-modal-body').innerHTML = html;
+    document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('open');
+}
+document.getElementById('edit-modal').addEventListener('click', e => { if (e.target === document.getElementById('edit-modal')) closeEditModal(); });
+
+// ══════════════════════════════════════════════════════════════════════════
+// TIMELINE
+// ══════════════════════════════════════════════════════════════════════════
+function saveTL() {
+    const d = document.getElementById('tl-d').value;
+    const lb = document.getElementById('tl-lb').value.trim();
+    if (!d || !lb) { alert('Date and description required'); return; }
+    const data = load();
+    data.timeline.push({ id: Date.now(), date: d, type: document.getElementById('tl-t').value, label: lb });
+    save(data);
+    document.getElementById('tl-lb').value = '';
+    flash('sv-tl');
+    setStatus('SYSTEM: EVENT SAVED');
+    renderTimeline();
+}
+
+function deleteTL(id) {
+    if (!confirm('Delete this event?')) return;
+    const data = load();
+    data.timeline = data.timeline.filter(e => e.id !== id);
+    save(data); renderTimeline();
+}
+
+function editTL(id) {
+    const data = load();
+    const e = data.timeline.find(x => x.id === id);
+    if (!e) return;
+    openEditModal(`
+        <h2>Edit Timeline Event</h2>
+        <div class="ir" style="margin-bottom:10px;">
+            <input type="date" id="etl-d" value="${esc(e.date)}" style="flex:1;">
+            <select id="etl-t" style="flex:1;">
+                <option value="medical" ${e.type==='medical'?'selected':''}>Medical</option>
+                <option value="loss" ${e.type==='loss'?'selected':''}>Loss / Death</option>
+                <option value="personal" ${e.type==='personal'?'selected':''}>Personal</option>
+            </select>
+        </div>
+        <textarea id="etl-lb" rows="3" style="width:100%;">${esc(e.label)}</textarea>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditTL(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditTL(id) {
+    const d = document.getElementById('etl-d').value;
+    const lb = document.getElementById('etl-lb').value.trim();
+    if (!d || !lb) { alert('Date and description required'); return; }
+    const data = load();
+    const idx = data.timeline.findIndex(x => x.id === id);
+    if (idx >= 0) { data.timeline[idx].date = d; data.timeline[idx].label = lb; data.timeline[idx].type = document.getElementById('etl-t').value; }
+    save(data); closeEditModal(); renderTimeline();
+}
+
+function renderTimeline() {
+    const data = load();
+    const list = [...data.timeline].sort((a,b) => b.date.localeCompare(a.date));
+    if (!list.length) { document.getElementById('tl-list').innerHTML = '<div class="empty-state">No events yet.</div>'; return; }
+    const { byYear, years } = yrGroup(list, e => e.date);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(e => {
+            h += `<div class="tl-entry">
+                <div class="tl-dot ${esc(e.type)}"></div>
+                <div class="tl-date">${esc(e.date)}</div>
+                <div class="tl-label">${esc(e.label)}</div>
+                <div class="tl-actions">
+                    <button class="tl-act act-edit" onclick="editTL(${e.id})">edit</button>
+                    <button class="tl-act act-delete" onclick="deleteTL(${e.id})">del</button>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('tl-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// VISITS
+// ══════════════════════════════════════════════════════════════════════════
+function saveVisit() {
+    const d = document.getElementById('v-d').value;
+    if (!d) { alert('Date required'); return; }
+    const data = load();
+    data.visits.push({
+        id: Date.now(), d,
+        t: document.getElementById('v-t').value,
+        f: document.getElementById('v-f').value,
+        dr: document.getElementById('v-dr').value,
+        dn: document.getElementById('v-dn').value,
+        lb: document.getElementById('v-lb').value,
+        im: document.getElementById('v-im').value,
+        vt: document.getElementById('v-vt').value,
+        mx: document.getElementById('v-mx').value,
+        dx: document.getElementById('v-dx').value,
+        mr: document.getElementById('v-mr').value,
+        nt: document.getElementById('v-nt').value
+    });
+    save(data);
+    ['v-t','v-f','v-dr','v-dn','v-lb','v-im','v-vt','v-mx','v-dx','v-mr','v-nt'].forEach(id => document.getElementById(id).value = '');
+    flash('sv-v'); setStatus('SYSTEM: VISIT SAVED'); renderVisits();
+}
+
+function deleteVisit(id) {
+    if (!confirm('Delete this visit?')) return;
+    const data = load(); data.visits = data.visits.filter(v => v.id !== id); save(data); renderVisits();
+}
+
+function editVisit(id) {
+    const data = load();
+    const v = data.visits.find(x => x.id === id);
+    if (!v) return;
+    const g = k => esc(v[k] || '');
+    openEditModal(`
+        <h2>Edit Visit</h2>
+        <div class="ir"><input type="date" id="ev-d" value="${g('d')}" style="flex:1;"><input id="ev-t" value="${g('t')}" placeholder="Type/Reason" style="flex:1;"></div>
+        <div class="ir"><input id="ev-f" value="${g('f')}" placeholder="Facility" style="flex:1;"><input id="ev-dr" value="${g('dr')}" placeholder="Provider(s)" style="flex:1;"></div>
+        <label>Physician Notes / Reports</label><textarea class="fi" id="ev-dn" rows="3">${g('dn')}</textarea>
+        <label>Labs</label><textarea class="fi" id="ev-lb" rows="2">${g('lb')}</textarea>
+        <label>Imaging / Diagnostics</label><textarea class="fi" id="ev-im" rows="2">${g('im')}</textarea>
+        <label>Vitals</label><input class="fi" id="ev-vt" value="${g('vt')}">
+        <label>Medications</label><textarea class="fi" id="ev-mx" rows="2">${g('mx')}</textarea>
+        <label>Diagnosis</label><textarea class="fi" id="ev-dx" rows="2">${g('dx')}</textarea>
+        <label>Medical Records Info</label><input class="fi" id="ev-mr" value="${g('mr')}">
+        <label>Your Notes</label><textarea class="fi" id="ev-nt" rows="2">${g('nt')}</textarea>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditVisit(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditVisit(id) {
+    const data = load();
+    const idx = data.visits.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    const fields = ['d','t','f','dr','dn','lb','im','vt','mx','dx','mr','nt'];
+    fields.forEach(k => { data.visits[idx][k] = document.getElementById('ev-' + k).value; });
+    save(data); closeEditModal(); renderVisits();
+}
+
+function renderVisits() {
+    const q = (document.getElementById('v-search')?.value || '').toLowerCase();
+    const data = load();
+    let list = [...data.visits].sort((a,b) => b.d.localeCompare(a.d));
+    if (q) list = list.filter(v => Object.values(v).join(' ').toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('v-list').innerHTML = '<div class="empty-state">No visits found.</div>'; return; }
+    const { byYear, years } = yrGroup(list, v => v.d);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach((v, i) => {
+            const idx = list.indexOf(v);
+            const secs = [];
+            if (v.dn) secs.push(['Physician Notes / Reports', v.dn, 'sc-notes']);
+            if (v.lb) secs.push(['Labs', v.lb, 'sc-labs']);
+            if (v.im) secs.push(['Imaging / Diagnostics', v.im, 'sc-imaging']);
+            if (v.vt) secs.push(['Vitals', v.vt, 'sc-vitals']);
+            if (v.mx) secs.push(['Medications', v.mx, 'sc-meds']);
+            if (v.dx) secs.push(['Diagnosis', v.dx, 'sc-dx']);
+            if (v.mr) secs.push(['Medical Records', v.mr, 'sc-records']);
+            if (v.nt) secs.push(['Your Notes', v.nt, 'sc-patient']);
+            const uid = `vc${yr}${v.id}`;
+            h += `<div class="entry" id="${uid}">
+                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div class="entry-t">${esc(v.t || 'Visit')} ${v.dr || v.f ? `<span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:8px;">${esc(v.dr || '')}${v.dr && v.f ? ' · ' : ''}${esc(v.f || '')}</span>` : ''}</div>
                     </div>
-                    <div class="entry-d">${formatDate(e.date)} ${currentView === 'overview' || currentView === 'timeline' ? `· ${e.type.toUpperCase()}` : ''}</div>
+                    <div class="entry-d">${esc(v.d)}</div>
                 </div>
                 <div class="entry-b">
-                    <div class="field-grid">
-                        <div class="field"><div class="f-label">Findings / Description</div><div class="f-value">${e.desc || 'None'}</div></div>
-                        <div class="field"><div class="f-label">Relevance / Notes</div><div class="f-value">${e.det || 'None'}</div></div>
-                        <div class="field"><div class="f-label">Type / Category</div><div class="f-value">${e.cat}</div></div>
-                        <div class="field">
-                            <div class="f-label">Reference</div>
-                            ${e.lnk ? `<a href="${e.lnk}" target="_blank" class="f-link">${e.lnk}</a>` : `<div class="f-value">No link provided</div>`}
-                        </div>
-                    </div>
+                    ${secs.map(([t, c]) => `<div class="sc-label">${t}</div><div class="f-value" style="margin-bottom:8px;">${esc(c)}</div>`).join('')}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="openModal(${e.id})">Edit Record</button>
-                        <button class="act-btn act-delete" onclick="deleteEntry(${e.id})">Delete Record</button>
+                        <button class="act-btn act-edit" onclick="editVisit(${v.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteVisit(${v.id})">Delete</button>
                     </div>
                 </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('v-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// LAB RESULTS
+// ══════════════════════════════════════════════════════════════════════════
+const LR_FLAGS = ['','High','Low','Critical High','Critical Low','Abnormal','Equivocal','Borderline','Reactive','Non-Reactive','Positive','Negative','Indeterminate','See Note'];
+
+function addLRRow() {
+    const wrap = document.getElementById('lr-rows');
+    const row = document.createElement('div');
+    row.className = 'lr-row';
+    row.innerHTML = `
+        <input placeholder="Test name" style="flex:2;">
+        <input placeholder="Result" style="flex:1;">
+        <input placeholder="Unit" style="flex:1;">
+        <input placeholder="Reference range" style="flex:1.5;">
+        <select style="flex:1;">${LR_FLAGS.map(f => `<option>${f}</option>`).join('')}</select>
+        <button onclick="this.parentNode.remove()">remove</button>`;
+    wrap.appendChild(row);
+    row.querySelector('input').focus();
+}
+
+function saveLR() {
+    const d = document.getElementById('lr-d').value;
+    if (!d) { alert('Date required'); return; }
+    const rows = [];
+    document.querySelectorAll('#lr-rows .lr-row').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const flag = row.querySelector('select').value;
+        const name = inputs[0].value.trim();
+        if (name) rows.push({ name, result: inputs[1].value.trim(), unit: inputs[2].value.trim(), ref: inputs[3].value.trim(), flag });
+    });
+    if (!rows.length) { alert('Add at least one result row'); return; }
+    const data = load();
+    data.labs.push({ id: Date.now(), date: d, source: document.getElementById('lr-src').value, notes: document.getElementById('lr-notes').value, rows });
+    save(data);
+    document.getElementById('lr-rows').innerHTML = '';
+    document.getElementById('lr-src').value = '';
+    document.getElementById('lr-notes').value = '';
+    flash('sv-lr'); setStatus('SYSTEM: LAB PANEL SAVED'); renderLabs();
+}
+
+function deleteLR(id) {
+    if (!confirm('Delete this lab panel?')) return;
+    const data = load(); data.labs = data.labs.filter(l => l.id !== id); save(data); renderLabs();
+}
+
+function renderLabs() {
+    const q = (document.getElementById('lr-search')?.value || '').toLowerCase();
+    const data = load();
+    let list = [...data.labs].sort((a,b) => b.date.localeCompare(a.date));
+    if (q) list = list.filter(l => (l.source + ' ' + l.notes + ' ' + l.rows.map(r => r.name + ' ' + r.result).join(' ')).toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('lr-list').innerHTML = '<div class="empty-state">No lab results yet.</div>'; return; }
+    const { byYear, years } = yrGroup(list, l => l.date);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(l => {
+            const uid = `lr${l.id}`;
+            const flagClass = f => f ? `flag flag-${f.replace(/\s+/g,'-')}` : '';
+            h += `<div class="lab-panel" id="${uid}">
+                <div class="lab-panel-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div>
+                            <div style="font-weight:600;font-size:13px;">Lab Panel — ${esc(l.source || 'Unknown Source')}</div>
+                            <div style="font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;">${l.rows.length} result${l.rows.length !== 1 ? 's' : ''}</div>
+                        </div>
+                    </div>
+                    <div class="entry-d">${esc(l.date)}</div>
+                </div>
+                <div class="lab-panel-b">
+                    <table class="lab-table">
+                        <thead><tr><th>Test</th><th>Result</th><th>Unit</th><th>Reference</th><th>Flag</th></tr></thead>
+                        <tbody>${l.rows.map(r => `<tr>
+                            <td>${esc(r.name)}</td>
+                            <td style="font-family:'IBM Plex Mono',monospace;">${esc(r.result)}</td>
+                            <td style="color:var(--tx3);">${esc(r.unit)}</td>
+                            <td style="color:var(--tx3);font-size:11px;">${esc(r.ref)}</td>
+                            <td>${r.flag ? `<span class="${flagClass(r.flag)}">${esc(r.flag)}</span>` : '—'}</td>
+                        </tr>`).join('')}</tbody>
+                    </table>
+                    ${l.notes ? `<div style="padding:12px 16px;font-size:12px;color:var(--tx3);border-top:1px solid var(--bd);">${esc(l.notes)}</div>` : ''}
+                    <div style="padding:10px 16px;border-top:1px solid var(--bd);">
+                        <button class="act-btn act-delete" onclick="deleteLR(${l.id})">Delete Panel</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('lr-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// IMAGING
+// ══════════════════════════════════════════════════════════════════════════
+function saveImaging() {
+    const d = document.getElementById('i-d').value;
+    const rpt = document.getElementById('i-rpt').value.trim();
+    if (!d || !rpt) { alert('Date and report required'); return; }
+    const imgs = collectImgs('i-imgs-wrap');
+    const data = load();
+    data.imaging.push({ id: Date.now(), date: d, type: document.getElementById('i-t').value, facility: document.getElementById('i-f').value, doctor: document.getElementById('i-dr').value, report: rpt, notes: document.getElementById('i-nt').value, imgs });
+    save(data);
+    ['i-t','i-f','i-dr','i-rpt','i-nt'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('i-imgs-wrap').innerHTML = '';
+    flash('sv-i'); setStatus('SYSTEM: IMAGING SAVED'); renderImaging();
+}
+
+function deleteImaging(id) {
+    if (!confirm('Delete this imaging record?')) return;
+    const data = load(); data.imaging = data.imaging.filter(i => i.id !== id); save(data); renderImaging();
+}
+
+function editImaging(id) {
+    const data = load();
+    const v = data.imaging.find(x => x.id === id);
+    if (!v) return;
+    const existingImgs = (v.imgs || []).map((u, i) => `<div class="img-url-row"><input id="ei-img-${i}" value="${esc(u)}" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    const g = k => esc(v[k] || '');
+    openEditModal(`
+        <h2>Edit Imaging Report</h2>
+        <div class="ir"><input type="date" id="ei-d" value="${g('date')}" style="flex:1;"><input id="ei-t" value="${g('type')}" placeholder="Type" style="flex:1;"></div>
+        <div class="ir"><input id="ei-f" value="${g('facility')}" placeholder="Facility" style="flex:1;"><input id="ei-dr" value="${g('doctor')}" placeholder="Radiologist" style="flex:1;"></div>
+        <label>Full Report</label><textarea class="fi" id="ei-rpt" rows="6">${g('report')}</textarea>
+        <label>Your Notes</label><textarea class="fi" id="ei-nt" rows="3">${g('notes')}</textarea>
+        <label>Images (Google Drive links)</label>
+        <div id="ei-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('ei-imgs-wrap')">+ Add Image URL</button>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditImaging(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditImaging(id) {
+    const d = document.getElementById('ei-d').value;
+    const rpt = document.getElementById('ei-rpt').value.trim();
+    if (!d || !rpt) { alert('Date and report required'); return; }
+    const imgs = collectImgs('ei-imgs-wrap');
+    const data = load();
+    const idx = data.imaging.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    Object.assign(data.imaging[idx], { date: d, type: document.getElementById('ei-t').value, facility: document.getElementById('ei-f').value, doctor: document.getElementById('ei-dr').value, report: rpt, notes: document.getElementById('ei-nt').value, imgs });
+    save(data); closeEditModal(); renderImaging();
+}
+
+function renderImaging() {
+    const data = load();
+    const list = [...data.imaging].sort((a,b) => b.date.localeCompare(a.date));
+    if (!list.length) { document.getElementById('i-list').innerHTML = '<div class="empty-state">No imaging records yet.</div>'; return; }
+    const { byYear, years } = yrGroup(list, i => i.date);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(v => {
+            const uid = `im${v.id}`;
+            h += `<div class="entry" id="${uid}">
+                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div class="entry-t">${esc(v.type || 'Imaging')} <span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:8px;">${esc(v.facility || '')}</span></div>
+                    </div>
+                    <div class="entry-d">${esc(v.date)}</div>
+                </div>
+                <div class="entry-b">
+                    ${v.doctor ? `<div style="color:var(--tx3);font-size:12px;margin-bottom:10px;"><b>Radiologist:</b> ${esc(v.doctor)}</div>` : ''}
+                    <div class="sc-label">Full Report</div>
+                    <div class="f-value" style="margin-bottom:8px;">${esc(v.report)}</div>
+                    ${v.notes ? `<div class="sc-label">Your Notes</div><div class="f-value" style="margin-bottom:8px;">${esc(v.notes)}</div>` : ''}
+                    ${imgStrip(v.imgs)}
+                    <div class="entry-actions">
+                        <button class="act-btn act-edit" onclick="editImaging(${v.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteImaging(${v.id})">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('i-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// SYMPTOM JOURNAL
+// ══════════════════════════════════════════════════════════════════════════
+function saveJournal() {
+    const d = document.getElementById('j-d').value;
+    const tx = document.getElementById('j-tx').value.trim();
+    if (!d || !tx) { alert('Date and entry text required'); return; }
+    const imgs = collectImgs('j-imgs-wrap');
+    const entry = {
+        id: Date.now(), date: d,
+        time: document.getElementById('j-tm').value,
+        category: document.getElementById('j-c').value,
+        message: tx,
+        location: document.getElementById('j-loc').value.trim(),
+        wxNarrative: document.getElementById('j-wx').value.trim(),
+        imgs
+    };
+    const tt = document.getElementById('j-temp-today').value;
+    const bt = document.getElementById('j-baro-today').value;
+    const tp = document.getElementById('j-temp-prior').value;
+    const bp = document.getElementById('j-baro-prior').value;
+    if (tt !== '') entry.tempToday = parseFloat(tt);
+    if (bt !== '') entry.baroToday = parseFloat(bt);
+    if (tp !== '') entry.tempPrior = parseFloat(tp);
+    if (bp !== '') entry.baroPrior = parseFloat(bp);
+    const data = load();
+    data.journal.push(entry);
+    save(data);
+    ['j-tx','j-loc','j-wx'].forEach(id => document.getElementById(id).value = '');
+    ['j-temp-today','j-baro-today','j-temp-prior','j-baro-prior'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('j-imgs-wrap').innerHTML = '';
+    flash('sv-j'); setStatus('SYSTEM: ENTRY SAVED'); renderJournal();
+}
+
+function deleteJournal(id) {
+    if (!confirm('Delete this journal entry?')) return;
+    const data = load(); data.journal = data.journal.filter(j => j.id !== id); save(data); renderJournal();
+}
+
+function editJournal(id) {
+    const data = load();
+    const s = data.journal.find(x => x.id === id);
+    if (!s) return;
+    const cats = ['Cognitive','Neurological','Migraine','Sleep','Autonomic','Cardiac','Vascular','Hematological','Musculoskeletal','Pain','Weakness','Injury','Lungs','Sinus','ENT','GI','Endocrine','Metabolic','Immune','Lymphatic','Psychological','Fatigue','Renal','Reproductive','Dermatological','Ophthalmic','Dental','General'];
+    const catOpts = cats.map(c => `<option ${s.category === c ? 'selected' : ''}>${c}</option>`).join('');
+    const existingImgs = (s.imgs || []).map((u,i) => `<div class="img-url-row"><input id="ej-img-${i}" value="${esc(u)}" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    openEditModal(`
+        <h2>Edit Journal Entry</h2>
+        <div class="ir">
+            <input type="date" id="ej-d" value="${esc(s.date)}" style="flex:1;">
+            <input type="time" id="ej-tm" value="${esc(s.time||'')}" style="flex:1;">
+            <select id="ej-c" style="flex:1;">${catOpts}</select>
+        </div>
+        <label>Location</label><input class="fi" id="ej-loc" value="${esc(s.location||'')}">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div><label>Today Temp (°F)</label><input id="ej-tt" type="number" step="0.1" value="${s.tempToday != null ? s.tempToday : ''}"></div>
+            <div><label>Today Baro (inHg)</label><input id="ej-bt" type="number" step="0.01" value="${s.baroToday != null ? s.baroToday : ''}"></div>
+            <div><label>Prior Temp (°F)</label><input id="ej-tp" type="number" step="0.1" value="${s.tempPrior != null ? s.tempPrior : ''}"></div>
+            <div><label>Prior Baro (inHg)</label><input id="ej-bp" type="number" step="0.01" value="${s.baroPrior != null ? s.baroPrior : ''}"></div>
+        </div>
+        <label>Weather Narrative</label><textarea class="fi" id="ej-wx" rows="2">${esc(s.wxNarrative||'')}</textarea>
+        <label>Entry</label><textarea class="fi" id="ej-tx" rows="6">${esc(s.message)}</textarea>
+        <label>Images (Google Drive links)</label>
+        <div id="ej-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('ej-imgs-wrap')">+ Add Image URL</button>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditJournal(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditJournal(id) {
+    const d = document.getElementById('ej-d').value;
+    const tx = document.getElementById('ej-tx').value.trim();
+    if (!d || !tx) { alert('Date and entry required'); return; }
+    const imgs = collectImgs('ej-imgs-wrap');
+    const tt = document.getElementById('ej-tt').value;
+    const bt = document.getElementById('ej-bt').value;
+    const tp = document.getElementById('ej-tp').value;
+    const bp = document.getElementById('ej-bp').value;
+    const upd = {
+        date: d, time: document.getElementById('ej-tm').value,
+        category: document.getElementById('ej-c').value,
+        message: tx, location: document.getElementById('ej-loc').value.trim(),
+        wxNarrative: document.getElementById('ej-wx').value.trim(), imgs,
+        tempToday: tt !== '' ? parseFloat(tt) : null,
+        baroToday: bt !== '' ? parseFloat(bt) : null,
+        tempPrior: tp !== '' ? parseFloat(tp) : null,
+        baroPrior: bp !== '' ? parseFloat(bp) : null
+    };
+    const data = load();
+    const idx = data.journal.findIndex(x => x.id === id);
+    if (idx >= 0) Object.assign(data.journal[idx], upd);
+    save(data); closeEditModal(); renderJournal();
+}
+
+function renderJournal() {
+    const q = (document.getElementById('j-search')?.value || '').toLowerCase();
+    const cf = document.getElementById('j-filter')?.value || '';
+    const data = load();
+    let list = [...data.journal].sort((a,b) => (b.date + (b.time||'')).localeCompare(a.date + (a.time||'')));
+    if (q) list = list.filter(s => (s.message + s.date + (s.category||'') + (s.location||'')).toLowerCase().includes(q));
+    if (cf) list = list.filter(s => s.category === cf);
+    if (!list.length) { document.getElementById('j-list').innerHTML = '<div class="empty-state">No journal entries found.</div>'; return; }
+    const { byYear, years } = yrGroup(list, s => s.date);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(s => {
+            const wxParts = [];
+            if (s.location) wxParts.push(`<span style="color:var(--ac)">&#128205;</span> ${esc(s.location)}`);
+            if (s.tempToday != null || s.baroToday != null) { let td = 'Today:'; if (s.tempToday != null) td += ` ${s.tempToday}°F`; if (s.baroToday != null) td += ` / ${s.baroToday} inHg`; wxParts.push(td); }
+            if (s.tempPrior != null || s.baroPrior != null) { let pd = 'Prior:'; if (s.tempPrior != null) pd += ` ${s.tempPrior}°F`; if (s.baroPrior != null) pd += ` / ${s.baroPrior} inHg`; wxParts.push(pd); }
+            const wxHtml = wxParts.length ? `<div style="font-size:12px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin:4px 0;display:flex;flex-wrap:wrap;gap:12px;">${wxParts.map(p=>`<span>${p}</span>`).join('')}</div>` : '';
+            const wxNarHtml = s.wxNarrative ? `<div style="font-size:12px;color:var(--tx3);font-style:italic;margin-bottom:4px;">${esc(s.wxNarrative)}</div>` : '';
+            h += `<div class="entry open">
+                <div class="entry-h" onclick="this.parentElement.classList.toggle('open')">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div>
+                            <div class="entry-t">${esc(s.category || 'General')}</div>
+                            <div style="font-size:11px;color:var(--tx3);">${esc(s.date)}${s.time ? ' · ' + esc(s.time) : ''}</div>
+                        </div>
+                    </div>
+                    <div class="entry-d">${esc(s.date)}</div>
+                </div>
+                <div class="entry-b">
+                    ${wxHtml}${wxNarHtml}
+                    <div class="f-value" style="margin-top:8px;line-height:1.7;">${esc(s.message)}</div>
+                    ${imgStrip(s.imgs)}
+                    <div class="entry-actions">
+                        <button class="act-btn act-edit" onclick="editJournal(${s.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteJournal(${s.id})">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('j-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// PORTAL MESSAGES
+// ══════════════════════════════════════════════════════════════════════════
+function savePM() {
+    const d = document.getElementById('pm-d').value;
+    if (!d) { alert('Date required'); return; }
+    const data = load();
+    data.messages.push({
+        id: Date.now(), date: d,
+        from: document.getElementById('pm-from').value,
+        to: document.getElementById('pm-to').value,
+        facility: document.getElementById('pm-fac').value,
+        subject: document.getElementById('pm-subj').value,
+        body: document.getElementById('pm-body').value
+    });
+    save(data);
+    ['pm-from','pm-to','pm-fac','pm-subj','pm-body'].forEach(id => document.getElementById(id).value = '');
+    flash('sv-pm'); setStatus('SYSTEM: MESSAGE SAVED'); renderMessages();
+}
+
+function deletePM(id) {
+    if (!confirm('Delete this message?')) return;
+    const data = load(); data.messages = data.messages.filter(m => m.id !== id); save(data); renderMessages();
+}
+
+function editPM(id) {
+    const data = load();
+    const m = data.messages.find(x => x.id === id);
+    if (!m) return;
+    const g = k => esc(m[k] || '');
+    openEditModal(`
+        <h2>Edit Portal Message</h2>
+        <div class="ir" style="flex-wrap:wrap;">
+            <input type="date" id="epm-d" value="${g('date')}" style="min-width:155px;">
+            <input id="epm-from" value="${g('from')}" placeholder="From" style="flex:1;">
+            <input id="epm-to" value="${g('to')}" placeholder="To" style="flex:1;">
+            <input id="epm-fac" value="${g('facility')}" placeholder="Facility / Portal" style="flex:1;">
+        </div>
+        <label>Subject</label><input class="fi" id="epm-subj" value="${g('subject')}">
+        <label>Message Body</label><textarea class="fi" id="epm-body" rows="6">${g('body')}</textarea>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditPM(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditPM(id) {
+    const data = load();
+    const idx = data.messages.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    Object.assign(data.messages[idx], {
+        date: document.getElementById('epm-d').value,
+        from: document.getElementById('epm-from').value,
+        to: document.getElementById('epm-to').value,
+        facility: document.getElementById('epm-fac').value,
+        subject: document.getElementById('epm-subj').value,
+        body: document.getElementById('epm-body').value
+    });
+    save(data); closeEditModal(); renderMessages();
+}
+
+function renderMessages() {
+    const q = (document.getElementById('pm-search')?.value || '').toLowerCase();
+    const data = load();
+    let list = [...data.messages].sort((a,b) => b.date.localeCompare(a.date));
+    if (q) list = list.filter(m => (m.subject + ' ' + m.from + ' ' + m.to + ' ' + m.body + ' ' + m.facility).toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('pm-list').innerHTML = '<div class="empty-state">No portal messages yet.</div>'; return; }
+    let h = '';
+    list.forEach(m => {
+        const uid = `pm${m.id}`;
+        h += `<div class="pm-entry" id="${uid}">
+            <div class="pm-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <div style="font-weight:600;font-size:13px;">${esc(m.subject || '(No subject)')}</div>
+                        <div style="font-size:11px;color:var(--tx3);margin-top:3px;font-family:'IBM Plex Mono',monospace;">
+                            ${m.from ? `From: ${esc(m.from)}` : ''}${m.from && m.to ? ' → ' : ''}${m.to ? `To: ${esc(m.to)}` : ''}${m.facility ? ` · ${esc(m.facility)}` : ''}
+                        </div>
+                    </div>
+                    <div class="entry-d">${esc(m.date)}</div>
+                </div>
             </div>
-        `;
-    }
+            <div class="pm-b">
+                <div class="pm-body">${esc(m.body)}</div>
+                <div class="entry-actions">
+                    <button class="act-btn act-edit" onclick="editPM(${m.id})">Edit</button>
+                    <button class="act-btn act-delete" onclick="deletePM(${m.id})">Delete</button>
+                </div>
+            </div>
+        </div>`;
+    });
+    document.getElementById('pm-list').innerHTML = h;
+}
 
-    function renderRecent() {
-        const list = document.getElementById('recent-list');
-        const sorted = [...entries].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-        if (sorted.length === 0) {
-            list.innerHTML = `<div class="empty-state">No records yet. Navigate to a section and add the first entry.</div>`;
-            return;
+// ══════════════════════════════════════════════════════════════════════════
+// DX TIMELINE
+// ══════════════════════════════════════════════════════════════════════════
+function saveDX() {
+    const d = document.getElementById('dx-d').value;
+    const name = document.getElementById('dx-name').value.trim();
+    if (!d || !name) { alert('Date and diagnosis name required'); return; }
+    const data = load();
+    data.dx.push({
+        id: Date.now(), date: d, name,
+        code: document.getElementById('dx-code').value,
+        status: document.getElementById('dx-status').value,
+        provider: document.getElementById('dx-provider').value,
+        notes: document.getElementById('dx-notes').value
+    });
+    save(data);
+    ['dx-name','dx-code','dx-status','dx-provider','dx-notes'].forEach(id => document.getElementById(id).value = '');
+    flash('sv-dx'); setStatus('SYSTEM: DIAGNOSIS SAVED'); renderDX();
+}
+
+function deleteDX(id) {
+    if (!confirm('Delete this diagnosis?')) return;
+    const data = load(); data.dx = data.dx.filter(d => d.id !== id); save(data); renderDX();
+}
+
+function editDX(id) {
+    const data = load();
+    const d = data.dx.find(x => x.id === id);
+    if (!d) return;
+    const g = k => esc(d[k] || '');
+    openEditModal(`
+        <h2>Edit Diagnosis</h2>
+        <div class="ir">
+            <input type="date" id="edx-d" value="${g('date')}" style="flex:1;">
+            <input id="edx-name" value="${g('name')}" placeholder="Diagnosis name" style="flex:2;">
+            <input id="edx-code" value="${g('code')}" placeholder="ICD-10 code" style="flex:1;">
+        </div>
+        <div class="ir">
+            <input id="edx-status" value="${g('status')}" placeholder="Status" style="flex:1;">
+            <input id="edx-provider" value="${g('provider')}" placeholder="Provider" style="flex:1;">
+        </div>
+        <label>Notes</label><textarea class="fi" id="edx-notes" rows="4">${g('notes')}</textarea>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditDX(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditDX(id) {
+    const data = load();
+    const idx = data.dx.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    Object.assign(data.dx[idx], {
+        date: document.getElementById('edx-d').value,
+        name: document.getElementById('edx-name').value,
+        code: document.getElementById('edx-code').value,
+        status: document.getElementById('edx-status').value,
+        provider: document.getElementById('edx-provider').value,
+        notes: document.getElementById('edx-notes').value
+    });
+    save(data); closeEditModal(); renderDX();
+}
+
+function renderDX() {
+    const q = (document.getElementById('dx-search')?.value || '').toLowerCase();
+    const data = load();
+    let list = [...data.dx].sort((a,b) => b.date.localeCompare(a.date));
+    if (q) list = list.filter(d => (d.name + ' ' + d.code + ' ' + d.status + ' ' + d.notes).toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('dx-list').innerHTML = '<div class="empty-state">No diagnoses yet.</div>'; return; }
+    let h = '<table class="dx-table"><thead><tr><th>Date</th><th>Diagnosis</th><th>Code</th><th>Status</th><th>Provider</th><th></th></tr></thead><tbody>';
+    list.forEach(d => {
+        h += `<tr>
+            <td>${esc(d.date)}</td>
+            <td style="color:var(--tx);font-weight:500;">${esc(d.name)}${d.notes ? `<div style="font-size:11px;color:var(--tx3);margin-top:3px;font-weight:400;">${esc(d.notes)}</div>` : ''}</td>
+            <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">${esc(d.code)}</span></td>
+            <td><span class="pill ac">${esc(d.status || 'Confirmed')}</span></td>
+            <td style="font-size:12px;">${esc(d.provider)}</td>
+            <td style="white-space:nowrap;">
+                <button class="act-btn act-edit" onclick="editDX(${d.id})">Edit</button>
+                <button class="act-btn act-delete" style="margin-left:8px;" onclick="deleteDX(${d.id})">Del</button>
+            </td>
+        </tr>`;
+    });
+    h += '</tbody></table>';
+    document.getElementById('dx-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// OVERVIEW
+// ══════════════════════════════════════════════════════════════════════════
+function renderOverview() {
+    const data = load();
+    const all = [
+        ...data.visits.map(v => ({ date: v.d, label: v.t || 'Visit', type: 'visits', id: v.id })),
+        ...data.labs.map(l => ({ date: l.date, label: `Lab Panel — ${l.source || ''}`, type: 'labs', id: l.id })),
+        ...data.imaging.map(i => ({ date: i.date, label: i.type || 'Imaging', type: 'imaging', id: i.id })),
+        ...data.journal.map(j => ({ date: j.date, label: j.category || 'Journal', type: 'journal', id: j.id })),
+        ...data.messages.map(m => ({ date: m.date, label: m.subject || 'Message', type: 'messages', id: m.id })),
+        ...data.timeline.map(t => ({ date: t.date, label: t.label, type: 'timeline', id: t.id })),
+        ...data.dx.map(d => ({ date: d.date, label: d.name, type: 'dx', id: d.id }))
+    ].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 8);
+
+    if (!all.length) { document.getElementById('recent-list').innerHTML = '<div class="empty-state">No records yet. Start by adding a visit, lab result, or journal entry.</div>'; return; }
+    document.getElementById('recent-list').innerHTML = all.map(e => `
+        <div class="entry" style="cursor:pointer;" onclick="showView('${e.type}')">
+            <div class="entry-h">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                    <div class="entry-t">${esc(e.label)}</div>
+                </div>
+                <div class="entry-d">${esc(e.date)} · ${esc(e.type.toUpperCase())}</div>
+            </div>
+        </div>`).join('');
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+window.onload = () => {
+    // Migrate old format if needed
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+        const parsed = JSON.parse(raw);
+        // If old format was an array (the previous version stored an array)
+        if (Array.isArray(parsed)) {
+            const migrated = { visits:[], labs:[], imaging:[], journal:[], messages:[], timeline:[], dx:[] };
+            parsed.forEach(e => {
+                const type = e.type || 'visits';
+                if (migrated[type]) migrated[type].push(e);
+            });
+            save(migrated);
         }
-        list.innerHTML = sorted.map(e => generateEntryHTML(e)).join('');
     }
-
-    function renderEntries(type) {
-        const list = document.getElementById('entry-list');
-        const filtered = entries.filter(e => type === 'timeline' ? true : e.type === type)
-                                .sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        if (filtered.length === 0) {
-            list.innerHTML = `<div class="empty-state">No records found for ${views[type].title}. Click the button above to add one.</div>`;
-            return;
-        }
-
-        list.innerHTML = filtered.map(e => generateEntryHTML(e)).join('');
-    }
-
-    function openModal(id = null) {
-        document.getElementById('modal').classList.add('open');
-
-        if (id) {
-            editingId = id;
-            const e = entries.find(item => item.id === id);
-            document.getElementById('modal-title').textContent = `Edit Record`;
-            document.getElementById('f-date').value = e.date;
-            document.getElementById('f-title').value = e.title;
-            document.getElementById('f-cat').value = e.cat;
-            document.getElementById('f-sum').value = e.sum || '';
-            document.getElementById('f-desc').value = e.desc || '';
-            document.getElementById('f-det').value = e.det || '';
-            document.getElementById('f-lnk').value = e.lnk || '';
-        } else {
-            editingId = null;
-            document.getElementById('modal-title').textContent = `Add to ${views[currentView].title}`;
-            document.getElementById('f-date').valueAsDate = new Date();
-            ['f-title', 'f-cat', 'f-sum', 'f-desc', 'f-det', 'f-lnk'].forEach(id => document.getElementById(id).value = '');
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('modal').classList.remove('open');
-        editingId = null;
-    }
-
-    function saveEntry() {
-        const data = {
-            date: document.getElementById('f-date').value || new Date().toISOString().split('T')[0],
-            title: document.getElementById('f-title').value || "Untitled Record",
-            cat: document.getElementById('f-cat').value || "General",
-            sum: document.getElementById('f-sum').value,
-            desc: document.getElementById('f-desc').value,
-            det: document.getElementById('f-det').value,
-            lnk: document.getElementById('f-lnk').value
-        };
-
-        if (editingId) {
-            const index = entries.findIndex(e => e.id === editingId);
-            if (index !== -1) {
-                entries[index] = { ...entries[index], ...data };
-            }
-        } else {
-            const newEntry = {
-                id: Date.now(),
-                type: currentView === 'timeline' || currentView === 'overview' ? 'visits' : currentView,
-                ...data
-            };
-            entries.push(newEntry);
-        }
-
-        localStorage.setItem('killian_records', JSON.stringify(entries));
-        closeModal();
-        showView(currentView);
-
-        const status = document.getElementById('status-text');
-        status.textContent = editingId ? "SYSTEM: RECORD UPDATED" : "SYSTEM: RECORD SAVED";
-        setTimeout(() => status.textContent = "SYSTEM: STABLE / UNRESTRICTED ACCESS", 3000);
-    }
-
-    function deleteEntry(id) {
-        event.stopPropagation();
-        if(!confirm("Are you sure you want to permanently delete this record?")) return;
-        entries = entries.filter(e => e.id !== id);
-        localStorage.setItem('killian_records', JSON.stringify(entries));
-        showView(currentView);
-    }
-
-    function formatDate(d) {
-        if(!d) return "N/A";
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(d).toLocaleDateString(undefined, options).toUpperCase();
-    }
-
-    window.onload = () => showView('overview');
+    showView('overview');
+};
 </script>
-
 </body>
 </html>
