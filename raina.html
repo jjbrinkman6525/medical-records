@@ -277,12 +277,19 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 
   <!-- Sidebar -->
   <div class="sb">
-    <div class="sb-h" onclick="showView('overview')">
+    <div class="sb-h" onclick="showView('overview')" style="position:relative;">
+      <!-- Photo display -->
+      <div id="sb-photo-wrap" style="display:none;margin-bottom:10px;">
+        <img id="sb-photo" src="" alt="Patient photo"
+          style="width:72px;height:72px;object-fit:cover;border-radius:50%;border:2px solid var(--ac);box-shadow:0 0 12px var(--ac-glow);cursor:pointer;display:block;">
+      </div>
       <div class="logo">Raina</div>
+      <div id="sb-legal-name" style="font-size:11px;color:var(--tx2);margin-top:3px;font-family:'IBM Plex Sans',sans-serif;font-weight:500;display:none;"></div>
       <div style="font-size:10px;color:var(--tx3);margin-top:4px;text-transform:uppercase;letter-spacing:1px;">Patient Personal Archive</div>
+      <button onclick="event.stopPropagation();editPatientProfile()" style="position:absolute;top:12px;right:12px;background:transparent;border:1px solid var(--bd);color:var(--tx3);border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Edit</button>
     </div>
     <div class="sb-nav">
-      <div class="nav-i" onclick="window.location.href='index.html'">⌂ Home</div>
+      <div class="nav-i" onclick="window.location.href='index.html'">&#8962; Home</div>
       <div class="nav-i" data-view="timeline" onclick="showView('timeline')">Timeline</div>
       <div class="nav-i" data-view="visits" onclick="showView('visits')">Visits</div>
       <div class="nav-i" data-view="labs" onclick="showView('labs')">Lab Results</div>
@@ -629,6 +636,56 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 </div>
 
 <script>
+const PROFILE_KEY = 'raina_profile';
+function loadProfile() { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
+function saveProfile(p) { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
+
+function renderPatientProfile() {
+    const p = loadProfile();
+    const legalEl = document.getElementById('sb-legal-name');
+    const photoWrap = document.getElementById('sb-photo-wrap');
+    const photoEl = document.getElementById('sb-photo');
+    if (p.legal_name) {
+        legalEl.textContent = p.legal_name;
+        legalEl.style.display = 'block';
+    } else {
+        legalEl.style.display = 'none';
+    }
+    if (p.photo_url) {
+        const url = driveUrl(p.photo_url) || p.photo_url;
+        photoEl.src = url;
+        photoEl.onclick = () => showImg(url);
+        photoWrap.style.display = 'block';
+    } else {
+        photoWrap.style.display = 'none';
+    }
+}
+
+function editPatientProfile() {
+    const p = loadProfile();
+    openEditModal(`
+        <h2>Edit Patient Profile</h2>
+        <label>Full Legal Name</label>
+        <input class="fi" id="prof-legal" value="${esc(p.legal_name||'')}" placeholder="e.g. Raina Marie Sullivan">
+        <label>Photo (Google Drive or image URL)</label>
+        <input class="fi" id="prof-photo" value="${esc(p.photo_url||'')}" placeholder="Paste Google Drive share link or image URL">
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="savePatientProfile()">Save</button>
+        </div>`);
+}
+
+function savePatientProfile() {
+    const p = {
+        legal_name: document.getElementById('prof-legal').value.trim(),
+        photo_url: document.getElementById('prof-photo').value.trim()
+    };
+    saveProfile(p);
+    closeEditModal();
+    renderPatientProfile();
+    setStatus('SYSTEM: PROFILE UPDATED');
+}
+
 // ─── Storage ───────────────────────────────────────────────────────────────
 const KEY = 'raina_records';
 function load() { return JSON.parse(localStorage.getItem(KEY)) || {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]}; }
@@ -1481,6 +1538,12 @@ function renderPCPCard() {
         if (p.insurance_id) h += `<div style="font-size:11px;color:var(--tx2);font-family:'IBM Plex Mono',monospace;">ID: ${esc(p.insurance_id)}</div>`;
         if (p.insurance_group) h += `<div style="font-size:11px;color:var(--tx2);font-family:'IBM Plex Mono',monospace;">Group: ${esc(p.insurance_group)}</div>`;
         if (p.insurance_rx) h += `<div style="font-size:11px;color:var(--tx2);font-family:'IBM Plex Mono',monospace;">Rx BIN: ${esc(p.insurance_rx)}</div>`;
+        if (p.insurance_card_front || p.insurance_card_back) {
+            h += `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">`;
+            if (p.insurance_card_front) h += `<div><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Card Front</div><img src="${esc(driveUrl(p.insurance_card_front))}" onclick="showImg('${esc(driveUrl(p.insurance_card_front))}')" style="height:70px;border-radius:5px;border:1px solid var(--bd);cursor:pointer;" onerror="this.style.display='none'"></div>`;
+            if (p.insurance_card_back) h += `<div><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Card Back</div><img src="${esc(driveUrl(p.insurance_card_back))}" onclick="showImg('${esc(driveUrl(p.insurance_card_back))}')" style="height:70px;border-radius:5px;border:1px solid var(--bd);cursor:pointer;" onerror="this.style.display='none'"></div>`;
+            h += `</div>`;
+        }
         h += `</div>`;
     }
     h += `</div>`;
@@ -1512,6 +1575,10 @@ function editPCP() {
                 <div style="flex:1;"><label>Rx BIN (Pharmacy)</label><input id="pcp-ins-rx" value="${g('insurance_rx')}" placeholder="Rx BIN #"></div>
                 <div style="flex:1;"><label>Plan / Network</label><input id="pcp-ins-plan" value="${g('insurance_plan')}" placeholder="PPO, HMO, EPO..."></div>
             </div>
+            <label>Insurance Card — Front (Google Drive or image URL)</label>
+            <input class="fi" id="pcp-ins-front" value="${g('insurance_card_front')}" placeholder="Paste Google Drive share link or image URL">
+            <label>Insurance Card — Back (Google Drive or image URL)</label>
+            <input class="fi" id="pcp-ins-back" value="${g('insurance_card_back')}" placeholder="Paste Google Drive share link or image URL">
         </div>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
@@ -1530,7 +1597,9 @@ function saveEditPCPCard() {
         insurance_id: document.getElementById('pcp-ins-id').value.trim(),
         insurance_group: document.getElementById('pcp-ins-grp').value.trim(),
         insurance_rx: document.getElementById('pcp-ins-rx').value.trim(),
-        insurance_plan: document.getElementById('pcp-ins-plan').value.trim()
+        insurance_plan: document.getElementById('pcp-ins-plan').value.trim(),
+        insurance_card_front: document.getElementById('pcp-ins-front').value.trim(),
+        insurance_card_back: document.getElementById('pcp-ins-back').value.trim()
     };
     savePCP(pcp);
     closeEditModal();
@@ -1642,8 +1711,8 @@ window.onload = () => {
         }
     }
     showView('overview');
+    renderPatientProfile();
 };
 </script>
 </body>
 </html>
-
