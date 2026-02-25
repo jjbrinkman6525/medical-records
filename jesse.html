@@ -198,6 +198,78 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 .img-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
 .img-lightbox-close { position: absolute; top: 20px; right: 24px; color: #fff; font-size: 24px; cursor: pointer; }
 
+/* ── Mobile hamburger button ── */
+.mob-menu-btn { display: none; background: transparent; border: 1px solid var(--bd); color: var(--tx2); border-radius: 6px; padding: 6px 10px; font-size: 18px; cursor: pointer; line-height: 1; }
+
+/* ── Mobile overlay for sidebar ── */
+.sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; }
+.sb-overlay.open { display: block; }
+
+/* ── Mobile styles ── */
+@media (max-width: 768px) {
+    body { overflow: auto; height: auto; }
+    .app { flex-direction: column; height: auto; min-height: 100vh; }
+
+    /* Sidebar slides in as a drawer */
+    .sb {
+        position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
+        z-index: 100; transition: left 0.25s ease; overflow-y: auto;
+    }
+    .sb.mob-open { left: 0; }
+
+    /* Main takes full width */
+    .main { width: 100%; flex: none; min-height: 100vh; overflow: visible; }
+
+    /* Topbar */
+    .tb { padding: 0 16px; height: 56px; position: sticky; top: 0; z-index: 50; }
+    .mob-menu-btn { display: block; }
+    #status-text { font-size: 11px; display: none; }
+    .user-id { font-size: 10px; }
+
+    /* Content */
+    .content { padding: 16px; overflow: visible; flex: none; }
+
+    /* Overview grid */
+    .grid { grid-template-columns: 1fr; gap: 12px; }
+
+    /* Form rows stack on mobile */
+    .ir { flex-direction: column; gap: 8px; }
+    .ir input, .ir select { min-width: 0; width: 100%; }
+
+    /* Journal weather grid */
+    .ir[style*="flex-wrap"] { flex-direction: row; }
+
+    /* Lab table — horizontal scroll */
+    .lab-panel-b { overflow-x: auto; }
+    .lab-table { min-width: 500px; }
+
+    /* Dx table — horizontal scroll */
+    #dx-list { overflow-x: auto; }
+    .dx-table { min-width: 560px; }
+
+    /* Modal full screen on mobile */
+    .modal-box { width: 96%; max-height: 92vh; padding: 20px; border-radius: 10px; }
+
+    /* Edit modal weather grid */
+    .modal-box [style*="grid-template-columns:1fr 1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr !important; }
+
+    /* Search bar row for journal */
+    .search-bar[style*="display:flex"] { flex-direction: column; }
+
+    /* Save row wraps */
+    .save-row { flex-wrap: wrap; }
+
+    /* Reduce year spine indent on mobile */
+    .yr-spine { padding-left: 20px; }
+    .yr-hdr::before { left: -18px; }
+
+    /* Entry header wraps date below title */
+    .entry-h { flex-wrap: wrap; gap: 4px; }
+    .entry-d { margin-left: 0; }
+
+    /* Topbar status hidden, show only indicator */
+    .tb > div:first-child { display: none; }
+}
 </style>
 </head>
 <body>
@@ -209,8 +281,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
       <div class="logo">Jesse</div>
       <div style="font-size:10px;color:var(--tx3);margin-top:4px;text-transform:uppercase;letter-spacing:1px;">Patient Personal Archive</div>
     </div>
-   <div class="sb-nav">
-      <div class="nav-i" onclick="window.location.href='index.html'">⌂ Home</div>
+    <div class="sb-nav">
       <div class="nav-i" data-view="timeline" onclick="showView('timeline')">Timeline</div>
       <div class="nav-i" data-view="visits" onclick="showView('visits')">Visits</div>
       <div class="nav-i" data-view="labs" onclick="showView('labs')">Lab Results</div>
@@ -234,7 +305,10 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
   <div class="main">
     <div class="bg-glow"></div>
     <div class="tb">
-      <div id="status-text" style="font-weight:600;letter-spacing:0.5px;font-size:12px;color:var(--tx2);">SYSTEM: STABLE / UNRESTRICTED ACCESS</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="mob-menu-btn" onclick="toggleMobMenu()" aria-label="Menu">&#9776;</button>
+        <div id="status-text" style="font-weight:600;letter-spacing:0.5px;font-size:12px;color:var(--tx2);">SYSTEM: STABLE / UNRESTRICTED ACCESS</div>
+      </div>
       <div class="user-id" id="view-indicator">LOC: DATA_NODE_01</div>
     </div>
 
@@ -517,6 +591,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
   </div><!-- end .main -->
 </div><!-- end .app -->
 
+<!-- Mobile sidebar overlay -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeMobMenu()"></div>
+
 <!-- Edit Modal -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal-box">
@@ -530,11 +607,22 @@ const KEY = 'jesse_records';
 function load() { return JSON.parse(localStorage.getItem(KEY)) || {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]}; }
 function save(data) { localStorage.setItem(KEY, JSON.stringify(data)); }
 
+// ─── Mobile menu ───────────────────────────────────────────────────────────
+function toggleMobMenu() {
+    document.querySelector('.sb').classList.toggle('mob-open');
+    document.getElementById('sb-overlay').classList.toggle('open');
+}
+function closeMobMenu() {
+    document.querySelector('.sb').classList.remove('mob-open');
+    document.getElementById('sb-overlay').classList.remove('open');
+}
+
 // ─── Navigation ────────────────────────────────────────────────────────────
 let currentView = 'overview';
 
 function showView(v) {
     currentView = v;
+    closeMobMenu();
     document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-i').forEach(el => el.classList.remove('active'));
     const nav = document.querySelector(`[data-view="${v}"]`);
