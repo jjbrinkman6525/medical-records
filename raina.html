@@ -279,10 +279,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
   <div class="sb">
     <div class="sb-h" onclick="showView('overview')">
       <div class="logo">Raina</div>
-      <div style="font-size:10px;color:var(--tx3);margin-top:4px;text-transform:uppercase;letter-spacing:1px;">Avera Patient Identifier: IR00023626</div>
+      <div style="font-size:10px;color:var(--tx3);margin-top:4px;text-transform:uppercase;letter-spacing:1px;">Patient Personal Archive</div>
     </div>
     <div class="sb-nav">
-      <div class="nav-i" onclick="window.location.href='index.html'">⌂ Home</div>
       <div class="nav-i" data-view="timeline" onclick="showView('timeline')">Timeline</div>
       <div class="nav-i" data-view="visits" onclick="showView('visits')">Visits</div>
       <div class="nav-i" data-view="labs" onclick="showView('labs')">Lab Results</div>
@@ -317,30 +316,55 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 
       <!-- OVERVIEW -->
       <div id="view-overview" class="view active">
-        <div style="margin-bottom:32px;border-left:4px solid var(--ac);padding-left:20px;">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
           <h1 style="font-size:28px;font-weight:700;margin-bottom:4px;font-family:'Playfair Display',serif;">Patient Overview</h1>
           <p style="color:var(--tx2);font-size:14px;">Master clinical summary and active care coordination.</p>
         </div>
-        <div class="grid">
-          <div class="card">
-            <div class="card-h"><div class="card-t">Current Diagnosis</div><div class="pill ac">Confirmed</div></div>
-            <div class="card-v">Autism Spectrum Disorder</div>
-            <div class="card-sub">ICD-10 Code: F84.0</div>
-          </div>
-          <div class="card">
-            <div class="card-h"><div class="card-t">Current Prescriptions</div><div class="pill fill">4 Active</div></div>
-            <div class="card-v">None</div>
-            <div class="card-sub">Refills Available: None</div>
-          </div>
-          <div class="card">
-            <div class="card-h"><div class="card-t">Primary Care Provider</div><div class="pill">Lead Physician</div></div>
-            <div class="card-v" style="font-size:16px;">Dr. Jonathan T. Mochel, DO</div>
-            <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:2px;">
-              <div style="font-size:11px;color:var(--tx2);">400 22nd Ave Brookings, SD 57006</div>
-              <div style="font-size:11px;color:var(--tx2);">P: 605-697-9500 · F: 605-322-8200</div>
+
+        <!-- 4 Summary Cards -->
+        <div class="grid" style="margin-bottom:24px;" id="summary-cards">
+
+          <!-- Box 1: PCP — editable -->
+          <div class="card" id="card-pcp">
+            <div class="card-h">
+              <div class="card-t">Primary Care Provider</div>
+              <button onclick="editPCP()" style="background:transparent;border:1px solid var(--bd);color:var(--tx3);border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Edit</button>
             </div>
+            <div id="pcp-display"></div>
           </div>
+
+          <!-- Box 2: Prescriptions — auto from visits -->
+          <div class="card" id="card-rx">
+            <div class="card-h">
+              <div class="card-t">Current Prescriptions</div>
+              <div class="pill fill" id="rx-pill">—</div>
+            </div>
+            <div id="rx-display" class="card-v" style="font-size:13px;line-height:1.6;"></div>
+            <div id="rx-sub" class="card-sub"></div>
+          </div>
+
+          <!-- Box 3: Diagnoses — auto from visits -->
+          <div class="card" id="card-dx">
+            <div class="card-h">
+              <div class="card-t">Current Diagnoses</div>
+              <div class="pill ac" id="dx-pill">—</div>
+            </div>
+            <div id="dx-display" class="card-v" style="font-size:13px;line-height:1.6;"></div>
+            <div id="dx-sub" class="card-sub"></div>
+          </div>
+
+          <!-- Box 4: Allergies — auto from visits -->
+          <div class="card" id="card-al">
+            <div class="card-h">
+              <div class="card-t">Known Allergies</div>
+              <div class="pill" id="al-pill" style="background:rgba(255,77,77,0.15);color:#ff4d4d;border:1px solid rgba(255,77,77,0.3);">—</div>
+            </div>
+            <div id="al-display" class="card-v" style="font-size:13px;line-height:1.6;"></div>
+            <div id="al-sub" class="card-sub"></div>
+          </div>
+
         </div>
+
         <h2 style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--tx3);letter-spacing:2px;margin-bottom:16px;">Recent Activity</h2>
         <div id="recent-list"></div>
       </div>
@@ -395,6 +419,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           <input class="fi" id="v-vt" placeholder="Vitals">
           <textarea class="fi" id="v-mx" rows="2" placeholder="Medications"></textarea>
           <textarea class="fi" id="v-dx" rows="2" placeholder="Diagnosis"></textarea>
+          <textarea class="fi" id="v-al" rows="2" placeholder="Allergies (new or updated)"></textarea>
           <input class="fi" id="v-mr" placeholder="Medical records info">
           <textarea class="fi" id="v-nt" rows="2" placeholder="YOUR NOTES"></textarea>
           <div class="save-row">
@@ -827,11 +852,12 @@ function saveVisit() {
         vt: document.getElementById('v-vt').value,
         mx: document.getElementById('v-mx').value,
         dx: document.getElementById('v-dx').value,
+        al: document.getElementById('v-al').value,
         mr: document.getElementById('v-mr').value,
         nt: document.getElementById('v-nt').value
     });
     save(data);
-    ['v-t','v-f','v-dr','v-dn','v-lb','v-im','v-vt','v-mx','v-dx','v-mr','v-nt'].forEach(id => document.getElementById(id).value = '');
+    ['v-t','v-f','v-dr','v-dn','v-lb','v-im','v-vt','v-mx','v-dx','v-al','v-mr','v-nt'].forEach(id => document.getElementById(id).value = '');
     flash('sv-v'); setStatus('SYSTEM: VISIT SAVED'); renderVisits();
 }
 
@@ -855,6 +881,7 @@ function editVisit(id) {
         <label>Vitals</label><input class="fi" id="ev-vt" value="${g('vt')}">
         <label>Medications</label><textarea class="fi" id="ev-mx" rows="2">${g('mx')}</textarea>
         <label>Diagnosis</label><textarea class="fi" id="ev-dx" rows="2">${g('dx')}</textarea>
+        <label>Allergies</label><textarea class="fi" id="ev-al" rows="2">${g('al')}</textarea>
         <label>Medical Records Info</label><input class="fi" id="ev-mr" value="${g('mr')}">
         <label>Your Notes</label><textarea class="fi" id="ev-nt" rows="2">${g('nt')}</textarea>
         <div class="modal-acts">
@@ -867,7 +894,7 @@ function saveEditVisit(id) {
     const data = load();
     const idx = data.visits.findIndex(x => x.id === id);
     if (idx < 0) return;
-    const fields = ['d','t','f','dr','dn','lb','im','vt','mx','dx','mr','nt'];
+    const fields = ['d','t','f','dr','dn','lb','im','vt','mx','dx','al','mr','nt'];
     fields.forEach(k => { data.visits[idx][k] = document.getElementById('ev-' + k).value; });
     save(data); closeEditModal(); renderVisits();
 }
@@ -891,6 +918,7 @@ function renderVisits() {
             if (v.vt) secs.push(['Vitals', v.vt, 'sc-vitals']);
             if (v.mx) secs.push(['Medications', v.mx, 'sc-meds']);
             if (v.dx) secs.push(['Diagnosis', v.dx, 'sc-dx']);
+            if (v.al) secs.push(['Allergies', v.al, 'sc-meds']);
             if (v.mr) secs.push(['Medical Records', v.mr, 'sc-records']);
             if (v.nt) secs.push(['Your Notes', v.nt, 'sc-patient']);
             const uid = `vc${yr}${v.id}`;
@@ -1422,10 +1450,154 @@ function renderDX() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+// PCP (Primary Care Provider) — stored separately
+// ══════════════════════════════════════════════════════════════════════════
+const PCP_KEY = 'raina_pcp';
+
+function loadPCP() {
+    return JSON.parse(localStorage.getItem(PCP_KEY)) || {};
+}
+function savePCP(pcp) {
+    localStorage.setItem(PCP_KEY, JSON.stringify(pcp));
+}
+
+function renderPCPCard() {
+    const p = loadPCP();
+    const el = document.getElementById('pcp-display');
+    if (!el) return;
+    if (!p.name) {
+        el.innerHTML = `<div style="color:var(--tx3);font-size:12px;font-style:italic;">No provider on file. Click Edit to add.</div>`;
+        return;
+    }
+    let h = `<div class="card-v" style="font-size:15px;margin-bottom:6px;">${esc(p.name)}</div>`;
+    if (p.specialty) h += `<div style="font-size:11px;color:var(--tx3);margin-bottom:6px;">${esc(p.specialty)}</div>`;
+    h += `<div style="border-top:1px solid var(--bd);padding-top:8px;margin-top:4px;display:flex;flex-direction:column;gap:3px;">`;
+    if (p.address) h += `<div style="font-size:11px;color:var(--tx2);">&#128205; ${esc(p.address)}</div>`;
+    if (p.phone) h += `<div style="font-size:11px;color:var(--tx2);">P: ${esc(p.phone)}${p.fax ? ' &nbsp;·&nbsp; F: ' + esc(p.fax) : ''}</div>`;
+    if (p.insurance_name || p.insurance_id) {
+        h += `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--bd);">`;
+        if (p.insurance_name) h += `<div style="font-size:11px;color:var(--ac);font-weight:600;">&#127973; ${esc(p.insurance_name)}</div>`;
+        if (p.insurance_id) h += `<div style="font-size:11px;color:var(--tx2);font-family:'IBM Plex Mono',monospace;">ID: ${esc(p.insurance_id)}</div>`;
+        if (p.insurance_group) h += `<div style="font-size:11px;color:var(--tx2);font-family:'IBM Plex Mono',monospace;">Group: ${esc(p.insurance_group)}</div>`;
+        if (p.insurance_rx) h += `<div style="font-size:11px;color:var(--tx2);font-family:'IBM Plex Mono',monospace;">Rx BIN: ${esc(p.insurance_rx)}</div>`;
+        h += `</div>`;
+    }
+    h += `</div>`;
+    el.innerHTML = h;
+}
+
+function editPCP() {
+    const p = loadPCP();
+    const g = k => esc(p[k] || '');
+    openEditModal(`
+        <h2>Edit Primary Care Provider</h2>
+        <div class="ir">
+            <div style="flex:1;"><label>Doctor / Provider Name</label><input id="pcp-name" value="${g('name')}" placeholder="Dr. Jane Smith"></div>
+            <div style="flex:1;"><label>Specialty</label><input id="pcp-spec" value="${g('specialty')}" placeholder="Primary Care, Cardiology..."></div>
+        </div>
+        <label>Address</label><input class="fi" id="pcp-addr" value="${g('address')}" placeholder="1200 Medical Center Dr, Suite 400">
+        <div class="ir">
+            <div style="flex:1;"><label>Phone</label><input id="pcp-phone" value="${g('phone')}" placeholder="(555) 000-0000"></div>
+            <div style="flex:1;"><label>Fax</label><input id="pcp-fax" value="${g('fax')}" placeholder="(555) 000-0000"></div>
+        </div>
+        <div style="margin:16px 0 10px;padding-top:14px;border-top:1px solid var(--bd);">
+            <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">&#127973; Insurance Information</div>
+            <label>Insurance Provider Name</label><input class="fi" id="pcp-ins-name" value="${g('insurance_name')}" placeholder="Blue Cross Blue Shield, Aetna...">
+            <div class="ir">
+                <div style="flex:1;"><label>Member / Insurance ID</label><input id="pcp-ins-id" value="${g('insurance_id')}" placeholder="XYZ123456789"></div>
+                <div style="flex:1;"><label>Group Number</label><input id="pcp-ins-grp" value="${g('insurance_group')}" placeholder="Group #"></div>
+            </div>
+            <div class="ir">
+                <div style="flex:1;"><label>Rx BIN (Pharmacy)</label><input id="pcp-ins-rx" value="${g('insurance_rx')}" placeholder="Rx BIN #"></div>
+                <div style="flex:1;"><label>Plan / Network</label><input id="pcp-ins-plan" value="${g('insurance_plan')}" placeholder="PPO, HMO, EPO..."></div>
+            </div>
+        </div>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditPCPCard()">Save</button>
+        </div>`);
+}
+
+function saveEditPCPCard() {
+    const pcp = {
+        name: document.getElementById('pcp-name').value.trim(),
+        specialty: document.getElementById('pcp-spec').value.trim(),
+        address: document.getElementById('pcp-addr').value.trim(),
+        phone: document.getElementById('pcp-phone').value.trim(),
+        fax: document.getElementById('pcp-fax').value.trim(),
+        insurance_name: document.getElementById('pcp-ins-name').value.trim(),
+        insurance_id: document.getElementById('pcp-ins-id').value.trim(),
+        insurance_group: document.getElementById('pcp-ins-grp').value.trim(),
+        insurance_rx: document.getElementById('pcp-ins-rx').value.trim(),
+        insurance_plan: document.getElementById('pcp-ins-plan').value.trim()
+    };
+    savePCP(pcp);
+    closeEditModal();
+    renderPCPCard();
+    setStatus('SYSTEM: PROVIDER INFO UPDATED');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // OVERVIEW
 // ══════════════════════════════════════════════════════════════════════════
 function renderOverview() {
     const data = load();
+
+    // PCP Card
+    renderPCPCard();
+
+    // Prescriptions — pull from most recent visit with mx field
+    const rxVisits = [...data.visits].filter(v => v.mx && v.mx.trim()).sort((a,b) => b.d.localeCompare(a.d));
+    const rxEl = document.getElementById('rx-display');
+    const rxSub = document.getElementById('rx-sub');
+    const rxPill = document.getElementById('rx-pill');
+    if (rxVisits.length) {
+        const latest = rxVisits[0];
+        const meds = latest.mx.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+        rxPill.textContent = `${meds.length} Listed`;
+        rxEl.textContent = meds.join(', ');
+        rxSub.textContent = `From visit: ${latest.d}${latest.f ? ' · ' + latest.f : ''}`;
+    } else {
+        rxPill.textContent = '—';
+        rxEl.innerHTML = '<span style="color:var(--tx3);font-style:italic;font-size:12px;">No prescription data yet. Add via a visit.</span>';
+        rxSub.textContent = '';
+    }
+
+    // Diagnoses — pull from most recent visit with dx field
+    const dxVisits = [...data.visits].filter(v => v.dx && v.dx.trim()).sort((a,b) => b.d.localeCompare(a.d));
+    const dxEl = document.getElementById('dx-display');
+    const dxSub = document.getElementById('dx-sub');
+    const dxPill = document.getElementById('dx-pill');
+    if (dxVisits.length) {
+        const latest = dxVisits[0];
+        const dxList = latest.dx.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+        dxPill.textContent = `${dxList.length} Listed`;
+        dxEl.textContent = dxList.join(', ');
+        dxSub.textContent = `From visit: ${latest.d}${latest.f ? ' · ' + latest.f : ''}`;
+    } else {
+        dxPill.textContent = '—';
+        dxEl.innerHTML = '<span style="color:var(--tx3);font-style:italic;font-size:12px;">No diagnosis data yet. Add via a visit.</span>';
+        dxSub.textContent = '';
+    }
+
+    // Allergies — pull from most recent visit with al field
+    const alVisits = [...data.visits].filter(v => v.al && v.al.trim()).sort((a,b) => b.d.localeCompare(a.d));
+    const alEl = document.getElementById('al-display');
+    const alSub = document.getElementById('al-sub');
+    const alPill = document.getElementById('al-pill');
+    if (alVisits.length) {
+        const latest = alVisits[0];
+        const alList = latest.al.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+        alPill.textContent = `${alList.length} Listed`;
+        alEl.textContent = alList.join(', ');
+        alSub.textContent = `From visit: ${latest.d}${latest.f ? ' · ' + latest.f : ''}`;
+    } else {
+        alPill.textContent = '—';
+        alEl.innerHTML = '<span style="color:var(--tx3);font-style:italic;font-size:12px;">No allergy data yet. Add via a visit.</span>';
+        alSub.textContent = '';
+    }
+
+    // Recent activity list
     const all = [
         ...data.visits.map(v => ({ date: v.d, label: v.t || 'Visit', type: 'visits', id: v.id })),
         ...data.labs.map(l => ({ date: l.date, label: `Lab Panel — ${l.source || ''}`, type: 'labs', id: l.id })),
@@ -1436,7 +1608,10 @@ function renderOverview() {
         ...data.dx.map(d => ({ date: d.date, label: d.name, type: 'dx', id: d.id }))
     ].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 8);
 
-    if (!all.length) { document.getElementById('recent-list').innerHTML = '<div class="empty-state">No records yet. Start by adding a visit, lab result, or journal entry.</div>'; return; }
+    if (!all.length) {
+        document.getElementById('recent-list').innerHTML = '<div class="empty-state">No records yet. Start by adding a visit, lab result, or journal entry.</div>';
+        return;
+    }
     document.getElementById('recent-list').innerHTML = all.map(e => `
         <div class="entry" style="cursor:pointer;" onclick="showView('${e.type}')">
             <div class="entry-h">
@@ -1470,6 +1645,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
-
