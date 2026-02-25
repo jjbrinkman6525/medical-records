@@ -754,6 +754,29 @@ function collectImgs(wrapId) {
     return [...wrap.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
 }
 
+function openInsuranceCard(rawUrl) {
+    const url = driveUrl(rawUrl);
+    // Try lightbox first, with fallback button to open in new tab
+    const lb = document.createElement('div');
+    lb.className = 'img-lightbox';
+    lb.innerHTML = `
+        <span class="img-lightbox-close" onclick="this.parentNode.remove()">&#10005;</span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <img src="${esc(url)}" alt="Insurance Card"
+                style="max-width:90vw;max-height:75vh;border-radius:8px;border:2px solid var(--ac);"
+                onerror="this.style.display='none';document.getElementById('ins-card-fallback').style.display='flex'">
+            <div id="ins-card-fallback" style="display:none;flex-direction:column;align-items:center;gap:10px;">
+                <div style="color:var(--tx3);font-size:13px;">Image couldn't load inline — open directly in Google Drive:</div>
+                <a href="${esc(rawUrl)}" target="_blank"
+                    style="background:var(--ac);color:#000;padding:10px 24px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;">
+                    Open in Google Drive &#8599;
+                </a>
+            </div>
+        </div>`;
+    lb.addEventListener('click', e => { if (e.target === lb) lb.remove(); });
+    document.body.appendChild(lb);
+}
+
 function driveUrl(u) {
     if (!u) return u;
     const m = u.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -1540,8 +1563,32 @@ function renderPCPCard() {
         if (p.insurance_rx) h += `<div style="font-size:11px;color:var(--tx2);font-family:'IBM Plex Mono',monospace;">Rx BIN: ${esc(p.insurance_rx)}</div>`;
         if (p.insurance_card_front || p.insurance_card_back) {
             h += `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">`;
-            if (p.insurance_card_front) h += `<div><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Card Front</div><img src="${esc(driveUrl(p.insurance_card_front))}" onclick="showImg('${esc(driveUrl(p.insurance_card_front))}')" style="height:70px;border-radius:5px;border:1px solid var(--bd);cursor:pointer;" onerror="this.style.display='none'"></div>`;
-            if (p.insurance_card_back) h += `<div><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Card Back</div><img src="${esc(driveUrl(p.insurance_card_back))}" onclick="showImg('${esc(driveUrl(p.insurance_card_back))}')" style="height:70px;border-radius:5px;border:1px solid var(--bd);cursor:pointer;" onerror="this.style.display='none'"></div>`;
+            if (p.insurance_card_front) {
+                const url = driveUrl(p.insurance_card_front);
+                h += `<div>
+                    <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Card Front</div>
+                    <div style="position:relative;width:110px;height:70px;border-radius:5px;border:1px solid var(--bd);overflow:hidden;background:var(--sf2);cursor:pointer;" onclick="openInsuranceCard('${esc(p.insurance_card_front)}')">
+                        <img src="${esc(url)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+                        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+                            <span style="font-size:18px;">&#128196;</span>
+                            <span style="font-size:10px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">View Front</span>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            if (p.insurance_card_back) {
+                const url = driveUrl(p.insurance_card_back);
+                h += `<div>
+                    <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Card Back</div>
+                    <div style="position:relative;width:110px;height:70px;border-radius:5px;border:1px solid var(--bd);overflow:hidden;background:var(--sf2);cursor:pointer;" onclick="openInsuranceCard('${esc(p.insurance_card_back)}')">
+                        <img src="${esc(url)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+                        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+                            <span style="font-size:18px;">&#128196;</span>
+                            <span style="font-size:10px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">View Back</span>
+                        </div>
+                    </div>
+                </div>`;
+            }
             h += `</div>`;
         }
         h += `</div>`;
