@@ -333,11 +333,12 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 .empty-state { padding: 60px 0; text-align: center; color: var(--tx3); border: 1px dashed var(--bd); border-radius: 12px; }
 
 /* Edit modal overlay */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 16px; }
 .modal-overlay.open { display: flex; }
-.modal-box { background: var(--sf); border: 1px solid var(--bd); width: 90%; max-width: 620px; border-radius: 12px; max-height: 90vh; overflow-y: auto; padding: 28px; }
-.modal-box h2 { font-size: 18px; font-weight: 700; color: var(--ac); font-family: 'Playfair Display', serif; margin-bottom: 18px; }
-.modal-acts { display: flex; gap: 10px; margin-top: 18px; }
+.modal-box { background: var(--sf); border: 1px solid var(--bd); width: 90%; max-width: 620px; border-radius: 12px; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.modal-box h2 { font-size: 18px; font-weight: 700; color: var(--ac); font-family: 'Playfair Display', serif; margin-bottom: 18px; flex-shrink: 0; }
+.modal-inner { padding: 28px 28px 0 28px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+.modal-acts { display: flex; gap: 10px; padding: 16px 28px 20px 28px; flex-shrink: 0; border-top: 1px solid var(--bd); background: var(--sf); }
 .modal-acts button { flex: 1; padding: 10px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
 
 /* Search bar */
@@ -411,7 +412,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
     .dx-table { min-width: 560px; }
 
     /* Modal full screen on mobile */
-    .modal-box { width: 96%; max-height: 92vh; padding: 20px; border-radius: 10px; }
+    .modal-box { width: 96%; max-height: 92vh; border-radius: 10px; }
+    .modal-inner { padding: 16px 16px 0 16px; }
+    .modal-acts { padding: 12px 16px 16px 16px; }
 
     /* Edit modal weather grid */
     .modal-box [style*="grid-template-columns:1fr 1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr !important; }
@@ -1289,7 +1292,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 <!-- Edit Modal -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal-box">
-    <div id="edit-modal-body"></div>
+    <div id="edit-modal-body" style="display:contents;"></div>
   </div>
 </div>
 
@@ -1783,8 +1786,19 @@ function renderYrSpine(items, getDate, renderItem) {
 
 // ─── Edit modal ────────────────────────────────────────────────────────────
 function openEditModal(html) {
-    document.getElementById('edit-modal-body').innerHTML = html;
+    // Split content from .modal-acts so acts stay sticky at bottom
+    const actMatch = html.match(/([\s\S]*?)(<div class="modal-acts">[\s\S]*<\/div>)\s*$/);
+    if (actMatch) {
+        document.getElementById('edit-modal-body').innerHTML =
+            `<div class="modal-inner">${actMatch[1]}</div>${actMatch[2]}`;
+    } else {
+        document.getElementById('edit-modal-body').innerHTML =
+            `<div class="modal-inner">${html}</div>`;
+    }
     document.getElementById('edit-modal').classList.add('open');
+    // Reset scroll to top
+    const inner = document.querySelector('.modal-inner');
+    if (inner) inner.scrollTop = 0;
 }
 function closeEditModal() {
     document.getElementById('edit-modal').classList.remove('open');
@@ -1966,7 +1980,7 @@ function editVisit(id) {
 
     openEditModal(`
         <h2>Edit Visit</h2>
-        <div style="max-height:70vh;overflow-y:auto;padding-right:4px;">
+        <div>
         <div class="ir">
             <input type="date" id="ev-d" value="${esc(g('d'))}" style="flex:1;">
             <input id="ev-t" value="${esc(g('t'))}" placeholder="Type / Reason" style="flex:1;">
@@ -2386,7 +2400,7 @@ function editJournal(id) {
 
     openEditModal(`
         <h2>Edit Journal Entry</h2>
-        <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
+        <div>
 
         <div class="j-section-label"><span class="j-section-num">1</span> Date &amp; Time</div>
         <div class="ir"><input type="date" id="ej-d" value="${g('date')}" style="flex:1;"><input type="time" id="ej-tm" value="${g('time')}" style="flex:1;"></div>
@@ -3016,7 +3030,7 @@ function editEducation(id) {
     const existingImgs = buildImgRows(e.imgs);
     openEditModal(`
         <h2>Edit Education Record</h2>
-        <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
+        <div>
         <div class="ir"><input type="date" id="eed-d" value="${g('date')}" style="flex:1;"><input id="eed-sy" value="${g('sy')}" placeholder="School Year" style="flex:1;"><input id="eed-school" value="${g('school')}" placeholder="School" style="flex:2;"></div>
         <label>Record Type</label><div class="ir"><select id="eed-type" style="flex:1;">${typeOpts}</select><input id="eed-grade" value="${g('grade')}" placeholder="Grade" style="flex:1;"></div>
         <label>Disability / Eligibility</label><input class="fi" id="eed-disability" value="${g('disability')}">
@@ -3154,7 +3168,7 @@ function editMH(id) {
     const existingImgs = buildImgRows(e.imgs);
     openEditModal(`
         <h2>Edit Mental Health Record</h2>
-        <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
+        <div>
         <div class="ir"><input type="date" id="emh-d" value="${g('date')}" style="flex:1;"><input type="time" id="emh-tm" value="${g('tm')}" style="flex:1;"><select id="emh-type" style="flex:2;">${typeOpts}</select></div>
         <label>Provider</label><div class="ir"><input id="emh-dr" value="${g('dr')}" placeholder="Provider" style="flex:1;"><input id="emh-specialty" value="${g('specialty')}" placeholder="Specialty" style="flex:1;"></div>
         <label>Facility</label><input class="fi" id="emh-facility" value="${g('facility')}">
