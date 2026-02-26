@@ -352,8 +352,11 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 .yr-hdr span { font-size: 18px; font-weight: 800; color: var(--ac); letter-spacing: -1px; font-family: monospace; padding: 2px 8px; background: rgba(255,0,127,0.06); border-radius: 4px; }
 
 /* Image strip */
-.img-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.img-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 1px solid var(--bd); }
+.img-strip { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+.img-thumb-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 90px; }
+.img-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 2px solid var(--bd); cursor: pointer; transition: border-color 0.2s; display: block; }
+.img-thumb:hover { border-color: var(--ac); }
+.img-thumb-label { font-size: 10px; color: var(--tx3); text-align: center; word-break: break-word; max-width: 80px; line-height: 1.3; font-family: 'IBM Plex Mono', monospace; }
 .img-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 300; display: flex; align-items: center; justify-content: center; }
 .img-lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
 .img-lightbox-close { position: absolute; top: 20px; right: 24px; color: #fff; font-size: 24px; cursor: pointer; }
@@ -1641,19 +1644,45 @@ function saveAppointments() {
 }
 
 // ─── Image helpers ─────────────────────────────────────────────────────────
+
+function buildImgRows(imgs) {
+    return (imgs||[]).map((item,i) => {
+        const raw = typeof item === 'string' ? item : (item.url || '');
+        const lbl = typeof item === 'object' ? (item.label || '') : '';
+        return `<div class="img-url-row" style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px;padding:8px;background:var(--sf3);border-radius:6px;border:1px solid var(--bd);">
+            <div style="display:flex;gap:6px;align-items:center;">
+                <input placeholder="Paste Google Drive share link" style="flex:1;" class="img-url-input" value="${esc(raw)}">
+                <button onclick="this.closest('.img-url-row').remove()" style="flex-shrink:0;">remove</button>
+            </div>
+            <input placeholder="Short label (e.g. Test 1, Page 2, Front)" class="img-label-input" style="font-size:11px;color:var(--tx3);" value="${esc(lbl)}">
+        </div>`;
+    }).join('');
+}
+
 function addImgRow(wrapId) {
     const wrap = document.getElementById(wrapId);
     const row = document.createElement('div');
     row.className = 'img-url-row';
-    row.innerHTML = '<input placeholder="Paste Google Drive share link"><button onclick="this.parentNode.remove()">remove</button>';
+    row.style.cssText = 'display:flex;flex-direction:column;gap:4px;margin-bottom:8px;padding:8px;background:var(--sf3);border-radius:6px;border:1px solid var(--bd);';
+    row.innerHTML = `
+        <div style="display:flex;gap:6px;align-items:center;">
+            <input placeholder="Paste Google Drive share link" style="flex:1;" class="img-url-input">
+            <button onclick="this.closest('.img-url-row').remove()" style="flex-shrink:0;">remove</button>
+        </div>
+        <input placeholder="Short label (e.g. Test 1, Page 2, Front)" class="img-label-input" style="font-size:11px;color:var(--tx3);">`;
     wrap.appendChild(row);
-    row.querySelector('input').focus();
+    row.querySelector('.img-url-input').focus();
 }
 
 function collectImgs(wrapId) {
     const wrap = document.getElementById(wrapId);
     if (!wrap) return [];
-    return [...wrap.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
+    return [...wrap.querySelectorAll('.img-url-row')].map(row => {
+        const url = (row.querySelector('.img-url-input')?.value || '').trim();
+        const label = (row.querySelector('.img-label-input')?.value || '').trim();
+        if (!url) return null;
+        return { url, label };
+    }).filter(Boolean);
 }
 
 function openInsuranceCard(rawUrl) {
@@ -1695,9 +1724,12 @@ function showImg(url) {
 
 function imgStrip(imgs) {
     if (!imgs || !imgs.length) return '';
-    return '<div class="img-strip">' + imgs.map(u => {
-        const d = driveUrl(u);
-        return `<img class="img-thumb" src="${esc(d)}" onclick="showImg('${esc(d)}')" onerror="this.style.display='none'">`;
+    return '<div class="img-strip">' + imgs.map(item => {
+        const raw = typeof item === 'string' ? item : (item.url || '');
+        const label = typeof item === 'object' ? (item.label || '') : '';
+        if (!raw) return '';
+        const d = driveUrl(raw);
+        return `<div class="img-thumb-wrap"><img class="img-thumb" src="${esc(d)}" onclick="showImg('${esc(d)}')" onerror="this.style.display='none'">${label ? `<div class="img-thumb-label">${esc(label)}</div>` : ''}</div>`;
     }).join('') + '</div>';
 }
 
@@ -1910,7 +1942,7 @@ function editVisit(id) {
     const v = data.visits.find(x => x.id === id);
     if (!v) return;
     const g = k => v[k] || '';
-    const existingImgs = (v.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="ev-img-${i}" value="${esc(u)}" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    const existingImgs = buildImgRows(v.imgs);
 
     openEditModal(`
         <h2>Edit Visit</h2>
@@ -2140,7 +2172,7 @@ function editImaging(id) {
     const data = load();
     const v = data.imaging.find(x => x.id === id);
     if (!v) return;
-    const existingImgs = (v.imgs || []).map((u, i) => `<div class="img-url-row"><input id="ei-img-${i}" value="${esc(u)}" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    const existingImgs = buildImgRows(v.imgs);
     const g = k => esc(v[k] || '');
     openEditModal(`
         <h2>Edit Imaging Report</h2>
@@ -2329,7 +2361,7 @@ function editJournal(id) {
     const painBtns = [1,2,3,4,5,6,7,8,9,10].map(n => `
         <button type="button" class="pain-btn${s.pain===n?' active':''}" data-p="${n}"
             onclick="this.closest('.pain-btns').querySelectorAll('.pain-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('ej-pain').value=${n}">${n}</button>`).join('');
-    const existingImgs = (s.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="ej-img-${i}" value="${esc(u)}" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    const existingImgs = buildImgRows(s.imgs);
     const g = k => esc(s[k]||'');
 
     openEditModal(`
@@ -2961,7 +2993,7 @@ function editEducation(id) {
     if (!e) return;
     const g = k => esc(e[k] || '');
     const typeOpts = ['IEP — Initial','IEP — Annual Review','IEP — Amendment','504 Plan','Evaluation / Re-evaluation','Eligibility Determination','Transition Plan','Manifestation Determination','Meeting Notes','Progress Report','Incident Report','Correspondence','Other'].map(o => `<option ${e.type===o?'selected':''}>${o}</option>`).join('');
-    const existingImgs = (e.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="eed-img-${i}" value="${esc(u)}" placeholder="URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    const existingImgs = buildImgRows(e.imgs);
     openEditModal(`
         <h2>Edit Education Record</h2>
         <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
@@ -3099,7 +3131,7 @@ function editMH(id) {
     const siOpts = ['','None reported','Passive ideation — no plan','Active ideation — no plan','Active ideation — with plan','Active ideation — with intent','Recent attempt'].map(o => `<option ${e.si===o?'selected':''}>${o}</option>`).join('');
     const hiOpts = ['','None reported','Passive ideation — no plan','Active ideation — no plan','Active ideation — with plan'].map(o => `<option ${e.hi===o?'selected':''}>${o}</option>`).join('');
     const shOpts = ['','None reported','History only — not current','Current — non-suicidal','Current — suicidal intent'].map(o => `<option ${e.sh===o?'selected':''}>${o}</option>`).join('');
-    const existingImgs = (e.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="emh-img-${i}" value="${esc(u)}" placeholder="URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    const existingImgs = buildImgRows(e.imgs);
     openEditModal(`
         <h2>Edit Mental Health Record</h2>
         <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
