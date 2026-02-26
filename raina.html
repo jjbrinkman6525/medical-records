@@ -1640,6 +1640,7 @@ function renderVisits() {
                 </div>
                 <div class="entry-b">
                     ${secs.map(([t, c]) => `<div class="sc-label">${t}</div><div class="f-value" style="margin-bottom:8px;">${esc(c)}</div>`).join('')}
+                    ${imgStrip(v.imgs)}
                     <div class="entry-actions">
                         <button class="act-btn act-edit" onclick="editVisit(${v.id})">Edit</button>
                         <button class="act-btn act-delete" onclick="deleteVisit(${v.id})">Delete</button>
