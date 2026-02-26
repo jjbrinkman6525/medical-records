@@ -27,7 +27,7 @@ const DOC_ID = 'raina';
 const PATIENT_DOC = doc(db, 'patients', DOC_ID);
 const META_DOC = doc(db, 'meta', DOC_ID);
 
-const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]};
+const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],education:[],mentalhealth:[]};
 
 // ── Sync status indicator ──────────────────────────────────────────────────
 function setSyncStatus(state) {
@@ -488,6 +488,28 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 .sb-4 { background:rgba(239,68,68,0.15);color:#ef4444; }
 .sb-5 { background:rgba(220,38,38,0.2);color:#dc2626;font-weight:800; }
 
+/* ── Rich text editor ─────────────────────────────────────────────────── */
+.rte-wrap { margin-bottom: 10px; }
+.rte-label { font-size: 10px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+.rte-toolbar { display: flex; flex-wrap: wrap; gap: 2px; padding: 6px 8px; background: var(--sf3); border: 1px solid var(--bd); border-bottom: none; border-radius: 6px 6px 0 0; }
+.rte-btn { width: 28px; height: 28px; border: none; background: transparent; color: var(--tx2); border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+.rte-btn:hover { background: var(--sf2); color: var(--tx); }
+.rte-btn.active { background: var(--ac); color: #000; }
+.rte-divider { width: 1px; height: 20px; background: var(--bd); margin: 4px 2px; }
+.rte-color-btn { width: 28px; height: 28px; border: 1px solid var(--bd); border-radius: 4px; cursor: pointer; flex-shrink: 0; }
+.rte-editor { min-height: 80px; padding: 10px 12px; background: var(--sf2); border: 1px solid var(--bd); border-radius: 0 0 6px 6px; color: var(--tx); font-size: 13px; line-height: 1.7; outline: none; font-family: 'IBM Plex Sans', sans-serif; }
+.rte-editor:focus { border-color: var(--ac); }
+.rte-editor ul, .rte-editor ol { padding-left: 20px; }
+.rte-editor b, .rte-editor strong { font-weight: 700; }
+.rte-editor i, .rte-editor em { font-style: italic; }
+.rte-editor u { text-decoration: underline; }
+.rte-editor mark { background: #fbbf2480; color: var(--tx); padding: 0 2px; border-radius: 2px; }
+/* Rendered rich text in entry cards */
+.rt-content { font-size: 13px; line-height: 1.7; color: var(--tx2); }
+.rt-content ul, .rt-content ol { padding-left: 20px; margin: 4px 0; }
+.rt-content b, .rt-content strong { font-weight: 700; color: var(--tx); }
+.rt-content mark { background: #fbbf2440; color: var(--tx); padding: 0 2px; border-radius: 2px; }
+
 </style>
 </head>
 <body>
@@ -532,6 +554,8 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
       <div class="nav-i" data-view="journal" onclick="showView('journal')">Symptom Journal</div>
       <div class="nav-i" data-view="messages" onclick="showView('messages')">Portal Messages</div>
       <div class="nav-i" data-view="dx" onclick="showView('dx')">Dx Timeline</div>
+      <div class="nav-i" data-view="education" onclick="showView('education')">Education / IEP</div>
+      <div class="nav-i" data-view="mentalhealth" onclick="showView('mentalhealth')">Mental Health</div>
     </div>
     <div style="padding:16px;border-top:1px solid var(--bd)">
       <div style="display:flex;align-items:center;gap:10px">
@@ -974,6 +998,264 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
       </div>
 
     </div><!-- end .content -->
+
+      <!-- EDUCATION / IEP -->
+      <div id="view-education" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Education / IEP</h1>
+          <p style="color:var(--tx2);font-size:14px;">Individualized Education Program records, accommodations, and academic documentation.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-education')"><span style="font-size:18px;">+</span> Add IEP / Education Record</button>
+        <div class="add-form" id="form-education">
+          <h3>New Education Record</h3>
+
+          <div class="j-section-label"><span class="j-section-num">1</span> Record Date &amp; School Year</div>
+          <div class="ir">
+            <input type="date" id="ed-d" style="min-width:155px;">
+            <input id="ed-sy" placeholder="School Year (e.g. 2024–2025)" style="flex:1;">
+            <input id="ed-school" placeholder="School / Institution" style="flex:2;">
+          </div>
+
+          <div class="j-section-label"><span class="j-section-num">2</span> Record Type</div>
+          <div class="ir">
+            <select id="ed-type" style="flex:1;">
+              <option>IEP — Initial</option>
+              <option>IEP — Annual Review</option>
+              <option>IEP — Amendment</option>
+              <option>504 Plan</option>
+              <option>Evaluation / Re-evaluation</option>
+              <option>Eligibility Determination</option>
+              <option>Transition Plan</option>
+              <option>Manifestation Determination</option>
+              <option>Meeting Notes</option>
+              <option>Progress Report</option>
+              <option>Incident Report</option>
+              <option>Correspondence</option>
+              <option>Other</option>
+            </select>
+            <input id="ed-grade" placeholder="Grade Level" style="flex:1;">
+          </div>
+
+          <div class="j-section-label"><span class="j-section-num">3</span> Disability / Eligibility Category</div>
+          <div class="ir" style="flex-wrap:wrap;">
+            <input id="ed-disability" placeholder="Primary disability category (e.g. OHI, SLD, ED, Autism...)" style="flex:2;min-width:220px;">
+            <input id="ed-eligdate" type="date" style="min-width:155px;">
+            <input id="ed-eligdate-label" placeholder="Eligibility date label" style="flex:1;min-width:160px;">
+          </div>
+
+          <div class="j-section-label"><span class="j-section-num">4</span> Present Levels of Academic Achievement (PLAAFP)</div>
+          <textarea class="fi" id="ed-plaafp" rows="4" placeholder="Current academic performance, strengths, areas of need, how disability affects involvement in general education..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">5</span> Annual Goals</div>
+          <textarea class="fi" id="ed-goals" rows="4" placeholder="Measurable annual goals — academic, behavioral, social/emotional, communication, transition..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">6</span> Short-Term Objectives / Benchmarks</div>
+          <textarea class="fi" id="ed-objectives" rows="3" placeholder="Intermediate steps toward annual goals..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">7</span> Special Education Services</div>
+          <textarea class="fi" id="ed-services" rows="3" placeholder="Type of service, provider, frequency, duration, location (e.g. Resource Room 45min/day, Speech 2x/week 30min...)"></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">8</span> Related Services</div>
+          <textarea class="fi" id="ed-related" rows="2" placeholder="OT, PT, speech/language, counseling, transportation, nursing services..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">9</span> Accommodations &amp; Modifications</div>
+          <textarea class="fi" id="ed-accomm" rows="4" placeholder="Extended time, preferential seating, reduced assignments, sensory breaks, assistive technology, read-aloud, calculator use, modified grading..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">10</span> Behavioral / Positive Support Plan</div>
+          <textarea class="fi" id="ed-behavior" rows="3" placeholder="BIP summary, target behaviors, antecedents, replacement behaviors, reinforcement strategies, crisis protocol..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">11</span> Testing Accommodations</div>
+          <textarea class="fi" id="ed-testing" rows="2" placeholder="State/district test accommodations — extended time, separate setting, text-to-speech, scribe..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">12</span> Transition Planning</div>
+          <textarea class="fi" id="ed-transition" rows="3" placeholder="Post-secondary goals, transition services, agency linkages, course of study (for age 14+)..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">13</span> Placement / Least Restrictive Environment (LRE)</div>
+          <div class="ir">
+            <input id="ed-placement" placeholder="Placement setting (e.g. General Ed 80%, Resource Room 20%)" style="flex:2;">
+            <input id="ed-lre-pct" placeholder="% time in general ed" style="flex:1;">
+          </div>
+
+          <div class="j-section-label"><span class="j-section-num">14</span> Meeting Attendees</div>
+          <textarea class="fi" id="ed-attendees" rows="2" placeholder="Names and roles of all IEP meeting participants..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">15</span> Parent / Guardian Input</div>
+          <textarea class="fi" id="ed-parent" rows="3" placeholder="Concerns raised, requests made, agreements or disagreements noted, prior written notice..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">16</span> Progress Toward Previous Goals</div>
+          <textarea class="fi" id="ed-progress" rows="3" placeholder="Status of goals from last IEP — met, not met, continuing. Include data/evidence..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">17</span> Evaluation Data &amp; Assessments</div>
+          <textarea class="fi" id="ed-evals" rows="3" placeholder="Standardized test scores, teacher observations, work samples, psychoeducational evaluation results..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">18</span> Next Review / Reevaluation Date</div>
+          <div class="ir">
+            <input type="date" id="ed-nextreview" style="min-width:155px;">
+            <input id="ed-nextreview-label" placeholder="Type (Annual Review, Re-eval, etc.)" style="flex:1;">
+          </div>
+
+          <div class="j-section-label"><span class="j-section-num">19</span> Your Notes / Concerns</div>
+          <textarea class="fi" id="ed-notes" rows="3" placeholder="Personal observations, follow-up items, things to dispute, advocate questions..."></textarea>
+
+          <div class="lbl" style="margin-bottom:4px;margin-top:4px;">Documents (Google Drive links)</div>
+          <div id="ed-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('ed-imgs-wrap')">+ Add Document / Image URL</button>
+
+          <div class="save-row">
+            <button class="btn-save" onclick="saveEducation()">Save Record</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-education')">Cancel</button>
+            <span class="saved-msg" id="sv-ed">Saved</span>
+          </div>
+        </div>
+        <div class="search-bar"><input id="ed-search" placeholder="Search education records..." oninput="renderEducation()"></div>
+        <div id="ed-list" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- MENTAL HEALTH -->
+      <div id="view-mentalhealth" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Mental Health</h1>
+          <p style="color:var(--tx2);font-size:14px;">Psychiatric visits, therapy sessions, and behavioral health documentation.</p>
+        </div>
+        <button class="add-btn" onclick="toggleForm('form-mh')"><span style="font-size:18px;">+</span> Add Mental Health Record</button>
+        <div class="add-form" id="form-mh">
+          <h3>New Mental Health Record</h3>
+
+          <div class="j-section-label"><span class="j-section-num">1</span> Date &amp; Session Info</div>
+          <div class="ir">
+            <input type="date" id="mh-d" style="min-width:155px;">
+            <input type="time" id="mh-tm" style="min-width:120px;">
+            <select id="mh-type" style="flex:1;">
+              <option>Therapy Session — Individual</option>
+              <option>Therapy Session — Family</option>
+              <option>Therapy Session — Group</option>
+              <option>Psychiatric Evaluation</option>
+              <option>Medication Management</option>
+              <option>Crisis Intervention</option>
+              <option>Inpatient Admission</option>
+              <option>Inpatient Discharge</option>
+              <option>Partial Hospitalization (PHP)</option>
+              <option>Intensive Outpatient (IOP)</option>
+              <option>Psychological Testing</option>
+              <option>Case Management</option>
+              <option>Telehealth Session</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="j-section-label"><span class="j-section-num">2</span> Provider &amp; Facility</div>
+          <div class="ir">
+            <input id="mh-dr" placeholder="Provider name &amp; credentials" style="flex:1;">
+            <input id="mh-specialty" placeholder="Specialty (Psychiatrist, LCSW, Psychologist...)" style="flex:1;">
+          </div>
+          <input class="fi" id="mh-facility" placeholder="Facility / Practice name &amp; address">
+
+          <div class="j-section-label"><span class="j-section-num">3</span> Presenting Concerns</div>
+          <textarea class="fi" id="mh-presenting" rows="3" placeholder="Chief complaint, reason for visit, current symptoms, what prompted this appointment..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">4</span> Mental Status Examination (MSE)</div>
+          <div class="ir" style="flex-wrap:wrap;">
+            <input id="mh-appearance" placeholder="Appearance / Behavior" style="flex:1;min-width:170px;">
+            <input id="mh-speech" placeholder="Speech" style="flex:1;min-width:130px;">
+            <input id="mh-affect" placeholder="Affect / Mood" style="flex:1;min-width:140px;">
+            <input id="mh-thought" placeholder="Thought Process" style="flex:1;min-width:150px;">
+            <input id="mh-cognition" placeholder="Cognition / Insight" style="flex:1;min-width:160px;">
+          </div>
+
+          <div class="j-section-label"><span class="j-section-num">5</span> Safety Assessment</div>
+          <div class="ir" style="flex-wrap:wrap;">
+            <select id="mh-si" style="flex:1;min-width:200px;">
+              <option value="">Suicidal Ideation — Select</option>
+              <option>None reported</option>
+              <option>Passive ideation — no plan</option>
+              <option>Active ideation — no plan</option>
+              <option>Active ideation — with plan</option>
+              <option>Active ideation — with intent</option>
+              <option>Recent attempt</option>
+            </select>
+            <select id="mh-hi" style="flex:1;min-width:200px;">
+              <option value="">Homicidal Ideation — Select</option>
+              <option>None reported</option>
+              <option>Passive ideation — no plan</option>
+              <option>Active ideation — no plan</option>
+              <option>Active ideation — with plan</option>
+            </select>
+            <select id="mh-sh" style="flex:1;min-width:200px;">
+              <option value="">Self-Harm — Select</option>
+              <option>None reported</option>
+              <option>History only — not current</option>
+              <option>Current — non-suicidal</option>
+              <option>Current — suicidal intent</option>
+            </select>
+          </div>
+          <textarea class="fi" id="mh-safety-notes" rows="2" placeholder="Safety plan details, crisis contacts, means restriction, hospitalization decision..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">6</span> Diagnoses (DSM-5)</div>
+          <textarea class="fi" id="mh-dx" rows="2" placeholder="Diagnoses with DSM-5 codes (e.g. F32.1 Major Depressive Disorder, moderate; F41.1 GAD)..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">7</span> Current Medications &amp; Changes</div>
+          <textarea class="fi" id="mh-meds" rows="3" placeholder="Psychiatric medications, dosages, start dates, changes made this visit, side effects reported..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">8</span> Therapeutic Interventions Used</div>
+          <textarea class="fi" id="mh-interventions" rows="2" placeholder="CBT, DBT, EMDR, motivational interviewing, somatic therapy, play therapy, art therapy, mindfulness..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">9</span> Session Content &amp; Clinical Notes</div>
+          <textarea class="fi" id="mh-notes" rows="5" placeholder="Topics discussed, patient response, progress toward treatment goals, significant disclosures, family dynamics..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">10</span> Treatment Goals &amp; Progress</div>
+          <textarea class="fi" id="mh-goals" rows="3" placeholder="Active treatment goals, progress made, barriers identified, goal updates..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">11</span> Behavioral Observations</div>
+          <textarea class="fi" id="mh-behavior" rows="2" placeholder="Observed behaviors during session, engagement level, cooperation, notable reactions..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">12</span> Trauma History / Relevant Background</div>
+          <textarea class="fi" id="mh-trauma" rows="2" placeholder="Relevant trauma disclosures, ACEs, abuse history, significant life events impacting treatment..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">13</span> Family &amp; Social Functioning</div>
+          <textarea class="fi" id="mh-social" rows="2" placeholder="Family relationships, peer relationships, school/work functioning, social support, living situation..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">14</span> Substance Use</div>
+          <textarea class="fi" id="mh-substance" rows="2" placeholder="Alcohol, cannabis, illicit drugs, self-medication patterns, CAGE/AUDIT screening results..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">15</span> Plan &amp; Follow-Up</div>
+          <div class="ir">
+            <input type="date" id="mh-followup" style="min-width:155px;">
+            <input id="mh-followup-label" placeholder="Next appointment type" style="flex:1;">
+          </div>
+          <textarea class="fi" id="mh-plan" rows="3" placeholder="Treatment plan updates, referrals made, homework assigned, safety plan, crisis resources given, medication adjustments, coordination of care..."></textarea>
+
+          <div class="j-section-label"><span class="j-section-num">16</span> Your Notes / Observations</div>
+          <textarea class="fi" id="mh-parent-notes" rows="3" placeholder="Your own observations as parent/caregiver — what you noticed before/after, concerns to raise, patterns you're seeing..."></textarea>
+
+          <div class="lbl" style="margin-bottom:4px;margin-top:4px;">Documents &amp; Images (Google Drive links)</div>
+          <div id="mh-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('mh-imgs-wrap')">+ Add Document / Image URL</button>
+
+          <div class="save-row">
+            <button class="btn-save" onclick="saveMH()">Save Record</button>
+            <button class="btn-cancel-form" onclick="toggleForm('form-mh')">Cancel</button>
+            <span class="saved-msg" id="sv-mh">Saved</span>
+          </div>
+        </div>
+        <div class="search-bar" style="display:flex;gap:10px;">
+          <input id="mh-search" placeholder="Search mental health records..." oninput="renderMH()" style="flex:1;">
+          <select id="mh-filter" onchange="renderMH()" style="width:180px;">
+            <option value="">All Types</option>
+            <option>Therapy Session — Individual</option>
+            <option>Therapy Session — Family</option>
+            <option>Psychiatric Evaluation</option>
+            <option>Medication Management</option>
+            <option>Crisis Intervention</option>
+            <option>Inpatient Admission</option>
+            <option>Inpatient Discharge</option>
+            <option>Partial Hospitalization (PHP)</option>
+            <option>Intensive Outpatient (IOP)</option>
+            <option>Psychological Testing</option>
+          </select>
+        </div>
+        <div id="mh-list" style="margin-top:12px;"></div>
+      </div>
+
   </div><!-- end .main -->
 </div><!-- end .app -->
 </div><!-- end #main-app -->
@@ -1131,7 +1413,7 @@ async function runMigration() {
                 parsed.forEach(e => { const t = e.type||'visits'; if(migrated[t]) migrated[t].push(e); });
                 parsed = migrated;
             }
-            const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]};
+            const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],education:[],mentalhealth:[]};
             Object.keys(EMPTY).forEach(k => { if(!parsed[k]) parsed[k]=[]; });
             await window.save(parsed);
         }
@@ -1179,7 +1461,7 @@ const KEY = 'raina_records';
 function load() {
     if (window._dbCache) return window._dbCache;
     const c = localStorage.getItem('raina_records_cache');
-    return c ? JSON.parse(c) : {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]};
+    return c ? JSON.parse(c) : {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],education:[],mentalhealth:[]};
 }
 function save(data) {
     if (window.save && window.save !== save) { window.save(data); return; }
@@ -1266,7 +1548,7 @@ function showView(v) {
     document.getElementById('main-scroll').scrollTop = 0;
     const viewEl = document.getElementById('view-' + v);
     if (viewEl) viewEl.classList.add('active');
-    const renders = { overview: renderOverview, timeline: renderTimeline, visits: renderVisits, labs: renderLabs, imaging: renderImaging, journal: renderJournal, messages: renderMessages, dx: renderDX };
+    const renders = { overview: renderOverview, timeline: renderTimeline, visits: renderVisits, labs: renderLabs, imaging: renderImaging, journal: renderJournal, messages: renderMessages, dx: renderDX, education: renderEducation, mentalhealth: renderMH };
     if (renders[v]) renders[v]();
 }
 
@@ -1567,26 +1849,89 @@ function deleteVisit(id) {
     const data = load(); data.visits = data.visits.filter(v => v.id !== id); save(data); renderVisits();
 }
 
+// ── Rich text editor helpers ───────────────────────────────────────────────
+function rteToolbar(fieldId) {
+    return `<div class="rte-toolbar" onmousedown="event.preventDefault()">
+        <button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button>
+        <button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button>
+        <button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button>
+        <div class="rte-divider"></div>
+        <button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button>
+        <button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button>
+        <div class="rte-divider"></div>
+        <button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button>
+        <button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button>
+        <div class="rte-divider"></div>
+        <button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button>
+        <button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button>
+    </div>
+    <div class="rte-editor" id="${fieldId}" contenteditable="true" spellcheck="true"></div>`;
+}
+
+function rteField(label, fieldId, html) {
+    return `<div class="rte-wrap">
+        <div class="rte-label">${label}</div>
+        ${rteToolbar(fieldId)}
+    </div>`;
+}
+
+function rtCmd(cmd) {
+    document.execCommand(cmd, false, null);
+    // Refocus active editor
+    const active = document.activeElement;
+    if (active && active.classList.contains('rte-editor')) active.focus();
+}
+
+function rtHighlight() {
+    // Toggle yellow highlight using mark tag
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return;
+    document.execCommand('hiliteColor', false, '#fbbf24');
+}
+
+function setRteContent(id, html) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Convert plain text (legacy) to html if no tags present
+    if (html && !/<[a-z][\s\S]*>/i.test(html)) {
+        el.innerHTML = html.replace(/\n/g, '<br>');
+    } else {
+        el.innerHTML = html || '';
+    }
+}
+
+function getRteContent(id) {
+    const el = document.getElementById(id);
+    return el ? el.innerHTML.trim() : '';
+}
+
 function editVisit(id) {
     const data = load();
     const v = data.visits.find(x => x.id === id);
     if (!v) return;
-    const g = k => esc(v[k] || '');
+    const g = k => v[k] || '';
     const existingImgs = (v.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="ev-img-${i}" value="${esc(u)}" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+
     openEditModal(`
         <h2>Edit Visit</h2>
-        <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
-        <div class="ir"><input type="date" id="ev-d" value="${g('d')}" style="flex:1;"><input id="ev-t" value="${g('t')}" placeholder="Type/Reason" style="flex:1;"></div>
-        <div class="ir"><input id="ev-f" value="${g('f')}" placeholder="Facility" style="flex:1;"><input id="ev-dr" value="${g('dr')}" placeholder="Provider(s)" style="flex:1;"></div>
-        <label>Physician Notes / Reports</label><textarea class="fi" id="ev-dn" rows="3">${g('dn')}</textarea>
-        <label>Labs</label><textarea class="fi" id="ev-lb" rows="2">${g('lb')}</textarea>
-        <label>Imaging / Diagnostics</label><textarea class="fi" id="ev-im" rows="2">${g('im')}</textarea>
-        <label>Vitals</label><input class="fi" id="ev-vt" value="${g('vt')}">
-        <label>Medications</label><textarea class="fi" id="ev-mx" rows="2">${g('mx')}</textarea>
-        <label>Diagnosis</label><textarea class="fi" id="ev-dx" rows="2">${g('dx')}</textarea>
-        <label>Allergies</label><textarea class="fi" id="ev-al" rows="2">${g('al')}</textarea>
-        <label>Medical Records Info</label><input class="fi" id="ev-mr" value="${g('mr')}">
-        <label>Your Notes</label><textarea class="fi" id="ev-nt" rows="2">${g('nt')}</textarea>
+        <div style="max-height:70vh;overflow-y:auto;padding-right:4px;">
+        <div class="ir">
+            <input type="date" id="ev-d" value="${esc(g('d'))}" style="flex:1;">
+            <input id="ev-t" value="${esc(g('t'))}" placeholder="Type / Reason" style="flex:1;">
+        </div>
+        <div class="ir">
+            <input id="ev-f" value="${esc(g('f'))}" placeholder="Facility" style="flex:1;">
+            <input id="ev-dr" value="${esc(g('dr'))}" placeholder="Provider(s)" style="flex:1;">
+        </div>
+        <div class="rte-wrap"><div class="rte-label">Physician Notes / Reports</div>${rteToolbar('ev-dn')}</div>
+        <div class="rte-wrap"><div class="rte-label">Labs</div>${rteToolbar('ev-lb')}</div>
+        <div class="rte-wrap"><div class="rte-label">Imaging / Diagnostics</div>${rteToolbar('ev-im')}</div>
+        <label>Vitals</label><input class="fi" id="ev-vt" value="${esc(g('vt'))}">
+        <div class="rte-wrap"><div class="rte-label">Medications</div>${rteToolbar('ev-mx')}</div>
+        <div class="rte-wrap"><div class="rte-label">Diagnosis</div>${rteToolbar('ev-dx')}</div>
+        <div class="rte-wrap"><div class="rte-label">Allergies</div>${rteToolbar('ev-al')}</div>
+        <label>Medical Records Info</label><input class="fi" id="ev-mr" value="${esc(g('mr'))}">
+        <div class="rte-wrap"><div class="rte-label">Your Notes</div>${rteToolbar('ev-nt')}</div>
         <label>Images (Google Drive links)</label>
         <div id="ev-imgs-wrap">${existingImgs}</div>
         <button class="add-row-btn" onclick="addImgRow('ev-imgs-wrap')">+ Add Image URL</button>
@@ -1595,14 +1940,32 @@ function editVisit(id) {
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditVisit(${id})">Save</button>
         </div>`);
+
+    // Populate rich text fields after modal renders
+    requestAnimationFrame(() => {
+        setRteContent('ev-dn', g('dn'));
+        setRteContent('ev-lb', g('lb'));
+        setRteContent('ev-im', g('im'));
+        setRteContent('ev-mx', g('mx'));
+        setRteContent('ev-dx', g('dx'));
+        setRteContent('ev-al', g('al'));
+        setRteContent('ev-nt', g('nt'));
+    });
 }
 
 function saveEditVisit(id) {
     const data = load();
     const idx = data.visits.findIndex(x => x.id === id);
     if (idx < 0) return;
-    const fields = ['d','t','f','dr','dn','lb','im','vt','mx','dx','al','mr','nt'];
-    fields.forEach(k => { data.visits[idx][k] = document.getElementById('ev-' + k).value; });
+    // Plain fields
+    ['d','t','f','dr','vt','mr'].forEach(k => {
+        const el = document.getElementById('ev-' + k);
+        if (el) data.visits[idx][k] = el.value;
+    });
+    // Rich text fields
+    ['dn','lb','im','mx','dx','al','nt'].forEach(k => {
+        data.visits[idx][k] = getRteContent('ev-' + k);
+    });
     data.visits[idx].imgs = collectImgs('ev-imgs-wrap');
     save(data); closeEditModal(); renderVisits();
 }
@@ -1639,7 +2002,14 @@ function renderVisits() {
                     <div class="entry-d">${esc(v.d)}</div>
                 </div>
                 <div class="entry-b">
-                    ${secs.map(([t, c]) => `<div class="sc-label">${t}</div><div class="f-value" style="margin-bottom:8px;">${esc(c)}</div>`).join('')}
+                    ${secs.map(([t, c]) => {
+                        // Detect if content is rich text HTML or plain text
+                        const isHtml = /<[a-z][\s\S]*>/i.test(c);
+                        const rendered = isHtml
+                            ? `<div class="rt-content" style="margin-bottom:8px;">${c}</div>`
+                            : `<div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(c)}</div>`;
+                        return `<div class="sc-label">${t}</div>${rendered}`;
+                    }).join('')}
                     ${imgStrip(v.imgs)}
                     <div class="entry-actions">
                         <button class="act-btn act-edit" onclick="editVisit(${v.id})">Edit</button>
@@ -2558,6 +2928,294 @@ function renderOverview() {
                 <div class="entry-d">${esc(e.date)} · ${esc(e.type.toUpperCase())}</div>
             </div>
         </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// EDUCATION / IEP
+// ══════════════════════════════════════════════════════════════════════════
+function saveEducation() {
+    const d = document.getElementById('ed-d').value;
+    if (!d) { alert('Date required'); return; }
+    const imgs = collectImgs('ed-imgs-wrap');
+    const fields = ['sy','school','type','grade','disability','eligdate','eligdate-label','plaafp','goals','objectives','services','related','accomm','behavior','testing','transition','placement','lre-pct','attendees','parent','progress','evals','nextreview','nextreview-label','notes'];
+    const entry = { id: Date.now(), date: d, imgs };
+    fields.forEach(k => { const el = document.getElementById('ed-' + k); if(el) entry[k.replace('-','_')] = el.value.trim(); });
+    const data = load();
+    if (!data.education) data.education = [];
+    data.education.push(entry);
+    save(data);
+    fields.forEach(k => { const el = document.getElementById('ed-' + k); if(el) el.value = ''; });
+    document.getElementById('ed-d').value = '';
+    document.getElementById('ed-imgs-wrap').innerHTML = '';
+    flash('sv-ed'); renderEducation();
+}
+
+function deleteEducation(id) {
+    if (!confirm('Delete this education record?')) return;
+    const data = load(); data.education = data.education.filter(e => e.id !== id); save(data); renderEducation();
+}
+
+function editEducation(id) {
+    const data = load();
+    const e = data.education.find(x => x.id === id);
+    if (!e) return;
+    const g = k => esc(e[k] || '');
+    const typeOpts = ['IEP — Initial','IEP — Annual Review','IEP — Amendment','504 Plan','Evaluation / Re-evaluation','Eligibility Determination','Transition Plan','Manifestation Determination','Meeting Notes','Progress Report','Incident Report','Correspondence','Other'].map(o => `<option ${e.type===o?'selected':''}>${o}</option>`).join('');
+    const existingImgs = (e.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="eed-img-${i}" value="${esc(u)}" placeholder="URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    openEditModal(`
+        <h2>Edit Education Record</h2>
+        <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
+        <div class="ir"><input type="date" id="eed-d" value="${g('date')}" style="flex:1;"><input id="eed-sy" value="${g('sy')}" placeholder="School Year" style="flex:1;"><input id="eed-school" value="${g('school')}" placeholder="School" style="flex:2;"></div>
+        <label>Record Type</label><div class="ir"><select id="eed-type" style="flex:1;">${typeOpts}</select><input id="eed-grade" value="${g('grade')}" placeholder="Grade" style="flex:1;"></div>
+        <label>Disability / Eligibility</label><input class="fi" id="eed-disability" value="${g('disability')}">
+        <label>PLAAFP</label><textarea class="fi" id="eed-plaafp" rows="3">${g('plaafp')}</textarea>
+        <label>Annual Goals</label><textarea class="fi" id="eed-goals" rows="3">${g('goals')}</textarea>
+        <label>Short-Term Objectives</label><textarea class="fi" id="eed-objectives" rows="2">${g('objectives')}</textarea>
+        <label>Special Education Services</label><textarea class="fi" id="eed-services" rows="2">${g('services')}</textarea>
+        <label>Related Services</label><textarea class="fi" id="eed-related" rows="2">${g('related')}</textarea>
+        <label>Accommodations &amp; Modifications</label><textarea class="fi" id="eed-accomm" rows="3">${g('accomm')}</textarea>
+        <label>Behavioral / BSP</label><textarea class="fi" id="eed-behavior" rows="2">${g('behavior')}</textarea>
+        <label>Testing Accommodations</label><textarea class="fi" id="eed-testing" rows="2">${g('testing')}</textarea>
+        <label>Transition Planning</label><textarea class="fi" id="eed-transition" rows="2">${g('transition')}</textarea>
+        <label>Placement / LRE</label><div class="ir"><input id="eed-placement" value="${g('placement')}" style="flex:2;"><input id="eed-lre_pct" value="${g('lre_pct')}" placeholder="% gen ed" style="flex:1;"></div>
+        <label>Meeting Attendees</label><textarea class="fi" id="eed-attendees" rows="2">${g('attendees')}</textarea>
+        <label>Parent / Guardian Input</label><textarea class="fi" id="eed-parent" rows="2">${g('parent')}</textarea>
+        <label>Progress Toward Previous Goals</label><textarea class="fi" id="eed-progress" rows="2">${g('progress')}</textarea>
+        <label>Evaluation Data</label><textarea class="fi" id="eed-evals" rows="2">${g('evals')}</textarea>
+        <label>Next Review Date</label><div class="ir"><input type="date" id="eed-nextreview" value="${g('nextreview')}" style="flex:1;"><input id="eed-nextreview_label" value="${g('nextreview_label')}" placeholder="Type" style="flex:1;"></div>
+        <label>Your Notes</label><textarea class="fi" id="eed-notes" rows="2">${g('notes')}</textarea>
+        <label>Documents / Images</label>
+        <div id="eed-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('eed-imgs-wrap')">+ Add URL</button>
+        </div>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditEducation(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditEducation(id) {
+    const data = load();
+    const idx = data.education.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    const fields = ['sy','school','grade','disability','plaafp','goals','objectives','services','related','accomm','behavior','testing','transition','placement','lre_pct','attendees','parent','progress','evals','nextreview','nextreview_label','notes'];
+    data.education[idx].date = document.getElementById('eed-d').value;
+    data.education[idx].type = document.getElementById('eed-type').value;
+    fields.forEach(k => { const el = document.getElementById('eed-' + k); if(el) data.education[idx][k] = el.value.trim(); });
+    data.education[idx].imgs = collectImgs('eed-imgs-wrap');
+    save(data); closeEditModal(); renderEducation();
+}
+
+function renderEducation() {
+    const q = (document.getElementById('ed-search')?.value || '').toLowerCase();
+    const data = load();
+    if (!data.education) { document.getElementById('ed-list').innerHTML = '<div class="empty-state">No education records found.</div>'; return; }
+    let list = [...data.education].sort((a,b) => b.date.localeCompare(a.date));
+    if (q) list = list.filter(e => JSON.stringify(e).toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('ed-list').innerHTML = '<div class="empty-state">No education records found.</div>'; return; }
+    const { byYear, years } = yrGroup(list, e => e.date);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(e => {
+            const uid = `ed${e.id}`;
+            const secs = [
+                ['School / Year', [e.school, e.sy, e.grade ? 'Grade '+e.grade : ''].filter(Boolean).join(' · ')],
+                ['Disability / Eligibility', e.disability],
+                ['PLAAFP', e.plaafp],
+                ['Annual Goals', e.goals],
+                ['Short-Term Objectives', e.objectives],
+                ['Special Ed Services', e.services],
+                ['Related Services', e.related],
+                ['Accommodations & Modifications', e.accomm],
+                ['Behavioral / BSP', e.behavior],
+                ['Testing Accommodations', e.testing],
+                ['Transition Planning', e.transition],
+                ['Placement / LRE', [e.placement, e.lre_pct ? e.lre_pct+'% gen ed' : ''].filter(Boolean).join(' · ')],
+                ['Meeting Attendees', e.attendees],
+                ['Parent / Guardian Input', e.parent],
+                ['Progress Toward Previous Goals', e.progress],
+                ['Evaluation Data', e.evals],
+                ['Next Review', [e.nextreview, e.nextreview_label].filter(Boolean).join(' · ')],
+                ['Your Notes', e.notes],
+            ].filter(([,v]) => v);
+            h += `<div class="entry" id="${uid}">
+                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                    <div style="display:flex;align-items:center;gap:12px;flex:1;flex-wrap:wrap;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div>
+                            <div class="entry-t">${esc(e.type || 'Education Record')}</div>
+                            <div style="font-size:11px;color:var(--tx3);">${esc(e.date)}${e.school?' · '+esc(e.school):''}${e.sy?' · '+esc(e.sy):''}</div>
+                        </div>
+                    </div>
+                    <div class="entry-d">&#9662;</div>
+                </div>
+                <div class="entry-b">
+                    ${secs.map(([l,v]) => `<div class="sc-label">${l}</div><div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(v)}</div>`).join('')}
+                    ${imgStrip(e.imgs)}
+                    <div class="entry-actions">
+                        <button class="act-btn act-edit" onclick="editEducation(${e.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteEducation(${e.id})">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('ed-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MENTAL HEALTH
+// ══════════════════════════════════════════════════════════════════════════
+function saveMH() {
+    const d = document.getElementById('mh-d').value;
+    if (!d) { alert('Date required'); return; }
+    const imgs = collectImgs('mh-imgs-wrap');
+    const fields = ['tm','type','dr','specialty','facility','presenting','appearance','speech','affect','thought','cognition','si','hi','sh','safety_notes','dx','meds','interventions','notes','goals','behavior','trauma','social','substance','followup','followup-label','plan','parent-notes'];
+    const entry = { id: Date.now(), date: d, imgs };
+    fields.forEach(k => { const el = document.getElementById('mh-' + k); if(el) entry[k.replace('-','_')] = el.value.trim(); });
+    const data = load();
+    if (!data.mentalhealth) data.mentalhealth = [];
+    data.mentalhealth.push(entry);
+    save(data);
+    fields.forEach(k => { const el = document.getElementById('mh-' + k); if(el) el.value = ''; });
+    document.getElementById('mh-d').value = '';
+    document.getElementById('mh-imgs-wrap').innerHTML = '';
+    flash('sv-mh'); renderMH();
+}
+
+function deleteMH(id) {
+    if (!confirm('Delete this mental health record?')) return;
+    const data = load(); data.mentalhealth = data.mentalhealth.filter(e => e.id !== id); save(data); renderMH();
+}
+
+function editMH(id) {
+    const data = load();
+    const e = data.mentalhealth.find(x => x.id === id);
+    if (!e) return;
+    const g = k => esc(e[k] || '');
+    const typeOpts = ['Therapy Session — Individual','Therapy Session — Family','Therapy Session — Group','Psychiatric Evaluation','Medication Management','Crisis Intervention','Inpatient Admission','Inpatient Discharge','Partial Hospitalization (PHP)','Intensive Outpatient (IOP)','Psychological Testing','Case Management','Telehealth Session','Other'].map(o => `<option ${e.type===o?'selected':''}>${o}</option>`).join('');
+    const siOpts = ['','None reported','Passive ideation — no plan','Active ideation — no plan','Active ideation — with plan','Active ideation — with intent','Recent attempt'].map(o => `<option ${e.si===o?'selected':''}>${o}</option>`).join('');
+    const hiOpts = ['','None reported','Passive ideation — no plan','Active ideation — no plan','Active ideation — with plan'].map(o => `<option ${e.hi===o?'selected':''}>${o}</option>`).join('');
+    const shOpts = ['','None reported','History only — not current','Current — non-suicidal','Current — suicidal intent'].map(o => `<option ${e.sh===o?'selected':''}>${o}</option>`).join('');
+    const existingImgs = (e.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="emh-img-${i}" value="${esc(u)}" placeholder="URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
+    openEditModal(`
+        <h2>Edit Mental Health Record</h2>
+        <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
+        <div class="ir"><input type="date" id="emh-d" value="${g('date')}" style="flex:1;"><input type="time" id="emh-tm" value="${g('tm')}" style="flex:1;"><select id="emh-type" style="flex:2;">${typeOpts}</select></div>
+        <label>Provider</label><div class="ir"><input id="emh-dr" value="${g('dr')}" placeholder="Provider" style="flex:1;"><input id="emh-specialty" value="${g('specialty')}" placeholder="Specialty" style="flex:1;"></div>
+        <label>Facility</label><input class="fi" id="emh-facility" value="${g('facility')}">
+        <label>Presenting Concerns</label><textarea class="fi" id="emh-presenting" rows="2">${g('presenting')}</textarea>
+        <label>Mental Status (MSE)</label>
+        <div class="ir" style="flex-wrap:wrap;">
+            <input id="emh-appearance" value="${g('appearance')}" placeholder="Appearance" style="flex:1;min-width:140px;">
+            <input id="emh-speech" value="${g('speech')}" placeholder="Speech" style="flex:1;min-width:120px;">
+            <input id="emh-affect" value="${g('affect')}" placeholder="Affect/Mood" style="flex:1;min-width:130px;">
+            <input id="emh-thought" value="${g('thought')}" placeholder="Thought Process" style="flex:1;min-width:140px;">
+            <input id="emh-cognition" value="${g('cognition')}" placeholder="Cognition" style="flex:1;min-width:130px;">
+        </div>
+        <label>Safety Assessment</label>
+        <div class="ir" style="flex-wrap:wrap;">
+            <select id="emh-si" style="flex:1;min-width:180px;">${siOpts}</select>
+            <select id="emh-hi" style="flex:1;min-width:180px;">${hiOpts}</select>
+            <select id="emh-sh" style="flex:1;min-width:180px;">${shOpts}</select>
+        </div>
+        <textarea class="fi" id="emh-safety_notes" rows="2">${g('safety_notes')}</textarea>
+        <label>Diagnoses (DSM-5)</label><textarea class="fi" id="emh-dx" rows="2">${g('dx')}</textarea>
+        <label>Medications &amp; Changes</label><textarea class="fi" id="emh-meds" rows="2">${g('meds')}</textarea>
+        <label>Therapeutic Interventions</label><textarea class="fi" id="emh-interventions" rows="2">${g('interventions')}</textarea>
+        <label>Session Content / Clinical Notes</label><textarea class="fi" id="emh-notes" rows="4">${g('notes')}</textarea>
+        <label>Treatment Goals &amp; Progress</label><textarea class="fi" id="emh-goals" rows="2">${g('goals')}</textarea>
+        <label>Behavioral Observations</label><textarea class="fi" id="emh-behavior" rows="2">${g('behavior')}</textarea>
+        <label>Trauma / Background</label><textarea class="fi" id="emh-trauma" rows="2">${g('trauma')}</textarea>
+        <label>Family &amp; Social Functioning</label><textarea class="fi" id="emh-social" rows="2">${g('social')}</textarea>
+        <label>Substance Use</label><textarea class="fi" id="emh-substance" rows="2">${g('substance')}</textarea>
+        <label>Plan &amp; Follow-Up</label>
+        <div class="ir"><input type="date" id="emh-followup" value="${g('followup')}" style="flex:1;"><input id="emh-followup_label" value="${g('followup_label')}" placeholder="Next appt type" style="flex:1;"></div>
+        <textarea class="fi" id="emh-plan" rows="3">${g('plan')}</textarea>
+        <label>Your Notes / Observations</label><textarea class="fi" id="emh-parent_notes" rows="2">${g('parent_notes')}</textarea>
+        <label>Documents &amp; Images</label>
+        <div id="emh-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('emh-imgs-wrap')">+ Add URL</button>
+        </div>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditMH(${id})">Save</button>
+        </div>`);
+}
+
+function saveEditMH(id) {
+    const data = load();
+    const idx = data.mentalhealth.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    const fields = ['tm','dr','specialty','facility','presenting','appearance','speech','affect','thought','cognition','si','hi','sh','safety_notes','dx','meds','interventions','notes','goals','behavior','trauma','social','substance','followup','followup_label','plan','parent_notes'];
+    data.mentalhealth[idx].date = document.getElementById('emh-d').value;
+    data.mentalhealth[idx].type = document.getElementById('emh-type').value;
+    fields.forEach(k => { const el = document.getElementById('emh-' + k); if(el) data.mentalhealth[idx][k] = el.value.trim(); });
+    data.mentalhealth[idx].imgs = collectImgs('emh-imgs-wrap');
+    save(data); closeEditModal(); renderMH();
+}
+
+function renderMH() {
+    const q = (document.getElementById('mh-search')?.value || '').toLowerCase();
+    const cf = document.getElementById('mh-filter')?.value || '';
+    const data = load();
+    if (!data.mentalhealth) { document.getElementById('mh-list').innerHTML = '<div class="empty-state">No mental health records found.</div>'; return; }
+    let list = [...data.mentalhealth].sort((a,b) => (b.date+(b.tm||'')).localeCompare(a.date+(a.tm||'')));
+    if (q) list = list.filter(e => JSON.stringify(e).toLowerCase().includes(q));
+    if (cf) list = list.filter(e => e.type === cf);
+    if (!list.length) { document.getElementById('mh-list').innerHTML = '<div class="empty-state">No mental health records found.</div>'; return; }
+    const { byYear, years } = yrGroup(list, e => e.date);
+    let h = '<div class="yr-spine">';
+    const SAFETY_COLOR = { 'Active ideation — with plan':'#ef4444','Active ideation — with intent':'#dc2626','Recent attempt':'#dc2626','Current — suicidal intent':'#dc2626' };
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(e => {
+            const uid = `mh${e.id}`;
+            const safetyFlags = [e.si, e.hi, e.sh].filter(v => v && v !== 'None reported' && v !== 'History only — not current' && v !== '');
+            const safetyHtml = safetyFlags.map(f => `<span style="font-size:10px;padding:2px 7px;border-radius:100px;background:rgba(239,68,68,0.12);color:${SAFETY_COLOR[f]||'#f97316'};font-weight:700;">${f}</span>`).join('');
+            const secs = [
+                ['Provider / Facility', [e.dr, e.specialty, e.facility].filter(Boolean).join(' · ')],
+                ['Presenting Concerns', e.presenting],
+                ['Mental Status', [e.appearance,e.speech,e.affect,e.thought,e.cognition].filter(Boolean).join(' · ')],
+                ['Safety Notes', e.safety_notes],
+                ['Diagnoses (DSM-5)', e.dx],
+                ['Medications & Changes', e.meds],
+                ['Therapeutic Interventions', e.interventions],
+                ['Session Content / Clinical Notes', e.notes],
+                ['Treatment Goals & Progress', e.goals],
+                ['Behavioral Observations', e.behavior],
+                ['Trauma / Background', e.trauma],
+                ['Family & Social Functioning', e.social],
+                ['Substance Use', e.substance],
+                ['Plan & Follow-Up', [e.followup, e.followup_label, e.plan].filter(Boolean).join(' · ')],
+                ['Your Notes', e.parent_notes],
+            ].filter(([,v]) => v);
+            h += `<div class="entry" id="${uid}">
+                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                    <div style="display:flex;align-items:center;gap:12px;flex:1;flex-wrap:wrap;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div>
+                            <div class="entry-t">${esc(e.type || 'MH Record')}${e.dr?` <span style="font-size:11px;color:var(--tx3);font-weight:400;">· ${esc(e.dr)}</span>`:''}</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px;">${safetyHtml}</div>
+                        </div>
+                    </div>
+                    <div class="entry-d">${esc(e.date)}${e.tm?' · '+esc(e.tm):''}</div>
+                </div>
+                <div class="entry-b">
+                    ${secs.map(([l,v]) => `<div class="sc-label">${l}</div><div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(v)}</div>`).join('')}
+                    ${imgStrip(e.imgs)}
+                    <div class="entry-actions">
+                        <button class="act-btn act-edit" onclick="editMH(${e.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteMH(${e.id})">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('mh-list').innerHTML = h;
 }
 
 // ─── Init (fallback if Firebase module hasn't loaded) ──────────────────────
