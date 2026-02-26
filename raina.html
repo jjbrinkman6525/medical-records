@@ -995,19 +995,25 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 // ══════════════════════════════════════════════════════════════════════════
 const PW_READ = '2458';
 const PW_ADMIN = '8456';
+const PW_RAINA = '73522';
 const AUTH_KEY = 'raina_auth';
 
 let isAdmin = false;
 let isAuthed = false;
+let isPatient = false;
 
 function tryLogin() {
     const val = document.getElementById('lock-input').value.trim();
     if (val === PW_ADMIN) {
-        isAdmin = true; isAuthed = true;
+        isAdmin = true; isPatient = false; isAuthed = true;
         sessionStorage.setItem(AUTH_KEY, 'admin');
         showApp();
+    } else if (val === PW_RAINA) {
+        isAdmin = false; isPatient = true; isAuthed = true;
+        sessionStorage.setItem(AUTH_KEY, 'patient');
+        showApp();
     } else if (val === PW_READ) {
-        isAdmin = false; isAuthed = true;
+        isAdmin = false; isPatient = false; isAuthed = true;
         sessionStorage.setItem(AUTH_KEY, 'readonly');
         showApp();
     } else {
@@ -1030,7 +1036,26 @@ function showApp() {
 function applyAuthMode() {
     const style = document.getElementById('auth-style') || document.createElement('style');
     style.id = 'auth-style';
-    if (!isAdmin) {
+
+    if (isAdmin) {
+        style.textContent = '';
+    } else if (isPatient) {
+        style.textContent = `
+            .add-btn, .act-edit, .act-delete, .act-btn,
+            .btn-save, .add-row-btn,
+            button[onclick*="toggleForm"],
+            button[onclick*="editPCP"],
+            button[onclick*="editAppointments"],
+            button[onclick*="editPatientProfile"],
+            .sb-h button { display: none !important; }
+            #view-journal .add-btn { display: inline-flex !important; }
+            #view-journal .act-edit, #view-journal .act-delete,
+            #view-journal .act-btn { display: inline-flex !important; }
+            #form-journal .btn-save,
+            #form-journal .btn-cancel-form,
+            #form-journal .add-row-btn { display: inline-flex !important; }`;
+        setTimeout(() => showView('journal'), 100);
+    } else {
         style.textContent = `
             .add-btn, .act-edit, .act-delete, .act-btn,
             .btn-save, .add-row-btn,
@@ -1039,20 +1064,20 @@ function applyAuthMode() {
             button[onclick*="editAppointments"],
             button[onclick*="editPatientProfile"],
             .sb-h button { display: none !important; }`;
-    } else {
-        style.textContent = '';
     }
     document.head.appendChild(style);
+
     const badge = document.getElementById('admin-badge');
     if (badge) {
-        badge.textContent = isAdmin ? '🔑 Admin' : '👁 View Only';
-        badge.style.color = isAdmin ? 'var(--ac)' : '#707070';
+        if (isAdmin) { badge.textContent = '🔑 Admin'; badge.style.color = 'var(--ac)'; }
+        else if (isPatient) { badge.textContent = '✏️ Journal Access'; badge.style.color = '#a78bfa'; }
+        else { badge.textContent = '👁 View Only'; badge.style.color = '#707070'; }
     }
 }
 
 function doLogout() {
     sessionStorage.removeItem(AUTH_KEY);
-    isAdmin = false; isAuthed = false;
+    isAdmin = false; isPatient = false; isAuthed = false;
     document.getElementById('main-app').style.display = 'none';
     document.getElementById('lock-screen').style.display = 'flex';
     document.getElementById('lock-input').value = '';
@@ -1061,8 +1086,9 @@ function doLogout() {
 
 function checkAuth() {
     const stored = sessionStorage.getItem(AUTH_KEY);
-    if (stored === 'admin') { isAdmin = true; isAuthed = true; showApp(); }
-    else if (stored === 'readonly') { isAdmin = false; isAuthed = true; showApp(); }
+    if (stored === 'admin') { isAdmin = true; isPatient = false; isAuthed = true; showApp(); }
+    else if (stored === 'patient') { isAdmin = false; isPatient = true; isAuthed = true; showApp(); }
+    else if (stored === 'readonly') { isAdmin = false; isPatient = false; isAuthed = true; showApp(); }
 }
 
 // ── One-time migration from localStorage to Firebase ──────────────────────
@@ -1546,8 +1572,10 @@ function editVisit(id) {
     const v = data.visits.find(x => x.id === id);
     if (!v) return;
     const g = k => esc(v[k] || '');
+    const existingImgs = (v.imgs||[]).map((u,i) => `<div class="img-url-row"><input id="ev-img-${i}" value="${esc(u)}" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>`).join('');
     openEditModal(`
         <h2>Edit Visit</h2>
+        <div style="max-height:65vh;overflow-y:auto;padding-right:4px;">
         <div class="ir"><input type="date" id="ev-d" value="${g('d')}" style="flex:1;"><input id="ev-t" value="${g('t')}" placeholder="Type/Reason" style="flex:1;"></div>
         <div class="ir"><input id="ev-f" value="${g('f')}" placeholder="Facility" style="flex:1;"><input id="ev-dr" value="${g('dr')}" placeholder="Provider(s)" style="flex:1;"></div>
         <label>Physician Notes / Reports</label><textarea class="fi" id="ev-dn" rows="3">${g('dn')}</textarea>
@@ -1559,6 +1587,10 @@ function editVisit(id) {
         <label>Allergies</label><textarea class="fi" id="ev-al" rows="2">${g('al')}</textarea>
         <label>Medical Records Info</label><input class="fi" id="ev-mr" value="${g('mr')}">
         <label>Your Notes</label><textarea class="fi" id="ev-nt" rows="2">${g('nt')}</textarea>
+        <label>Images (Google Drive links)</label>
+        <div id="ev-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('ev-imgs-wrap')">+ Add Image URL</button>
+        </div>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditVisit(${id})">Save</button>
@@ -1571,6 +1603,7 @@ function saveEditVisit(id) {
     if (idx < 0) return;
     const fields = ['d','t','f','dr','dn','lb','im','vt','mx','dx','al','mr','nt'];
     fields.forEach(k => { data.visits[idx][k] = document.getElementById('ev-' + k).value; });
+    data.visits[idx].imgs = collectImgs('ev-imgs-wrap');
     save(data); closeEditModal(); renderVisits();
 }
 
