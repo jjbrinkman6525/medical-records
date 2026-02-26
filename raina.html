@@ -5,6 +5,166 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Raina | Patient Portal</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script type="module">
+// ══════════════════════════════════════════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════════════════════════════════════════
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD0iBz1JmRb59JclYbz506KbBI6hkithP0",
+  authDomain: "jjbrinkman6525-medical-records.firebaseapp.com",
+  projectId: "jjbrinkman6525-medical-records",
+  storageBucket: "jjbrinkman6525-medical-records.firebasestorage.app",
+  messagingSenderId: "197582250930",
+  appId: "1:197582250930:web:ba7ac704d7fd412ec77aab"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const DOC_ID = 'raina';
+const PATIENT_DOC = doc(db, 'patients', DOC_ID);
+const META_DOC = doc(db, 'meta', DOC_ID);
+
+const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]};
+
+// ── Sync status indicator ──────────────────────────────────────────────────
+function setSyncStatus(state) {
+    const el = document.getElementById('sync-status');
+    if (!el) return;
+    const states = {
+        syncing: { text:'↑ Syncing...', color:'#eab308' },
+        saved:   { text:'✓ Synced', color:'#22c55e' },
+        error:   { text:'⚠ Offline', color:'#ef4444' },
+        live:    { text:'● Live', color:'#22c55e' }
+    };
+    const s = states[state] || states.live;
+    el.textContent = s.text;
+    el.style.color = s.color;
+}
+
+// ── Load from Firestore (with localStorage cache fallback) ─────────────────
+window._dbCache = null;
+
+async function loadFromFirebase() {
+    try {
+        const snap = await getDoc(PATIENT_DOC);
+        const data = snap.exists() ? snap.data() : { ...EMPTY };
+        // Ensure all keys exist
+        Object.keys(EMPTY).forEach(k => { if (!data[k]) data[k] = []; });
+        window._dbCache = data;
+        localStorage.setItem('raina_records_cache', JSON.stringify(data));
+        return data;
+    } catch(e) {
+        console.warn('Firebase load failed, using cache:', e);
+        const cached = localStorage.getItem('raina_records_cache');
+        window._dbCache = cached ? JSON.parse(cached) : { ...EMPTY };
+        setSyncStatus('error');
+        return window._dbCache;
+    }
+}
+
+async function saveToFirebase(data) {
+    setSyncStatus('syncing');
+    window._dbCache = data;
+    localStorage.setItem('raina_records_cache', JSON.stringify(data));
+    try {
+        await setDoc(PATIENT_DOC, data);
+        setSyncStatus('saved');
+        setTimeout(() => setSyncStatus('live'), 2000);
+    } catch(e) {
+        console.error('Firebase save failed:', e);
+        setSyncStatus('error');
+    }
+}
+
+// ── Drop-in replacements for load() and save() ────────────────────────────
+window.load = function() {
+    return window._dbCache || JSON.parse(localStorage.getItem('raina_records_cache') || 'null') || { ...EMPTY };
+};
+window.save = function(data) {
+    saveToFirebase(data);
+};
+
+// ── PCP & Appointments stored in meta doc ─────────────────────────────────
+window._metaCache = null;
+
+async function loadMeta() {
+    try {
+        const snap = await getDoc(META_DOC);
+        window._metaCache = snap.exists() ? snap.data() : {};
+        return window._metaCache;
+    } catch(e) {
+        return window._metaCache || {};
+    }
+}
+
+async function saveMeta(meta) {
+    window._metaCache = meta;
+    try { await setDoc(META_DOC, meta); } catch(e) { console.error('Meta save failed:', e); }
+}
+
+// Override PCP and appointments storage to use Firestore meta doc
+window.loadPCP = function() { return (window._metaCache || {}).pcp || {}; };
+window.savePCP = function(pcp) {
+    const meta = window._metaCache || {};
+    meta.pcp = pcp;
+    saveMeta(meta);
+};
+window.loadAppts = function() { return (window._metaCache || {}).appointments || []; };
+window.saveAppts = function(a) {
+    const meta = window._metaCache || {};
+    meta.appointments = a;
+    saveMeta(meta);
+};
+window.loadProfile = function() { return (window._metaCache || {}).profile || {}; };
+window.saveProfile = function(p) {
+    const meta = window._metaCache || {};
+    meta.profile = p;
+    saveMeta(meta);
+};
+
+// ── Real-time listener — updates all connected devices instantly ───────────
+function startRealtimeSync() {
+    onSnapshot(PATIENT_DOC, (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.data();
+        Object.keys(EMPTY).forEach(k => { if (!data[k]) data[k] = []; });
+        window._dbCache = data;
+        localStorage.setItem('raina_records_cache', JSON.stringify(data));
+        // Re-render current view silently
+        const renders = {
+            overview: window.renderOverview, timeline: window.renderTimeline,
+            visits: window.renderVisits, labs: window.renderLabs,
+            imaging: window.renderImaging, journal: window.renderJournal,
+            messages: window.renderMessages, dx: window.renderDX
+        };
+        const cur = window.currentView;
+        if (cur && renders[cur]) renders[cur]();
+        setSyncStatus('live');
+    }, (err) => { console.warn('Snapshot error:', err); setSyncStatus('error'); });
+
+    onSnapshot(META_DOC, (snap) => {
+        if (!snap.exists()) return;
+        window._metaCache = snap.data();
+        if (window.renderPCPCard) window.renderPCPCard();
+        if (window.renderApptBar) window.renderApptBar();
+        if (window.renderPatientProfile) window.renderPatientProfile();
+    });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+    window._firebaseReady = true;
+    setSyncStatus('syncing');
+    await Promise.all([loadFromFirebase(), loadMeta()]);
+    setSyncStatus('live');
+    startRealtimeSync();
+    // Auth check — show lock screen or app depending on session
+    checkAuth();
+});
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
@@ -331,7 +491,24 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 </style>
 </head>
 <body>
-<div class="app">
+<!-- Login Screen -->
+<div id="lock-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);position:fixed;inset:0;z-index:9999;">
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:48px 40px;max-width:380px;width:90%;text-align:center;">
+    <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--ac);font-style:italic;text-shadow:0 0 20px var(--ac-glow);margin-bottom:6px;">Raina</div>
+    <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:2px;margin-bottom:32px;">Patient Portal · Secure Access</div>
+    <input id="lock-input" type="password" inputmode="numeric" maxlength="6"
+      placeholder="Enter access code"
+      style="width:100%;padding:14px;font-size:22px;text-align:center;letter-spacing:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);outline:none;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;"
+      onkeydown="if(event.key==='Enter')tryLogin()">
+    <button onclick="tryLogin()"
+      style="width:100%;padding:13px;background:var(--ac);color:#000;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;">
+      Enter
+    </button>
+    <div id="lock-err" style="color:#ff4d4d;font-size:12px;margin-top:10px;min-height:16px;"></div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none;">
 
   <!-- Sidebar -->
   <div class="sb">
@@ -359,11 +536,13 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
     <div style="padding:16px;border-top:1px solid var(--bd)">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="width:36px;height:36px;background:var(--sf2);border:1px solid var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ac);font-weight:bold;font-family:'Playfair Display';font-size:18px;">R</div>
-        <div>
+        <div style="flex:1;">
           <div style="font-weight:600;font-size:13px;">Raina</div>
           <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;">IR00023626</div>
         </div>
+        <button onclick="doLogout()" title="Logout" style="background:transparent;border:1px solid var(--bd);color:var(--tx3);border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;">⏏ Out</button>
       </div>
+      <div id="admin-badge" style="font-size:10px;margin-top:6px;text-align:center;font-family:'IBM Plex Mono',monospace;"></div>
     </div>
   </div>
 
@@ -379,7 +558,10 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           <button onclick="editAppointments()" style="background:transparent;border:1px solid var(--bd);color:var(--tx3);border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;flex-shrink:0;">Edit</button>
         </div>
       </div>
-      <div class="user-id" id="view-indicator">LOC: DATA_NODE_01</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="sync-status" style="font-size:10px;font-family:'IBM Plex Mono',monospace;color:#22c55e;">● Live</span>
+        <div class="user-id" id="view-indicator">LOC: DATA_NODE_01</div>
+      </div>
     </div>
 
     <div class="content" id="main-scroll">
@@ -794,6 +976,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
     </div><!-- end .content -->
   </div><!-- end .main -->
 </div><!-- end .app -->
+</div><!-- end #main-app -->
 
 <!-- Mobile sidebar overlay -->
 <div class="sb-overlay" id="sb-overlay" onclick="closeMobMenu()"></div>
@@ -806,9 +989,101 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 </div>
 
 <script>
+// ─── Storage — overridden by Firebase module at runtime ────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════════════════════════
+const PW_READ = '2458';
+const PW_ADMIN = '8456';
+const AUTH_KEY = 'raina_auth';
+
+let isAdmin = false;
+let isAuthed = false;
+
+function tryLogin() {
+    const val = document.getElementById('lock-input').value.trim();
+    if (val === PW_ADMIN) {
+        isAdmin = true; isAuthed = true;
+        sessionStorage.setItem(AUTH_KEY, 'admin');
+        showApp();
+    } else if (val === PW_READ) {
+        isAdmin = false; isAuthed = true;
+        sessionStorage.setItem(AUTH_KEY, 'readonly');
+        showApp();
+    } else {
+        document.getElementById('lock-err').textContent = 'Incorrect code. Try again.';
+        document.getElementById('lock-input').value = '';
+        setTimeout(() => document.getElementById('lock-err').textContent = '', 3000);
+    }
+}
+
+function showApp() {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'flex';
+    applyAuthMode();
+    showView('overview');
+    renderPatientProfile();
+    renderApptBar();
+}
+
+function applyAuthMode() {
+    const style = document.getElementById('auth-style') || document.createElement('style');
+    style.id = 'auth-style';
+    if (!isAdmin) {
+        style.textContent = `
+            .add-btn, .act-edit, .act-delete, .act-btn,
+            .btn-save, .add-row-btn,
+            button[onclick*="toggleForm"],
+            button[onclick*="editPCP"],
+            button[onclick*="editAppointments"],
+            button[onclick*="editPatientProfile"],
+            .sb-h button { display: none !important; }`;
+    } else {
+        style.textContent = '';
+    }
+    document.head.appendChild(style);
+    const badge = document.getElementById('admin-badge');
+    if (badge) {
+        badge.textContent = isAdmin ? '🔑 Admin' : '👁 View Only';
+        badge.style.color = isAdmin ? 'var(--ac)' : '#707070';
+    }
+}
+
+function doLogout() {
+    sessionStorage.removeItem(AUTH_KEY);
+    isAdmin = false; isAuthed = false;
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('lock-input').value = '';
+    document.getElementById('lock-err').textContent = '';
+}
+
+function checkAuth() {
+    const stored = sessionStorage.getItem(AUTH_KEY);
+    if (stored === 'admin') { isAdmin = true; isAuthed = true; showApp(); }
+    else if (stored === 'readonly') { isAdmin = false; isAuthed = true; showApp(); }
+}
+
+const KEY = 'raina_records';
+function load() {
+    if (window._dbCache) return window._dbCache;
+    const c = localStorage.getItem('raina_records_cache');
+    return c ? JSON.parse(c) : {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]};
+}
+function save(data) {
+    if (window.save && window.save !== save) { window.save(data); return; }
+    localStorage.setItem('raina_records_cache', JSON.stringify(data));
+}
+
+const PCP_KEY = 'raina_pcp';
+const APPT_KEY = 'raina_appointments';
 const PROFILE_KEY = 'raina_profile';
-function loadProfile() { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
-function saveProfile(p) { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
+function loadPCP() { return window._metaCache?.pcp || JSON.parse(localStorage.getItem(PCP_KEY)||'{}'); }
+function savePCP(p) { if(window.savePCP&&window.savePCP!==savePCP){window.savePCP(p);return;} localStorage.setItem(PCP_KEY,JSON.stringify(p)); }
+function loadAppts() { return window._metaCache?.appointments || JSON.parse(localStorage.getItem(APPT_KEY)||'[]'); }
+function saveAppts(a) { if(window.saveAppts&&window.saveAppts!==saveAppts){window.saveAppts(a);return;} localStorage.setItem(APPT_KEY,JSON.stringify(a)); }
+function loadProfile() { return window._metaCache?.profile || JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}'); }
+function saveProfile(p) { if(window.saveProfile&&window.saveProfile!==saveProfile){window.saveProfile(p);return;} localStorage.setItem(PROFILE_KEY,JSON.stringify(p)); }
 
 function renderPatientProfile() {
     const p = loadProfile();
@@ -856,11 +1131,6 @@ function savePatientProfile() {
     setStatus('SYSTEM: PROFILE UPDATED');
 }
 
-// ─── Storage ───────────────────────────────────────────────────────────────
-const KEY = 'raina_records';
-function load() { return JSON.parse(localStorage.getItem(KEY)) || {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]}; }
-function save(data) { localStorage.setItem(KEY, JSON.stringify(data)); }
-
 // ─── Mobile menu ───────────────────────────────────────────────────────────
 function toggleMobMenu() {
     document.querySelector('.sb').classList.toggle('mob-open');
@@ -907,10 +1177,6 @@ function setStatus(msg) {
 }
 
 // ─── Appointments ──────────────────────────────────────────────────────────
-const APPT_KEY = 'raina_appointments';
-function loadAppts() { return JSON.parse(localStorage.getItem(APPT_KEY)) || []; }
-function saveAppts(a) { localStorage.setItem(APPT_KEY, JSON.stringify(a)); }
-
 function renderApptBar() {
     const appts = loadAppts().filter(a => a.date >= new Date().toISOString().slice(0,10)).sort((a,b) => a.date.localeCompare(b.date));
     const el = document.getElementById('appt-display');
@@ -1974,17 +2240,8 @@ function renderDX() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// PCP (Primary Care Provider) — stored separately
+// PCP (Primary Care Provider)
 // ══════════════════════════════════════════════════════════════════════════
-const PCP_KEY = 'raina_pcp';
-
-function loadPCP() {
-    return JSON.parse(localStorage.getItem(PCP_KEY)) || {};
-}
-function savePCP(pcp) {
-    localStorage.setItem(PCP_KEY, JSON.stringify(pcp));
-}
-
 function renderPCPCard() {
     const p = loadPCP();
     const el = document.getElementById('pcp-display');
@@ -2184,26 +2441,16 @@ function renderOverview() {
         </div>`).join('');
 }
 
-// ─── Init ──────────────────────────────────────────────────────────────────
-window.onload = () => {
-    // Migrate old format if needed
-    const raw = localStorage.getItem(KEY);
-    if (raw) {
-        const parsed = JSON.parse(raw);
-        // If old format was an array (the previous version stored an array)
-        if (Array.isArray(parsed)) {
-            const migrated = { visits:[], labs:[], imaging:[], journal:[], messages:[], timeline:[], dx:[] };
-            parsed.forEach(e => {
-                const type = e.type || 'visits';
-                if (migrated[type]) migrated[type].push(e);
-            });
-            save(migrated);
-        }
-    }
+// ─── Init (fallback if Firebase module hasn't loaded) ──────────────────────
+// Primary init is handled by the Firebase module above.
+// This fires only if the module fails to load.
+window.addEventListener('load', () => {
+    if (window._firebaseReady) return; // Firebase module handled it
     showView('overview');
     renderPatientProfile();
     renderApptBar();
-};
+});
+
 </script>
 </body>
 </html>
