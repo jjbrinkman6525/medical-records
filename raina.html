@@ -27,7 +27,7 @@ const DOC_ID = 'raina';
 const PATIENT_DOC = doc(db, 'patients', DOC_ID);
 const META_DOC = doc(db, 'meta', DOC_ID);
 
-const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],education:[],mentalhealth:[]};
+const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
 
 // ── Sync status indicator ──────────────────────────────────────────────────
 function setSyncStatus(state) {
@@ -138,7 +138,9 @@ function startRealtimeSync() {
             overview: window.renderOverview, timeline: window.renderTimeline,
             visits: window.renderVisits, labs: window.renderLabs,
             imaging: window.renderImaging, journal: window.renderJournal,
-            messages: window.renderMessages, dx: window.renderDX
+            messages: window.renderMessages, dx: window.renderDX,
+            mentalhealth: window.renderMH,
+            iep: window.renderIEP
         };
         const cur = window.currentView;
         if (cur && renders[cur]) renders[cur]();
@@ -219,7 +221,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', sa
 .card-sub { font-size: 11px; color: var(--tx2); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
 
 /* Entry cards */
-.entry { background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s; }
+.entry { background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; margin-bottom: 12px; transition: border-color 0.2s; }
 .entry:hover { border-color: var(--tx3); }
 .entry-h { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(90deg, var(--sf) 0%, var(--sf2) 100%); }
 .entry-t { font-weight: 600; color: var(--tx); font-size: 13px; flex: 1; }
@@ -496,7 +498,16 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 .sb-5 { background:rgba(220,38,38,0.2);color:#dc2626;font-weight:800; }
 
 
-/* ── Cherry blossom background ─────────────────────────────────────────── */
+/* ── IEP tab buttons ─────────────────────────────────────────────────── */
+.iep-tab {
+    background: var(--sf2); border: 1px solid var(--bd); color: var(--tx2);
+    border-radius: 6px; padding: 8px 16px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+}
+.iep-tab:hover { border-color: var(--tx3); color: var(--tx); }
+.iep-tab.active { background: var(--ac); color: #000; border-color: var(--ac); box-shadow: 0 4px 12px var(--ac-glow); }
+
+
 .blossom-bg {
     position: fixed;
     top: 0;
@@ -581,8 +592,8 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
       <div class="nav-i" data-view="journal" onclick="showView('journal')">Symptom Journal</div>
       <div class="nav-i" data-view="messages" onclick="showView('messages')">Portal Messages</div>
       <div class="nav-i" data-view="dx" onclick="showView('dx')">Dx Timeline</div>
-      <div class="nav-i" data-view="education" onclick="showView('education')">Education / IEP</div>
       <div class="nav-i" data-view="mentalhealth" onclick="showView('mentalhealth')">Mental Health</div>
+      <div class="nav-i" data-view="iep" onclick="showView('iep')">IEP &amp; Education</div>
     </div>
     <div style="padding:16px;border-top:1px solid var(--bd)">
       <div style="display:flex;align-items:center;gap:10px">
@@ -1024,119 +1035,6 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
         <div id="dx-list"></div>
       </div>
 
-    </div><!-- end .content -->
-
-      <!-- EDUCATION / IEP -->
-      <div id="view-education" class="view">
-        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
-          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">Education / IEP</h1>
-          <p style="color:var(--tx2);font-size:14px;">Individualized Education Program records, accommodations, and academic documentation.</p>
-        </div>
-        <button class="add-btn" onclick="toggleForm('form-education')"><span style="font-size:18px;">+</span> Add IEP / Education Record</button>
-        <div class="add-form" id="form-education" style="max-height:75vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
-          <h3>New Education Record</h3>
-
-          <div class="j-section-label"><span class="j-section-num">1</span> Record Date &amp; School Year</div>
-          <div class="ir">
-            <input type="date" id="ed-d" style="min-width:155px;">
-            <input id="ed-sy" placeholder="School Year (e.g. 2024–2025)" style="flex:1;">
-            <input id="ed-school" placeholder="School / Institution" style="flex:2;">
-          </div>
-
-          <div class="j-section-label"><span class="j-section-num">2</span> Record Type</div>
-          <div class="ir">
-            <select id="ed-type" style="flex:1;">
-              <option>IEP — Initial</option>
-              <option>IEP — Annual Review</option>
-              <option>IEP — Amendment</option>
-              <option>504 Plan</option>
-              <option>Evaluation / Re-evaluation</option>
-              <option>Eligibility Determination</option>
-              <option>Transition Plan</option>
-              <option>Manifestation Determination</option>
-              <option>Meeting Notes</option>
-              <option>Progress Report</option>
-              <option>Incident Report</option>
-              <option>Correspondence</option>
-              <option>Other</option>
-            </select>
-            <input id="ed-grade" placeholder="Grade Level" style="flex:1;">
-          </div>
-
-          <div class="j-section-label"><span class="j-section-num">3</span> Disability / Eligibility Category</div>
-          <div class="ir" style="flex-wrap:wrap;">
-            <input id="ed-disability" placeholder="Primary disability category (e.g. OHI, SLD, ED, Autism...)" style="flex:2;min-width:220px;">
-            <input id="ed-eligdate" type="date" style="min-width:155px;">
-            <input id="ed-eligdate-label" placeholder="Eligibility date label" style="flex:1;min-width:160px;">
-          </div>
-
-          <div class="j-section-label"><span class="j-section-num">4</span> Present Levels of Academic Achievement (PLAAFP)</div>
-          <textarea class="fi" id="ed-plaafp" rows="4" placeholder="Current academic performance, strengths, areas of need, how disability affects involvement in general education..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">5</span> Annual Goals</div>
-          <textarea class="fi" id="ed-goals" rows="4" placeholder="Measurable annual goals — academic, behavioral, social/emotional, communication, transition..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">6</span> Short-Term Objectives / Benchmarks</div>
-          <textarea class="fi" id="ed-objectives" rows="3" placeholder="Intermediate steps toward annual goals..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">7</span> Special Education Services</div>
-          <textarea class="fi" id="ed-services" rows="3" placeholder="Type of service, provider, frequency, duration, location (e.g. Resource Room 45min/day, Speech 2x/week 30min...)"></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">8</span> Related Services</div>
-          <textarea class="fi" id="ed-related" rows="2" placeholder="OT, PT, speech/language, counseling, transportation, nursing services..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">9</span> Accommodations &amp; Modifications</div>
-          <textarea class="fi" id="ed-accomm" rows="4" placeholder="Extended time, preferential seating, reduced assignments, sensory breaks, assistive technology, read-aloud, calculator use, modified grading..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">10</span> Behavioral / Positive Support Plan</div>
-          <textarea class="fi" id="ed-behavior" rows="3" placeholder="BIP summary, target behaviors, antecedents, replacement behaviors, reinforcement strategies, crisis protocol..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">11</span> Testing Accommodations</div>
-          <textarea class="fi" id="ed-testing" rows="2" placeholder="State/district test accommodations — extended time, separate setting, text-to-speech, scribe..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">12</span> Transition Planning</div>
-          <textarea class="fi" id="ed-transition" rows="3" placeholder="Post-secondary goals, transition services, agency linkages, course of study (for age 14+)..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">13</span> Placement / Least Restrictive Environment (LRE)</div>
-          <div class="ir">
-            <input id="ed-placement" placeholder="Placement setting (e.g. General Ed 80%, Resource Room 20%)" style="flex:2;">
-            <input id="ed-lre-pct" placeholder="% time in general ed" style="flex:1;">
-          </div>
-
-          <div class="j-section-label"><span class="j-section-num">14</span> Meeting Attendees</div>
-          <textarea class="fi" id="ed-attendees" rows="2" placeholder="Names and roles of all IEP meeting participants..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">15</span> Parent / Guardian Input</div>
-          <textarea class="fi" id="ed-parent" rows="3" placeholder="Concerns raised, requests made, agreements or disagreements noted, prior written notice..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">16</span> Progress Toward Previous Goals</div>
-          <textarea class="fi" id="ed-progress" rows="3" placeholder="Status of goals from last IEP — met, not met, continuing. Include data/evidence..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">17</span> Evaluation Data &amp; Assessments</div>
-          <textarea class="fi" id="ed-evals" rows="3" placeholder="Standardized test scores, teacher observations, work samples, psychoeducational evaluation results..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">18</span> Next Review / Reevaluation Date</div>
-          <div class="ir">
-            <input type="date" id="ed-nextreview" style="min-width:155px;">
-            <input id="ed-nextreview-label" placeholder="Type (Annual Review, Re-eval, etc.)" style="flex:1;">
-          </div>
-
-          <div class="j-section-label"><span class="j-section-num">19</span> Your Notes / Concerns</div>
-          <textarea class="fi" id="ed-notes" rows="3" placeholder="Personal observations, follow-up items, things to dispute, advocate questions..."></textarea>
-
-          <div class="lbl" style="margin-bottom:4px;margin-top:4px;">Documents (Google Drive links)</div>
-          <div id="ed-imgs-wrap"></div>
-          <button class="add-row-btn" onclick="addImgRow('ed-imgs-wrap')">+ Add Document / Image URL</button>
-
-          <div class="save-row">
-            <button class="btn-save" onclick="saveEducation()">Save Record</button>
-            <button class="btn-cancel-form" onclick="toggleForm('form-education')">Cancel</button>
-            <span class="saved-msg" id="sv-ed">Saved</span>
-          </div>
-        </div>
-        <div class="search-bar"><input id="ed-search" placeholder="Search education records..." oninput="renderEducation()"></div>
-        <div id="ed-list" style="margin-top:12px;"></div>
-      </div>
 
       <!-- MENTAL HEALTH -->
       <div id="view-mentalhealth" class="view">
@@ -1145,143 +1043,151 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           <p style="color:var(--tx2);font-size:14px;">Psychiatric visits, therapy sessions, and behavioral health documentation.</p>
         </div>
         <button class="add-btn" onclick="toggleForm('form-mh')"><span style="font-size:18px;">+</span> Add Mental Health Record</button>
-        <div class="add-form" id="form-mh" style="max-height:75vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div class="add-form" id="form-mh">
           <h3>New Mental Health Record</h3>
-
-          <div class="j-section-label"><span class="j-section-num">1</span> Date &amp; Session Info</div>
           <div class="ir">
             <input type="date" id="mh-d" style="min-width:155px;">
-            <input type="time" id="mh-tm" style="min-width:120px;">
-            <select id="mh-type" style="flex:1;">
-              <option>Therapy Session — Individual</option>
-              <option>Therapy Session — Family</option>
-              <option>Therapy Session — Group</option>
-              <option>Psychiatric Evaluation</option>
-              <option>Medication Management</option>
-              <option>Crisis Intervention</option>
-              <option>Inpatient Admission</option>
-              <option>Inpatient Discharge</option>
-              <option>Partial Hospitalization (PHP)</option>
-              <option>Intensive Outpatient (IOP)</option>
-              <option>Psychological Testing</option>
-              <option>Case Management</option>
-              <option>Telehealth Session</option>
-              <option>Other</option>
-            </select>
+            <input id="mh-t" placeholder="Type / Reason" style="flex:1;">
           </div>
-
-          <div class="j-section-label"><span class="j-section-num">2</span> Provider &amp; Facility</div>
           <div class="ir">
-            <input id="mh-dr" placeholder="Provider name &amp; credentials" style="flex:1;">
-            <input id="mh-specialty" placeholder="Specialty (Psychiatrist, LCSW, Psychologist...)" style="flex:1;">
+            <input id="mh-f" placeholder="Facility" style="flex:1;">
+            <input id="mh-dr" placeholder="Provider(s)" style="flex:1;">
           </div>
-          <input class="fi" id="mh-facility" placeholder="Facility / Practice name &amp; address">
-
-          <div class="j-section-label"><span class="j-section-num">3</span> Presenting Concerns</div>
-          <textarea class="fi" id="mh-presenting" rows="3" placeholder="Chief complaint, reason for visit, current symptoms, what prompted this appointment..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">4</span> Mental Status Examination (MSE)</div>
-          <div class="ir" style="flex-wrap:wrap;">
-            <input id="mh-appearance" placeholder="Appearance / Behavior" style="flex:1;min-width:170px;">
-            <input id="mh-speech" placeholder="Speech" style="flex:1;min-width:130px;">
-            <input id="mh-affect" placeholder="Affect / Mood" style="flex:1;min-width:140px;">
-            <input id="mh-thought" placeholder="Thought Process" style="flex:1;min-width:150px;">
-            <input id="mh-cognition" placeholder="Cognition / Insight" style="flex:1;min-width:160px;">
-          </div>
-
-          <div class="j-section-label"><span class="j-section-num">5</span> Safety Assessment</div>
-          <div class="ir" style="flex-wrap:wrap;">
-            <select id="mh-si" style="flex:1;min-width:200px;">
-              <option value="">Suicidal Ideation — Select</option>
-              <option>None reported</option>
-              <option>Passive ideation — no plan</option>
-              <option>Active ideation — no plan</option>
-              <option>Active ideation — with plan</option>
-              <option>Active ideation — with intent</option>
-              <option>Recent attempt</option>
-            </select>
-            <select id="mh-hi" style="flex:1;min-width:200px;">
-              <option value="">Homicidal Ideation — Select</option>
-              <option>None reported</option>
-              <option>Passive ideation — no plan</option>
-              <option>Active ideation — no plan</option>
-              <option>Active ideation — with plan</option>
-            </select>
-            <select id="mh-sh" style="flex:1;min-width:200px;">
-              <option value="">Self-Harm — Select</option>
-              <option>None reported</option>
-              <option>History only — not current</option>
-              <option>Current — non-suicidal</option>
-              <option>Current — suicidal intent</option>
-            </select>
-          </div>
-          <textarea class="fi" id="mh-safety-notes" rows="2" placeholder="Safety plan details, crisis contacts, means restriction, hospitalization decision..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">6</span> Diagnoses (DSM-5)</div>
-          <textarea class="fi" id="mh-dx" rows="2" placeholder="Diagnoses with DSM-5 codes (e.g. F32.1 Major Depressive Disorder, moderate; F41.1 GAD)..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">7</span> Current Medications &amp; Changes</div>
-          <textarea class="fi" id="mh-meds" rows="3" placeholder="Psychiatric medications, dosages, start dates, changes made this visit, side effects reported..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">8</span> Therapeutic Interventions Used</div>
-          <textarea class="fi" id="mh-interventions" rows="2" placeholder="CBT, DBT, EMDR, motivational interviewing, somatic therapy, play therapy, art therapy, mindfulness..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">9</span> Session Content &amp; Clinical Notes</div>
-          <textarea class="fi" id="mh-notes" rows="5" placeholder="Topics discussed, patient response, progress toward treatment goals, significant disclosures, family dynamics..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">10</span> Treatment Goals &amp; Progress</div>
-          <textarea class="fi" id="mh-goals" rows="3" placeholder="Active treatment goals, progress made, barriers identified, goal updates..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">11</span> Behavioral Observations</div>
-          <textarea class="fi" id="mh-behavior" rows="2" placeholder="Observed behaviors during session, engagement level, cooperation, notable reactions..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">12</span> Trauma History / Relevant Background</div>
-          <textarea class="fi" id="mh-trauma" rows="2" placeholder="Relevant trauma disclosures, ACEs, abuse history, significant life events impacting treatment..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">13</span> Family &amp; Social Functioning</div>
-          <textarea class="fi" id="mh-social" rows="2" placeholder="Family relationships, peer relationships, school/work functioning, social support, living situation..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">14</span> Substance Use</div>
-          <textarea class="fi" id="mh-substance" rows="2" placeholder="Alcohol, cannabis, illicit drugs, self-medication patterns, CAGE/AUDIT screening results..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">15</span> Plan &amp; Follow-Up</div>
-          <div class="ir">
-            <input type="date" id="mh-followup" style="min-width:155px;">
-            <input id="mh-followup-label" placeholder="Next appointment type" style="flex:1;">
-          </div>
-          <textarea class="fi" id="mh-plan" rows="3" placeholder="Treatment plan updates, referrals made, homework assigned, safety plan, crisis resources given, medication adjustments, coordination of care..."></textarea>
-
-          <div class="j-section-label"><span class="j-section-num">16</span> Your Notes / Observations</div>
-          <textarea class="fi" id="mh-parent-notes" rows="3" placeholder="Your own observations as parent/caregiver — what you noticed before/after, concerns to raise, patterns you're seeing..."></textarea>
-
-          <div class="lbl" style="margin-bottom:4px;margin-top:4px;">Documents &amp; Images (Google Drive links)</div>
-          <div id="mh-imgs-wrap"></div>
-          <button class="add-row-btn" onclick="addImgRow('mh-imgs-wrap')">+ Add Document / Image URL</button>
-
+          <textarea class="fi" id="mh-dn" rows="3" placeholder="Session notes / reports"></textarea>
+          <textarea class="fi" id="mh-lb" rows="2" placeholder="Labs / assessments"></textarea>
+          <textarea class="fi" id="mh-im" rows="2" placeholder="Psychological testing / diagnostics"></textarea>
+          <input class="fi" id="mh-vt" placeholder="Vitals">
+          <textarea class="fi" id="mh-mx" rows="2" placeholder="Medications"></textarea>
+          <textarea class="fi" id="mh-dx" rows="2" placeholder="Diagnosis (DSM-5)"></textarea>
+          <textarea class="fi" id="mh-al" rows="2" placeholder="Allergies (new or updated)"></textarea>
+          <input class="fi" id="mh-mr" placeholder="Medical records info">
+          <textarea class="fi" id="mh-nt" rows="2" placeholder="YOUR NOTES"></textarea>
           <div class="save-row">
             <button class="btn-save" onclick="saveMH()">Save Record</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-mh')">Cancel</button>
             <span class="saved-msg" id="sv-mh">Saved</span>
           </div>
         </div>
-        <div class="search-bar" style="display:flex;gap:10px;">
-          <input id="mh-search" placeholder="Search mental health records..." oninput="renderMH()" style="flex:1;">
-          <select id="mh-filter" onchange="renderMH()" style="width:180px;">
-            <option value="">All Types</option>
-            <option>Therapy Session — Individual</option>
-            <option>Therapy Session — Family</option>
-            <option>Psychiatric Evaluation</option>
-            <option>Medication Management</option>
-            <option>Crisis Intervention</option>
-            <option>Inpatient Admission</option>
-            <option>Inpatient Discharge</option>
-            <option>Partial Hospitalization (PHP)</option>
-            <option>Intensive Outpatient (IOP)</option>
-            <option>Psychological Testing</option>
-          </select>
-        </div>
-        <div id="mh-list" style="margin-top:12px;"></div>
+        <div class="search-bar"><input id="mh-search" placeholder="Search mental health records..." oninput="renderMH()"></div>
+        <div id="mh-list"></div>
       </div>
+
+      <!-- IEP & EDUCATION -->
+      <div id="view-iep" class="view">
+        <div style="margin-bottom:24px;border-left:4px solid var(--ac);padding-left:20px;">
+          <h1 style="font-size:28px;font-weight:700;font-family:'Playfair Display',serif;">IEP &amp; Education</h1>
+          <p style="color:var(--tx2);font-size:14px;">IEP records, progress notes, transcripts, report cards, teacher notes, and school-parent correspondence.</p>
+        </div>
+
+        <!-- TAB BAR -->
+        <div id="iep-tabs" style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="iep-tab active" data-tab="records" onclick="switchIEPTab('records')">IEP &amp; Academic Records</button>
+          <button class="iep-tab" data-tab="correspondence" onclick="switchIEPTab('correspondence')">School–Parent Correspondence</button>
+        </div>
+
+        <!-- ── TAB: IEP & ACADEMIC RECORDS ── -->
+        <div id="iep-tab-records">
+          <button class="add-btn" onclick="toggleForm('form-iep')"><span style="font-size:18px;">+</span> Add Record</button>
+          <div class="add-form" id="form-iep">
+            <h3>New IEP / Academic Record</h3>
+            <div class="ir">
+              <input type="date" id="iep-d" style="min-width:155px;">
+              <select id="iep-type" style="flex:1;">
+                <option value="">— Record Type —</option>
+                <option>IEP Meeting</option>
+                <option>IEP Amendment</option>
+                <option>IEP Annual Review</option>
+                <option>Evaluation / Assessment</option>
+                <option>Progress Notes</option>
+                <option>Report Card</option>
+                <option>Transcript</option>
+                <option>Teacher Notes</option>
+                <option>504 Plan</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="ir">
+              <input id="iep-school" placeholder="School / District" style="flex:1;">
+              <input id="iep-grade" placeholder="Grade / School Year" style="flex:1;">
+            </div>
+            <div class="ir">
+              <input id="iep-teacher" placeholder="Teacher / Case Manager" style="flex:1;">
+              <input id="iep-attendees" placeholder="Meeting Attendees" style="flex:1;">
+            </div>
+            <textarea class="fi" id="iep-goals" rows="3" placeholder="IEP Goals / Objectives"></textarea>
+            <textarea class="fi" id="iep-services" rows="2" placeholder="Services &amp; Accommodations (e.g. Speech, OT, extended time...)"></textarea>
+            <textarea class="fi" id="iep-progress" rows="3" placeholder="Progress Notes / Academic Performance"></textarea>
+            <textarea class="fi" id="iep-grades" rows="2" placeholder="Grades / GPA / Report Card Summary"></textarea>
+            <textarea class="fi" id="iep-testing" rows="2" placeholder="Standardized Testing / Evaluations (scores, dates, instruments)"></textarea>
+            <textarea class="fi" id="iep-behavior" rows="2" placeholder="Behavioral Observations / Incidents"></textarea>
+            <textarea class="fi" id="iep-concerns" rows="2" placeholder="Parental Concerns Noted"></textarea>
+            <input class="fi" id="iep-nextiep" type="date" placeholder="" style="min-width:0;">
+            <label style="margin-top:-6px;margin-bottom:8px;display:block;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;">Next IEP / Review Date</label>
+            <input class="fi" id="iep-mr" placeholder="Record / File reference number">
+            <textarea class="fi" id="iep-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+            <div class="lbl" style="margin-bottom:4px;">Documents &amp; Images (Google Drive links)</div>
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">In Drive: right-click → Share → Copy link. Paste below.</div>
+            <div id="iep-imgs-wrap"></div>
+            <button class="add-row-btn" onclick="addImgRow('iep-imgs-wrap')">+ Add Document / Image URL</button>
+            <div class="save-row">
+              <button class="btn-save" onclick="saveIEP()">Save Record</button>
+              <button class="btn-cancel-form" onclick="toggleForm('form-iep')">Cancel</button>
+              <span class="saved-msg" id="sv-iep">Saved</span>
+            </div>
+          </div>
+          <div class="search-bar"><input id="iep-search" placeholder="Search IEP &amp; academic records..." oninput="renderIEP()"></div>
+          <div id="iep-list"></div>
+        </div>
+
+        <!-- ── TAB: SCHOOL–PARENT CORRESPONDENCE ── -->
+        <div id="iep-tab-correspondence" style="display:none;">
+          <button class="add-btn" onclick="toggleForm('form-iepcorr')"><span style="font-size:18px;">+</span> Add Correspondence</button>
+          <div class="add-form" id="form-iepcorr">
+            <h3>New School–Parent Correspondence</h3>
+            <div class="ir">
+              <input type="date" id="iepc-d" style="min-width:155px;">
+              <select id="iepc-type" style="flex:1;">
+                <option value="">— Correspondence Type —</option>
+                <option>Letter from School</option>
+                <option>Letter to School</option>
+                <option>Email from School</option>
+                <option>Email to School</option>
+                <option>Prior Written Notice (PWN)</option>
+                <option>Consent Form</option>
+                <option>Evaluation Request</option>
+                <option>Dispute / Complaint</option>
+                <option>Meeting Request</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="ir">
+              <input id="iepc-from" placeholder="From (name / role)" style="flex:1;">
+              <input id="iepc-to" placeholder="To (name / role)" style="flex:1;">
+            </div>
+            <div class="ir">
+              <input id="iepc-school" placeholder="School / District" style="flex:1;">
+              <input id="iepc-re" placeholder="Re: (subject / topic)" style="flex:1;">
+            </div>
+            <textarea class="fi" id="iepc-body" rows="6" placeholder="Transcribe the full letter or email here..."></textarea>
+            <textarea class="fi" id="iepc-response" rows="3" placeholder="Response / Action taken (if any)"></textarea>
+            <textarea class="fi" id="iepc-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+            <div class="lbl" style="margin-bottom:4px;">Upload Letter / Document Images (Google Drive links)</div>
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">In Drive: right-click → Share → Copy link. Paste below.</div>
+            <div id="iepc-imgs-wrap"></div>
+            <button class="add-row-btn" onclick="addImgRow('iepc-imgs-wrap')">+ Add Document / Image URL</button>
+            <div class="save-row">
+              <button class="btn-save" onclick="saveIEPCorr()">Save Correspondence</button>
+              <button class="btn-cancel-form" onclick="toggleForm('form-iepcorr')">Cancel</button>
+              <span class="saved-msg" id="sv-iepc">Saved</span>
+            </div>
+          </div>
+          <div class="search-bar"><input id="iepc-search" placeholder="Search correspondence..." oninput="renderIEPCorr()"></div>
+          <div id="iepc-list"></div>
+        </div>
+
+      </div>
+
+    </div><!-- end .content -->
 
   </div><!-- end .main -->
 </div><!-- end .app -->
@@ -1440,7 +1346,7 @@ async function runMigration() {
                 parsed.forEach(e => { const t = e.type||'visits'; if(migrated[t]) migrated[t].push(e); });
                 parsed = migrated;
             }
-            const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],education:[],mentalhealth:[]};
+            const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
             Object.keys(EMPTY).forEach(k => { if(!parsed[k]) parsed[k]=[]; });
             await window.save(parsed);
         }
@@ -1488,7 +1394,7 @@ const KEY = 'raina_records';
 function load() {
     if (window._dbCache) return window._dbCache;
     const c = localStorage.getItem('raina_records_cache');
-    return c ? JSON.parse(c) : {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],education:[],mentalhealth:[]};
+    return c ? JSON.parse(c) : {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
 }
 function save(data) {
     if (window.save && window.save !== save) { window.save(data); return; }
@@ -1575,11 +1481,20 @@ function showView(v) {
     document.getElementById('main-scroll').scrollTop = 0;
     const viewEl = document.getElementById('view-' + v);
     if (viewEl) viewEl.classList.add('active');
-    const renders = { overview: renderOverview, timeline: renderTimeline, visits: renderVisits, labs: renderLabs, imaging: renderImaging, journal: renderJournal, messages: renderMessages, dx: renderDX, education: renderEducation, mentalhealth: renderMH };
+    const renders = { overview: renderOverview, timeline: renderTimeline, visits: renderVisits, labs: renderLabs, imaging: renderImaging, journal: renderJournal, messages: renderMessages, dx: renderDX, mentalhealth: renderMH, iep: renderIEP };
     if (renders[v]) renders[v]();
 }
 
 // ─── Form toggle ───────────────────────────────────────────────────────────
+function toggleEntry(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('open');
+    if (el.classList.contains('open')) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
+}
+
 function toggleForm(id) {
     const f = document.getElementById(id);
     f.classList.toggle('open');
@@ -2066,7 +1981,7 @@ function renderVisits() {
             if (v.nt) secs.push(['Your Notes', v.nt, 'sc-patient']);
             const uid = `vc${yr}${v.id}`;
             h += `<div class="entry" id="${uid}">
-                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                <div class="entry-h" onclick="toggleEntry('${uid}')">
                     <div style="display:flex;align-items:center;gap:12px;">
                         <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
                         <div class="entry-t">${esc(v.t || 'Visit')} ${v.dr || v.f ? `<span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:8px;">${esc(v.dr || '')}${v.dr && v.f ? ' · ' : ''}${esc(v.f || '')}</span>` : ''}</div>
@@ -2093,6 +2008,495 @@ function renderVisits() {
     });
     h += '</div>';
     document.getElementById('v-list').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MENTAL HEALTH
+// ══════════════════════════════════════════════════════════════════════════
+function saveMH() {
+    const d = document.getElementById('mh-d').value;
+    if (!d) { alert('Date required'); return; }
+    const data = load();
+    if (!data.mentalhealth) data.mentalhealth = [];
+    const imgs = collectImgs('mh-imgs-wrap');
+    data.mentalhealth.push({
+        id: Date.now(), d,
+        t:  document.getElementById('mh-t').value,
+        f:  document.getElementById('mh-f').value,
+        dr: document.getElementById('mh-dr').value,
+        dn: document.getElementById('mh-dn').value,
+        lb: document.getElementById('mh-lb').value,
+        im: document.getElementById('mh-im').value,
+        vt: document.getElementById('mh-vt').value,
+        mx: document.getElementById('mh-mx').value,
+        dx: document.getElementById('mh-dx').value,
+        al: document.getElementById('mh-al').value,
+        mr: document.getElementById('mh-mr').value,
+        nt: document.getElementById('mh-nt').value,
+        imgs
+    });
+    save(data);
+    ['mh-d','mh-t','mh-f','mh-dr','mh-dn','mh-lb','mh-im','mh-vt','mh-mx','mh-dx','mh-al','mh-mr','mh-nt'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('mh-imgs-wrap').innerHTML = '';
+    flash('sv-mh'); renderMH();
+}
+
+function deleteMH(id) {
+    if (!confirm('Delete this record?')) return;
+    const data = load();
+    data.mentalhealth = (data.mentalhealth || []).filter(v => v.id !== id);
+    save(data); renderMH();
+}
+
+function editMH(id) {
+    const data = load();
+    const v = (data.mentalhealth || []).find(x => x.id === id);
+    if (!v) return;
+    const g = k => esc(v[k] || '');
+    const existingImgs = buildImgRows(v.imgs);
+    openEditModal(`
+        <h2>Edit Mental Health Record</h2>
+        <div class="ir">
+            <input type="date" id="emh-d" value="${g('d')}" style="flex:1;">
+            <input id="emh-t" value="${g('t')}" placeholder="Type / Reason" style="flex:1;">
+        </div>
+        <div class="ir">
+            <input id="emh-f" value="${g('f')}" placeholder="Facility" style="flex:1;">
+            <input id="emh-dr" value="${g('dr')}" placeholder="Provider(s)" style="flex:1;">
+        </div>
+        <label>Session Notes / Reports</label><textarea class="fi" id="emh-dn" rows="3">${g('dn')}</textarea>
+        <label>Labs / Assessments</label><textarea class="fi" id="emh-lb" rows="2">${g('lb')}</textarea>
+        <label>Psychological Testing / Diagnostics</label><textarea class="fi" id="emh-im" rows="2">${g('im')}</textarea>
+        <label>Vitals</label><input class="fi" id="emh-vt" value="${g('vt')}">
+        <label>Medications</label><textarea class="fi" id="emh-mx" rows="2">${g('mx')}</textarea>
+        <label>Diagnosis (DSM-5)</label><textarea class="fi" id="emh-dx" rows="2">${g('dx')}</textarea>
+        <label>Allergies</label><textarea class="fi" id="emh-al" rows="2">${g('al')}</textarea>
+        <label>Medical Records Info</label><input class="fi" id="emh-mr" value="${g('mr')}">
+        <label>Your Notes</label><textarea class="fi" id="emh-nt" rows="2">${g('nt')}</textarea>
+        <label>Images / Documents (Google Drive links)</label>
+        <div id="emh-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('emh-imgs-wrap')">+ Add Image URL</button>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditMH(${id})">Save</button>
+        </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('emh-dn', v.dn || '');
+        setRteContent('emh-lb', v.lb || '');
+        setRteContent('emh-im', v.im || '');
+        setRteContent('emh-mx', v.mx || '');
+        setRteContent('emh-dx', v.dx || '');
+        setRteContent('emh-al', v.al || '');
+        setRteContent('emh-nt', v.nt || '');
+    });
+}
+
+function saveEditMH(id) {
+    const data = load();
+    const idx = (data.mentalhealth || []).findIndex(x => x.id === id);
+    if (idx < 0) return;
+    ['d','t','f','dr','vt','mr'].forEach(k => {
+        const el = document.getElementById('emh-' + k); if (el) data.mentalhealth[idx][k] = el.value;
+    });
+    ['dn','lb','im','mx','dx','al','nt'].forEach(k => {
+        data.mentalhealth[idx][k] = getRteContent('emh-' + k);
+    });
+    data.mentalhealth[idx].imgs = collectImgs('emh-imgs-wrap');
+    save(data); closeEditModal(); renderMH();
+}
+
+function renderMH() {
+    const q = (document.getElementById('mh-search')?.value || '').toLowerCase();
+    const data = load();
+    const list = [...(data.mentalhealth || [])].sort((a,b) => b.d.localeCompare(a.d))
+        .filter(v => !q || Object.values(v).join(' ').toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('mh-list').innerHTML = '<div class="empty-state">No mental health records found.</div>'; return; }
+    const { byYear, years } = yrGroup(list, v => v.d);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(v => {
+            const uid = `mhc${yr}${v.id}`;
+            const secs = [];
+            if (v.dn) secs.push(['Session Notes / Reports', v.dn]);
+            if (v.lb) secs.push(['Labs / Assessments', v.lb]);
+            if (v.im) secs.push(['Psychological Testing / Diagnostics', v.im]);
+            if (v.vt) secs.push(['Vitals', v.vt]);
+            if (v.mx) secs.push(['Medications', v.mx]);
+            if (v.dx) secs.push(['Diagnosis (DSM-5)', v.dx]);
+            if (v.al) secs.push(['Allergies', v.al]);
+            if (v.mr) secs.push(['Medical Records', v.mr]);
+            if (v.nt) secs.push(['Your Notes', v.nt]);
+            h += `<div class="entry" id="${uid}">
+                <div class="entry-h" onclick="toggleEntry('${uid}')">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div class="entry-t">${esc(v.t || 'MH Record')} ${v.dr || v.f ? `<span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:8px;">${esc(v.dr || '')}${v.dr && v.f ? ' · ' : ''}${esc(v.f || '')}</span>` : ''}</div>
+                    </div>
+                    <div class="entry-d">${esc(v.d)}</div>
+                </div>
+                <div class="entry-b">
+                    ${secs.map(([t,c]) => {
+                        const isHtml = /<[a-z][\s\S]*>/i.test(c);
+                        const rendered = isHtml
+                            ? `<div class="rt-content" style="margin-bottom:8px;">${c}</div>`
+                            : `<div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(c)}</div>`;
+                        return `<div class="sc-label">${t}</div>${rendered}`;
+                    }).join('')}
+                    ${imgStrip(v.imgs)}
+                    <div class="entry-actions">
+                        <button class="act-btn act-edit" onclick="editMH(${v.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteMH(${v.id})">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('mh-list').innerHTML = h;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// IEP & EDUCATION
+// ══════════════════════════════════════════════════════════════════════════
+
+// ── Tab switching ──────────────────────────────────────────────────────────
+function switchIEPTab(tab) {
+    document.querySelectorAll('.iep-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.getElementById('iep-tab-records').style.display = tab === 'records' ? '' : 'none';
+    document.getElementById('iep-tab-correspondence').style.display = tab === 'correspondence' ? '' : 'none';
+}
+
+// ── IEP Academic Records ───────────────────────────────────────────────────
+// ── Plain-text → HTML helper (keeps initial saves consistent with RTE edits) ─
+function tv(id) {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    const val = el.value.trim();
+    if (!val) return '';
+    // Wrap each line in <p> so render logic treats it as HTML consistently
+    return val.split(/\n+/).map(l => `<p>${l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>`).join('');
+}
+
+function saveIEP() {
+    const d = document.getElementById('iep-d').value;
+    if (!d) { alert('Date required'); return; }
+    const data = load();
+    if (!data.iep) data.iep = [];
+    const imgs = collectImgs('iep-imgs-wrap');
+    data.iep.push({
+        id: Date.now(), d,
+        type:      document.getElementById('iep-type').value,
+        school:    document.getElementById('iep-school').value.trim(),
+        grade:     document.getElementById('iep-grade').value.trim(),
+        teacher:   document.getElementById('iep-teacher').value.trim(),
+        attendees: document.getElementById('iep-attendees').value.trim(),
+        goals:     tv('iep-goals'),
+        services:  tv('iep-services'),
+        progress:  tv('iep-progress'),
+        grades:    tv('iep-grades'),
+        testing:   tv('iep-testing'),
+        behavior:  tv('iep-behavior'),
+        concerns:  tv('iep-concerns'),
+        nextiep:   document.getElementById('iep-nextiep').value,
+        mr:        document.getElementById('iep-mr').value.trim(),
+        nt:        tv('iep-nt'),
+        imgs
+    });
+    save(data);
+    ['iep-d','iep-school','iep-grade','iep-teacher','iep-attendees','iep-goals',
+     'iep-services','iep-progress','iep-grades','iep-testing','iep-behavior',
+     'iep-concerns','iep-nextiep','iep-mr','iep-nt'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('iep-type').value = '';
+    document.getElementById('iep-imgs-wrap').innerHTML = '';
+    flash('sv-iep'); renderIEP();
+}
+
+function deleteIEP(id) {
+    if (!confirm('Delete this record?')) return;
+    const data = load();
+    data.iep = (data.iep || []).filter(v => v.id !== id);
+    save(data); renderIEP();
+}
+
+function editIEP(id) {
+    const data = load();
+    const v = (data.iep || []).find(x => x.id === id);
+    if (!v) return;
+    const g = k => esc(v[k] || '');
+    const typeOpts = ['','IEP Meeting','IEP Amendment','IEP Annual Review','Evaluation / Assessment',
+        'Progress Notes','Report Card','Transcript','Teacher Notes','504 Plan','Other']
+        .map(o => `<option${v.type===o?' selected':''}>${esc(o)}</option>`).join('');
+    const existingImgs = buildImgRows(v.imgs);
+    openEditModal(`
+        <h2>Edit IEP / Academic Record</h2>
+        <div>
+        <div class="ir">
+            <input type="date" id="eiep-d" value="${g('d')}" style="flex:1;">
+            <select id="eiep-type" style="flex:1;">${typeOpts}</select>
+        </div>
+        <div class="ir">
+            <input id="eiep-school" value="${g('school')}" placeholder="School / District" style="flex:1;">
+            <input id="eiep-grade" value="${g('grade')}" placeholder="Grade / School Year" style="flex:1;">
+        </div>
+        <div class="ir">
+            <input id="eiep-teacher" value="${g('teacher')}" placeholder="Teacher / Case Manager" style="flex:1;">
+            <input id="eiep-attendees" value="${g('attendees')}" placeholder="Meeting Attendees" style="flex:1;">
+        </div>
+        <div class="rte-wrap"><div class="rte-label">IEP Goals / Objectives</div>${rteToolbar('eiep-goals')}</div>
+        <div class="rte-wrap"><div class="rte-label">Services &amp; Accommodations</div>${rteToolbar('eiep-services')}</div>
+        <div class="rte-wrap"><div class="rte-label">Progress Notes / Academic Performance</div>${rteToolbar('eiep-progress')}</div>
+        <div class="rte-wrap"><div class="rte-label">Grades / GPA / Report Card Summary</div>${rteToolbar('eiep-grades')}</div>
+        <div class="rte-wrap"><div class="rte-label">Standardized Testing / Evaluations</div>${rteToolbar('eiep-testing')}</div>
+        <div class="rte-wrap"><div class="rte-label">Behavioral Observations / Incidents</div>${rteToolbar('eiep-behavior')}</div>
+        <div class="rte-wrap"><div class="rte-label">Parental Concerns Noted</div>${rteToolbar('eiep-concerns')}</div>
+        <label>Next IEP / Review Date</label><input type="date" class="fi" id="eiep-nextiep" value="${g('nextiep')}">
+        <label>Record / File Reference</label><input class="fi" id="eiep-mr" value="${g('mr')}">
+        <div class="rte-wrap"><div class="rte-label">Your Notes</div>${rteToolbar('eiep-nt')}</div>
+        <label>Documents &amp; Images (Google Drive links)</label>
+        <div id="eiep-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('eiep-imgs-wrap')">+ Add Document / Image URL</button>
+        </div>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditIEP(${id})">Save</button>
+        </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('eiep-goals', v.goals || '');
+        setRteContent('eiep-services', v.services || '');
+        setRteContent('eiep-progress', v.progress || '');
+        setRteContent('eiep-grades', v.grades || '');
+        setRteContent('eiep-testing', v.testing || '');
+        setRteContent('eiep-behavior', v.behavior || '');
+        setRteContent('eiep-concerns', v.concerns || '');
+        setRteContent('eiep-nt', v.nt || '');
+    });
+}
+
+function saveEditIEP(id) {
+    const data = load();
+    const idx = (data.iep || []).findIndex(x => x.id === id);
+    if (idx < 0) return;
+    const r = data.iep[idx];
+    r.d         = document.getElementById('eiep-d').value;
+    r.type      = document.getElementById('eiep-type').value;
+    r.school    = document.getElementById('eiep-school').value.trim();
+    r.grade     = document.getElementById('eiep-grade').value.trim();
+    r.teacher   = document.getElementById('eiep-teacher').value.trim();
+    r.attendees = document.getElementById('eiep-attendees').value.trim();
+    r.nextiep   = document.getElementById('eiep-nextiep').value;
+    r.mr        = document.getElementById('eiep-mr').value.trim();
+    ['goals','services','progress','grades','testing','behavior','concerns','nt'].forEach(k => {
+        r[k] = getRteContent('eiep-' + k);
+    });
+    r.imgs = collectImgs('eiep-imgs-wrap');
+    save(data); closeEditModal(); renderIEP();
+}
+
+function renderIEP() {
+    const q = (document.getElementById('iep-search')?.value || '').toLowerCase();
+    const data = load();
+    const list = [...(data.iep || [])].sort((a,b) => b.d.localeCompare(a.d))
+        .filter(v => !q || JSON.stringify(v).toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('iep-list').innerHTML = '<div class="empty-state">No IEP or academic records yet.</div>'; return; }
+    const { byYear, years } = yrGroup(list, v => v.d);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(v => {
+            const uid = `iep${yr}${v.id}`;
+            const secs = [
+                ['IEP Goals / Objectives', v.goals],
+                ['Services & Accommodations', v.services],
+                ['Progress Notes / Academic Performance', v.progress],
+                ['Grades / GPA / Report Card', v.grades],
+                ['Standardized Testing / Evaluations', v.testing],
+                ['Behavioral Observations / Incidents', v.behavior],
+                ['Parental Concerns Noted', v.concerns],
+                ['Your Notes', v.nt],
+            ].filter(([,c]) => c);
+            const meta = [];
+            if (v.school) meta.push(esc(v.school));
+            if (v.grade)  meta.push(esc(v.grade));
+            h += `<div class="entry" id="${uid}">
+                <div class="entry-h" onclick="toggleEntry('${uid}')">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div class="entry-t">${esc(v.type || 'IEP Record')}${meta.length ? `<span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:8px;">${meta.join(' · ')}</span>` : ''}</div>
+                    </div>
+                    <div class="entry-d">${esc(v.d)}</div>
+                </div>
+                <div class="entry-b">
+                    ${v.teacher || v.attendees ? `<div style="font-size:12px;color:var(--tx3);margin-bottom:10px;">${v.teacher?`<b>Teacher/CM:</b> ${esc(v.teacher)}`:''}${v.teacher&&v.attendees?' &nbsp;·&nbsp; ':''}${v.attendees?`<b>Attendees:</b> ${esc(v.attendees)}`:''}</div>` : ''}
+                    ${v.nextiep ? `<div style="font-size:11px;color:var(--ac);font-family:'IBM Plex Mono',monospace;margin-bottom:10px;">Next IEP / Review: ${esc(v.nextiep)}</div>` : ''}
+                    ${secs.map(([t,c]) => {
+                        const isHtml = /<[a-z][\s\S]*>/i.test(c);
+                        const rendered = isHtml
+                            ? `<div class="rt-content" style="margin-bottom:8px;">${c}</div>`
+                            : `<div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(c)}</div>`;
+                        return `<div class="sc-label">${t}</div>${rendered}`;
+                    }).join('')}
+                    ${v.mr ? `<div class="sc-label">Record Reference</div><div class="f-value" style="margin-bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;">${esc(v.mr)}</div>` : ''}
+                    ${imgStrip(v.imgs)}
+                    <div class="entry-actions">
+                        <button class="act-btn act-edit" onclick="editIEP(${v.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteIEP(${v.id})">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('iep-list').innerHTML = h;
+}
+
+// ── School–Parent Correspondence ───────────────────────────────────────────
+function saveIEPCorr() {
+    const d = document.getElementById('iepc-d').value;
+    if (!d) { alert('Date required'); return; }
+    const data = load();
+    if (!data.iepcorr) data.iepcorr = [];
+    const imgs = collectImgs('iepc-imgs-wrap');
+    data.iepcorr.push({
+        id: Date.now(), d,
+        type:     document.getElementById('iepc-type').value,
+        from:     document.getElementById('iepc-from').value.trim(),
+        to:       document.getElementById('iepc-to').value.trim(),
+        school:   document.getElementById('iepc-school').value.trim(),
+        re:       document.getElementById('iepc-re').value.trim(),
+        body:     tv('iepc-body'),
+        response: tv('iepc-response'),
+        nt:       tv('iepc-nt'),
+        imgs
+    });
+    save(data);
+    ['iepc-d','iepc-from','iepc-to','iepc-school','iepc-re','iepc-body','iepc-response','iepc-nt'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('iepc-type').value = '';
+    document.getElementById('iepc-imgs-wrap').innerHTML = '';
+    flash('sv-iepc'); renderIEPCorr();
+}
+
+function deleteIEPCorr(id) {
+    if (!confirm('Delete this correspondence?')) return;
+    const data = load();
+    data.iepcorr = (data.iepcorr || []).filter(v => v.id !== id);
+    save(data); renderIEPCorr();
+}
+
+function editIEPCorr(id) {
+    const data = load();
+    const v = (data.iepcorr || []).find(x => x.id === id);
+    if (!v) return;
+    const g = k => esc(v[k] || '');
+    const typeOpts = ['','Letter from School','Letter to School','Email from School','Email to School',
+        'Prior Written Notice (PWN)','Consent Form','Evaluation Request','Dispute / Complaint',
+        'Meeting Request','Other']
+        .map(o => `<option${v.type===o?' selected':''}>${esc(o)}</option>`).join('');
+    const existingImgs = buildImgRows(v.imgs);
+    openEditModal(`
+        <h2>Edit Correspondence</h2>
+        <div>
+        <div class="ir">
+            <input type="date" id="eiepc-d" value="${g('d')}" style="flex:1;">
+            <select id="eiepc-type" style="flex:1;">${typeOpts}</select>
+        </div>
+        <div class="ir">
+            <input id="eiepc-from" value="${g('from')}" placeholder="From (name / role)" style="flex:1;">
+            <input id="eiepc-to" value="${g('to')}" placeholder="To (name / role)" style="flex:1;">
+        </div>
+        <div class="ir">
+            <input id="eiepc-school" value="${g('school')}" placeholder="School / District" style="flex:1;">
+            <input id="eiepc-re" value="${g('re')}" placeholder="Re: (subject / topic)" style="flex:1;">
+        </div>
+        <div class="rte-wrap"><div class="rte-label">Full Letter / Email Body</div>${rteToolbar('eiepc-body')}</div>
+        <div class="rte-wrap"><div class="rte-label">Response / Action Taken</div>${rteToolbar('eiepc-response')}</div>
+        <div class="rte-wrap"><div class="rte-label">Your Notes</div>${rteToolbar('eiepc-nt')}</div>
+        <label>Documents &amp; Images (Google Drive links)</label>
+        <div id="eiepc-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('eiepc-imgs-wrap')">+ Add Document / Image URL</button>
+        </div>
+        <div class="modal-acts">
+            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveEditIEPCorr(${id})">Save</button>
+        </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('eiepc-body', v.body || '');
+        setRteContent('eiepc-response', v.response || '');
+        setRteContent('eiepc-nt', v.nt || '');
+    });
+}
+
+function saveEditIEPCorr(id) {
+    const data = load();
+    const idx = (data.iepcorr || []).findIndex(x => x.id === id);
+    if (idx < 0) return;
+    const r = data.iepcorr[idx];
+    r.d      = document.getElementById('eiepc-d').value;
+    r.type   = document.getElementById('eiepc-type').value;
+    r.from   = document.getElementById('eiepc-from').value.trim();
+    r.to     = document.getElementById('eiepc-to').value.trim();
+    r.school = document.getElementById('eiepc-school').value.trim();
+    r.re     = document.getElementById('eiepc-re').value.trim();
+    ['body','response','nt'].forEach(k => { r[k] = getRteContent('eiepc-' + k); });
+    r.imgs = collectImgs('eiepc-imgs-wrap');
+    save(data); closeEditModal(); renderIEPCorr();
+}
+
+function renderIEPCorr() {
+    const q = (document.getElementById('iepc-search')?.value || '').toLowerCase();
+    const data = load();
+    const list = [...(data.iepcorr || [])].sort((a,b) => b.d.localeCompare(a.d))
+        .filter(v => !q || JSON.stringify(v).toLowerCase().includes(q));
+    if (!list.length) { document.getElementById('iepc-list').innerHTML = '<div class="empty-state">No correspondence records yet.</div>'; return; }
+    const { byYear, years } = yrGroup(list, v => v.d);
+    let h = '<div class="yr-spine">';
+    years.forEach(yr => {
+        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
+        byYear[yr].forEach(v => {
+            const uid = `iepc${yr}${v.id}`;
+            const secs = [
+                ['Full Letter / Email Body', v.body],
+                ['Response / Action Taken', v.response],
+                ['Your Notes', v.nt],
+            ].filter(([,c]) => c);
+            h += `<div class="entry" id="${uid}">
+                <div class="entry-h" onclick="toggleEntry('${uid}')">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
+                        <div>
+                            <div class="entry-t">${esc(v.type || 'Correspondence')}${v.re ? `<span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:8px;">Re: ${esc(v.re)}</span>` : ''}</div>
+                            <div style="font-size:11px;color:var(--tx3);margin-top:2px;font-family:'IBM Plex Mono',monospace;">${v.from?`From: ${esc(v.from)}`:''}${v.from&&v.to?' → ':''}${v.to?`To: ${esc(v.to)}`:''}</div>
+                        </div>
+                    </div>
+                    <div class="entry-d">${esc(v.d)}</div>
+                </div>
+                <div class="entry-b">
+                    ${v.school ? `<div style="font-size:12px;color:var(--tx3);margin-bottom:10px;"><b>School / District:</b> ${esc(v.school)}</div>` : ''}
+                    ${secs.map(([t,c]) => {
+                        const isHtml = /<[a-z][\s\S]*>/i.test(c);
+                        const rendered = isHtml
+                            ? `<div class="rt-content" style="margin-bottom:8px;">${c}</div>`
+                            : `<div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(c)}</div>`;
+                        return `<div class="sc-label">${t}</div>${rendered}`;
+                    }).join('')}
+                    ${imgStrip(v.imgs)}
+                    <div class="entry-actions">
+                        <button class="act-btn act-edit" onclick="editIEPCorr(${v.id})">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteIEPCorr(${v.id})">Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+    });
+    h += '</div>';
+    document.getElementById('iepc-list').innerHTML = h;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -2154,7 +2558,7 @@ function renderLabs() {
             const uid = `lr${l.id}`;
             const flagClass = f => f ? `flag flag-${f.replace(/\s+/g,'-')}` : '';
             h += `<div class="lab-panel" id="${uid}">
-                <div class="lab-panel-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                <div class="lab-panel-h" onclick="toggleEntry('${uid}')">
                     <div style="display:flex;align-items:center;gap:12px;">
                         <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
                         <div>
@@ -2252,7 +2656,7 @@ function renderImaging() {
         byYear[yr].forEach(v => {
             const uid = `im${v.id}`;
             h += `<div class="entry" id="${uid}">
-                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                <div class="entry-h" onclick="toggleEntry('${uid}')">
                     <div style="display:flex;align-items:center;gap:12px;">
                         <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
                         <div class="entry-t">${esc(v.type || 'Imaging')} <span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:8px;">${esc(v.facility || '')}</span></div>
@@ -2588,7 +2992,7 @@ function renderJournal() {
             ].filter(([,v]) => v);
 
             h += `<div class="entry" id="${uid}">
-                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+                <div class="entry-h" onclick="toggleEntry('${uid}')">
                     <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;flex-wrap:wrap;">
                         <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
                         <div>
@@ -2690,7 +3094,7 @@ function renderMessages() {
     list.forEach(m => {
         const uid = `pm${m.id}`;
         h += `<div class="pm-entry" id="${uid}">
-            <div class="pm-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
+            <div class="pm-h" onclick="toggleEntry('${uid}')">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                     <div>
                         <div style="font-weight:600;font-size:13px;">${esc(m.subject || '(No subject)')}</div>
@@ -3002,293 +3406,6 @@ function renderOverview() {
         </div>`).join('');
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-// EDUCATION / IEP
-// ══════════════════════════════════════════════════════════════════════════
-function saveEducation() {
-    const d = document.getElementById('ed-d').value;
-    if (!d) { alert('Date required'); return; }
-    const imgs = collectImgs('ed-imgs-wrap');
-    const fields = ['sy','school','type','grade','disability','eligdate','eligdate-label','plaafp','goals','objectives','services','related','accomm','behavior','testing','transition','placement','lre-pct','attendees','parent','progress','evals','nextreview','nextreview-label','notes'];
-    const entry = { id: Date.now(), date: d, imgs };
-    fields.forEach(k => { const el = document.getElementById('ed-' + k); if(el) entry[k.replace('-','_')] = el.value.trim(); });
-    const data = load();
-    if (!data.education) data.education = [];
-    data.education.push(entry);
-    save(data);
-    fields.forEach(k => { const el = document.getElementById('ed-' + k); if(el) el.value = ''; });
-    document.getElementById('ed-d').value = '';
-    document.getElementById('ed-imgs-wrap').innerHTML = '';
-    flash('sv-ed'); renderEducation();
-}
-
-function deleteEducation(id) {
-    if (!confirm('Delete this education record?')) return;
-    const data = load(); data.education = data.education.filter(e => e.id !== id); save(data); renderEducation();
-}
-
-function editEducation(id) {
-    const data = load();
-    const e = data.education.find(x => x.id === id);
-    if (!e) return;
-    const g = k => esc(e[k] || '');
-    const typeOpts = ['IEP — Initial','IEP — Annual Review','IEP — Amendment','504 Plan','Evaluation / Re-evaluation','Eligibility Determination','Transition Plan','Manifestation Determination','Meeting Notes','Progress Report','Incident Report','Correspondence','Other'].map(o => `<option ${e.type===o?'selected':''}>${o}</option>`).join('');
-    const existingImgs = buildImgRows(e.imgs);
-    openEditModal(`
-        <h2>Edit Education Record</h2>
-        <div>
-        <div class="ir"><input type="date" id="eed-d" value="${g('date')}" style="flex:1;"><input id="eed-sy" value="${g('sy')}" placeholder="School Year" style="flex:1;"><input id="eed-school" value="${g('school')}" placeholder="School" style="flex:2;"></div>
-        <label>Record Type</label><div class="ir"><select id="eed-type" style="flex:1;">${typeOpts}</select><input id="eed-grade" value="${g('grade')}" placeholder="Grade" style="flex:1;"></div>
-        <label>Disability / Eligibility</label><input class="fi" id="eed-disability" value="${g('disability')}">
-        <label>PLAAFP</label><textarea class="fi" id="eed-plaafp" rows="3">${g('plaafp')}</textarea>
-        <label>Annual Goals</label><textarea class="fi" id="eed-goals" rows="3">${g('goals')}</textarea>
-        <label>Short-Term Objectives</label><textarea class="fi" id="eed-objectives" rows="2">${g('objectives')}</textarea>
-        <label>Special Education Services</label><textarea class="fi" id="eed-services" rows="2">${g('services')}</textarea>
-        <label>Related Services</label><textarea class="fi" id="eed-related" rows="2">${g('related')}</textarea>
-        <label>Accommodations &amp; Modifications</label><textarea class="fi" id="eed-accomm" rows="3">${g('accomm')}</textarea>
-        <label>Behavioral / BSP</label><textarea class="fi" id="eed-behavior" rows="2">${g('behavior')}</textarea>
-        <label>Testing Accommodations</label><textarea class="fi" id="eed-testing" rows="2">${g('testing')}</textarea>
-        <label>Transition Planning</label><textarea class="fi" id="eed-transition" rows="2">${g('transition')}</textarea>
-        <label>Placement / LRE</label><div class="ir"><input id="eed-placement" value="${g('placement')}" style="flex:2;"><input id="eed-lre_pct" value="${g('lre_pct')}" placeholder="% gen ed" style="flex:1;"></div>
-        <label>Meeting Attendees</label><textarea class="fi" id="eed-attendees" rows="2">${g('attendees')}</textarea>
-        <label>Parent / Guardian Input</label><textarea class="fi" id="eed-parent" rows="2">${g('parent')}</textarea>
-        <label>Progress Toward Previous Goals</label><textarea class="fi" id="eed-progress" rows="2">${g('progress')}</textarea>
-        <label>Evaluation Data</label><textarea class="fi" id="eed-evals" rows="2">${g('evals')}</textarea>
-        <label>Next Review Date</label><div class="ir"><input type="date" id="eed-nextreview" value="${g('nextreview')}" style="flex:1;"><input id="eed-nextreview_label" value="${g('nextreview_label')}" placeholder="Type" style="flex:1;"></div>
-        <label>Your Notes</label><textarea class="fi" id="eed-notes" rows="2">${g('notes')}</textarea>
-        <label>Documents / Images</label>
-        <div id="eed-imgs-wrap">${existingImgs}</div>
-        <button class="add-row-btn" onclick="addImgRow('eed-imgs-wrap')">+ Add URL</button>
-        </div>
-        <div class="modal-acts">
-            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
-            <button class="btn-save" onclick="saveEditEducation(${id})">Save</button>
-        </div>`);
-}
-
-function saveEditEducation(id) {
-    const data = load();
-    const idx = data.education.findIndex(x => x.id === id);
-    if (idx < 0) return;
-    const fields = ['sy','school','grade','disability','plaafp','goals','objectives','services','related','accomm','behavior','testing','transition','placement','lre_pct','attendees','parent','progress','evals','nextreview','nextreview_label','notes'];
-    data.education[idx].date = document.getElementById('eed-d').value;
-    data.education[idx].type = document.getElementById('eed-type').value;
-    fields.forEach(k => { const el = document.getElementById('eed-' + k); if(el) data.education[idx][k] = el.value.trim(); });
-    data.education[idx].imgs = collectImgs('eed-imgs-wrap');
-    save(data); closeEditModal(); renderEducation();
-}
-
-function renderEducation() {
-    const q = (document.getElementById('ed-search')?.value || '').toLowerCase();
-    const data = load();
-    if (!data.education) { document.getElementById('ed-list').innerHTML = '<div class="empty-state">No education records found.</div>'; return; }
-    let list = [...data.education].sort((a,b) => b.date.localeCompare(a.date));
-    if (q) list = list.filter(e => JSON.stringify(e).toLowerCase().includes(q));
-    if (!list.length) { document.getElementById('ed-list').innerHTML = '<div class="empty-state">No education records found.</div>'; return; }
-    const { byYear, years } = yrGroup(list, e => e.date);
-    let h = '<div class="yr-spine">';
-    years.forEach(yr => {
-        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
-        byYear[yr].forEach(e => {
-            const uid = `ed${e.id}`;
-            const secs = [
-                ['School / Year', [e.school, e.sy, e.grade ? 'Grade '+e.grade : ''].filter(Boolean).join(' · ')],
-                ['Disability / Eligibility', e.disability],
-                ['PLAAFP', e.plaafp],
-                ['Annual Goals', e.goals],
-                ['Short-Term Objectives', e.objectives],
-                ['Special Ed Services', e.services],
-                ['Related Services', e.related],
-                ['Accommodations & Modifications', e.accomm],
-                ['Behavioral / BSP', e.behavior],
-                ['Testing Accommodations', e.testing],
-                ['Transition Planning', e.transition],
-                ['Placement / LRE', [e.placement, e.lre_pct ? e.lre_pct+'% gen ed' : ''].filter(Boolean).join(' · ')],
-                ['Meeting Attendees', e.attendees],
-                ['Parent / Guardian Input', e.parent],
-                ['Progress Toward Previous Goals', e.progress],
-                ['Evaluation Data', e.evals],
-                ['Next Review', [e.nextreview, e.nextreview_label].filter(Boolean).join(' · ')],
-                ['Your Notes', e.notes],
-            ].filter(([,v]) => v);
-            h += `<div class="entry" id="${uid}">
-                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
-                    <div style="display:flex;align-items:center;gap:12px;flex:1;flex-wrap:wrap;">
-                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
-                        <div>
-                            <div class="entry-t">${esc(e.type || 'Education Record')}</div>
-                            <div style="font-size:11px;color:var(--tx3);">${esc(e.date)}${e.school?' · '+esc(e.school):''}${e.sy?' · '+esc(e.sy):''}</div>
-                        </div>
-                    </div>
-                    <div class="entry-d">&#9662;</div>
-                </div>
-                <div class="entry-b">
-                    ${secs.map(([l,v]) => `<div class="sc-label">${l}</div><div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(v)}</div>`).join('')}
-                    ${imgStrip(e.imgs)}
-                    <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editEducation(${e.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteEducation(${e.id})">Delete</button>
-                    </div>
-                </div>
-            </div>`;
-        });
-    });
-    h += '</div>';
-    document.getElementById('ed-list').innerHTML = h;
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// MENTAL HEALTH
-// ══════════════════════════════════════════════════════════════════════════
-function saveMH() {
-    const d = document.getElementById('mh-d').value;
-    if (!d) { alert('Date required'); return; }
-    const imgs = collectImgs('mh-imgs-wrap');
-    const fields = ['tm','type','dr','specialty','facility','presenting','appearance','speech','affect','thought','cognition','si','hi','sh','safety_notes','dx','meds','interventions','notes','goals','behavior','trauma','social','substance','followup','followup-label','plan','parent-notes'];
-    const entry = { id: Date.now(), date: d, imgs };
-    fields.forEach(k => { const el = document.getElementById('mh-' + k); if(el) entry[k.replace('-','_')] = el.value.trim(); });
-    const data = load();
-    if (!data.mentalhealth) data.mentalhealth = [];
-    data.mentalhealth.push(entry);
-    save(data);
-    fields.forEach(k => { const el = document.getElementById('mh-' + k); if(el) el.value = ''; });
-    document.getElementById('mh-d').value = '';
-    document.getElementById('mh-imgs-wrap').innerHTML = '';
-    flash('sv-mh'); renderMH();
-}
-
-function deleteMH(id) {
-    if (!confirm('Delete this mental health record?')) return;
-    const data = load(); data.mentalhealth = data.mentalhealth.filter(e => e.id !== id); save(data); renderMH();
-}
-
-function editMH(id) {
-    const data = load();
-    const e = data.mentalhealth.find(x => x.id === id);
-    if (!e) return;
-    const g = k => esc(e[k] || '');
-    const typeOpts = ['Therapy Session — Individual','Therapy Session — Family','Therapy Session — Group','Psychiatric Evaluation','Medication Management','Crisis Intervention','Inpatient Admission','Inpatient Discharge','Partial Hospitalization (PHP)','Intensive Outpatient (IOP)','Psychological Testing','Case Management','Telehealth Session','Other'].map(o => `<option ${e.type===o?'selected':''}>${o}</option>`).join('');
-    const siOpts = ['','None reported','Passive ideation — no plan','Active ideation — no plan','Active ideation — with plan','Active ideation — with intent','Recent attempt'].map(o => `<option ${e.si===o?'selected':''}>${o}</option>`).join('');
-    const hiOpts = ['','None reported','Passive ideation — no plan','Active ideation — no plan','Active ideation — with plan'].map(o => `<option ${e.hi===o?'selected':''}>${o}</option>`).join('');
-    const shOpts = ['','None reported','History only — not current','Current — non-suicidal','Current — suicidal intent'].map(o => `<option ${e.sh===o?'selected':''}>${o}</option>`).join('');
-    const existingImgs = buildImgRows(e.imgs);
-    openEditModal(`
-        <h2>Edit Mental Health Record</h2>
-        <div>
-        <div class="ir"><input type="date" id="emh-d" value="${g('date')}" style="flex:1;"><input type="time" id="emh-tm" value="${g('tm')}" style="flex:1;"><select id="emh-type" style="flex:2;">${typeOpts}</select></div>
-        <label>Provider</label><div class="ir"><input id="emh-dr" value="${g('dr')}" placeholder="Provider" style="flex:1;"><input id="emh-specialty" value="${g('specialty')}" placeholder="Specialty" style="flex:1;"></div>
-        <label>Facility</label><input class="fi" id="emh-facility" value="${g('facility')}">
-        <label>Presenting Concerns</label><textarea class="fi" id="emh-presenting" rows="2">${g('presenting')}</textarea>
-        <label>Mental Status (MSE)</label>
-        <div class="ir" style="flex-wrap:wrap;">
-            <input id="emh-appearance" value="${g('appearance')}" placeholder="Appearance" style="flex:1;min-width:140px;">
-            <input id="emh-speech" value="${g('speech')}" placeholder="Speech" style="flex:1;min-width:120px;">
-            <input id="emh-affect" value="${g('affect')}" placeholder="Affect/Mood" style="flex:1;min-width:130px;">
-            <input id="emh-thought" value="${g('thought')}" placeholder="Thought Process" style="flex:1;min-width:140px;">
-            <input id="emh-cognition" value="${g('cognition')}" placeholder="Cognition" style="flex:1;min-width:130px;">
-        </div>
-        <label>Safety Assessment</label>
-        <div class="ir" style="flex-wrap:wrap;">
-            <select id="emh-si" style="flex:1;min-width:180px;">${siOpts}</select>
-            <select id="emh-hi" style="flex:1;min-width:180px;">${hiOpts}</select>
-            <select id="emh-sh" style="flex:1;min-width:180px;">${shOpts}</select>
-        </div>
-        <textarea class="fi" id="emh-safety_notes" rows="2">${g('safety_notes')}</textarea>
-        <label>Diagnoses (DSM-5)</label><textarea class="fi" id="emh-dx" rows="2">${g('dx')}</textarea>
-        <label>Medications &amp; Changes</label><textarea class="fi" id="emh-meds" rows="2">${g('meds')}</textarea>
-        <label>Therapeutic Interventions</label><textarea class="fi" id="emh-interventions" rows="2">${g('interventions')}</textarea>
-        <label>Session Content / Clinical Notes</label><textarea class="fi" id="emh-notes" rows="4">${g('notes')}</textarea>
-        <label>Treatment Goals &amp; Progress</label><textarea class="fi" id="emh-goals" rows="2">${g('goals')}</textarea>
-        <label>Behavioral Observations</label><textarea class="fi" id="emh-behavior" rows="2">${g('behavior')}</textarea>
-        <label>Trauma / Background</label><textarea class="fi" id="emh-trauma" rows="2">${g('trauma')}</textarea>
-        <label>Family &amp; Social Functioning</label><textarea class="fi" id="emh-social" rows="2">${g('social')}</textarea>
-        <label>Substance Use</label><textarea class="fi" id="emh-substance" rows="2">${g('substance')}</textarea>
-        <label>Plan &amp; Follow-Up</label>
-        <div class="ir"><input type="date" id="emh-followup" value="${g('followup')}" style="flex:1;"><input id="emh-followup_label" value="${g('followup_label')}" placeholder="Next appt type" style="flex:1;"></div>
-        <textarea class="fi" id="emh-plan" rows="3">${g('plan')}</textarea>
-        <label>Your Notes / Observations</label><textarea class="fi" id="emh-parent_notes" rows="2">${g('parent_notes')}</textarea>
-        <label>Documents &amp; Images</label>
-        <div id="emh-imgs-wrap">${existingImgs}</div>
-        <button class="add-row-btn" onclick="addImgRow('emh-imgs-wrap')">+ Add URL</button>
-        </div>
-        <div class="modal-acts">
-            <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
-            <button class="btn-save" onclick="saveEditMH(${id})">Save</button>
-        </div>`);
-}
-
-function saveEditMH(id) {
-    const data = load();
-    const idx = data.mentalhealth.findIndex(x => x.id === id);
-    if (idx < 0) return;
-    const fields = ['tm','dr','specialty','facility','presenting','appearance','speech','affect','thought','cognition','si','hi','sh','safety_notes','dx','meds','interventions','notes','goals','behavior','trauma','social','substance','followup','followup_label','plan','parent_notes'];
-    data.mentalhealth[idx].date = document.getElementById('emh-d').value;
-    data.mentalhealth[idx].type = document.getElementById('emh-type').value;
-    fields.forEach(k => { const el = document.getElementById('emh-' + k); if(el) data.mentalhealth[idx][k] = el.value.trim(); });
-    data.mentalhealth[idx].imgs = collectImgs('emh-imgs-wrap');
-    save(data); closeEditModal(); renderMH();
-}
-
-function renderMH() {
-    const q = (document.getElementById('mh-search')?.value || '').toLowerCase();
-    const cf = document.getElementById('mh-filter')?.value || '';
-    const data = load();
-    if (!data.mentalhealth) { document.getElementById('mh-list').innerHTML = '<div class="empty-state">No mental health records found.</div>'; return; }
-    let list = [...data.mentalhealth].sort((a,b) => (b.date+(b.tm||'')).localeCompare(a.date+(a.tm||'')));
-    if (q) list = list.filter(e => JSON.stringify(e).toLowerCase().includes(q));
-    if (cf) list = list.filter(e => e.type === cf);
-    if (!list.length) { document.getElementById('mh-list').innerHTML = '<div class="empty-state">No mental health records found.</div>'; return; }
-    const { byYear, years } = yrGroup(list, e => e.date);
-    let h = '<div class="yr-spine">';
-    const SAFETY_COLOR = { 'Active ideation — with plan':'#ef4444','Active ideation — with intent':'#dc2626','Recent attempt':'#dc2626','Current — suicidal intent':'#dc2626' };
-    years.forEach(yr => {
-        h += `<div class="yr-hdr"><span>${yr}</span></div>`;
-        byYear[yr].forEach(e => {
-            const uid = `mh${e.id}`;
-            const safetyFlags = [e.si, e.hi, e.sh].filter(v => v && v !== 'None reported' && v !== 'History only — not current' && v !== '');
-            const safetyHtml = safetyFlags.map(f => `<span style="font-size:10px;padding:2px 7px;border-radius:100px;background:rgba(239,68,68,0.12);color:${SAFETY_COLOR[f]||'#f97316'};font-weight:700;">${f}</span>`).join('');
-            const secs = [
-                ['Provider / Facility', [e.dr, e.specialty, e.facility].filter(Boolean).join(' · ')],
-                ['Presenting Concerns', e.presenting],
-                ['Mental Status', [e.appearance,e.speech,e.affect,e.thought,e.cognition].filter(Boolean).join(' · ')],
-                ['Safety Notes', e.safety_notes],
-                ['Diagnoses (DSM-5)', e.dx],
-                ['Medications & Changes', e.meds],
-                ['Therapeutic Interventions', e.interventions],
-                ['Session Content / Clinical Notes', e.notes],
-                ['Treatment Goals & Progress', e.goals],
-                ['Behavioral Observations', e.behavior],
-                ['Trauma / Background', e.trauma],
-                ['Family & Social Functioning', e.social],
-                ['Substance Use', e.substance],
-                ['Plan & Follow-Up', [e.followup, e.followup_label, e.plan].filter(Boolean).join(' · ')],
-                ['Your Notes', e.parent_notes],
-            ].filter(([,v]) => v);
-            h += `<div class="entry" id="${uid}">
-                <div class="entry-h" onclick="document.getElementById('${uid}').classList.toggle('open')">
-                    <div style="display:flex;align-items:center;gap:12px;flex:1;flex-wrap:wrap;">
-                        <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
-                        <div>
-                            <div class="entry-t">${esc(e.type || 'MH Record')}${e.dr?` <span style="font-size:11px;color:var(--tx3);font-weight:400;">· ${esc(e.dr)}</span>`:''}</div>
-                            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:3px;">${safetyHtml}</div>
-                        </div>
-                    </div>
-                    <div class="entry-d">${esc(e.date)}${e.tm?' · '+esc(e.tm):''}</div>
-                </div>
-                <div class="entry-b">
-                    ${secs.map(([l,v]) => `<div class="sc-label">${l}</div><div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(v)}</div>`).join('')}
-                    ${imgStrip(e.imgs)}
-                    <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editMH(${e.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteMH(${e.id})">Delete</button>
-                    </div>
-                </div>
-            </div>`;
-        });
-    });
-    h += '</div>';
-    document.getElementById('mh-list').innerHTML = h;
-}
 
 // ─── Init (fallback if Firebase module hasn't loaded) ──────────────────────
 // Primary init is handled by the Firebase module above.
