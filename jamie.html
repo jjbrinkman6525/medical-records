@@ -3156,12 +3156,12 @@ function saveJournal() {
 
 function deleteJournal(id) {
     if (!confirm('Delete this journal entry?')) return;
-    const data = load(); data.journal = data.journal.filter(j => j.id !== id); save(data); renderJournal();
+    const data = load(); data.journal = data.journal.filter(j => j.id != id); save(data); renderJournal();
 }
 
 function editJournal(id) {
     const data = load();
-    const s = data.journal.find(x => x.id === id);
+    const s = data.journal.find(x => x.id == id);
     if (!s) return;
     const safetyLabels = ['','Safe — No danger','Fear / Concern','Self-Mutilation Occurring','Suicidal / Homicidal','⚠ Life in Danger'];
     const safetyOpts = [1,2,3,4,5].map(n => `
@@ -3323,7 +3323,7 @@ function saveEditJournal(id) {
         baroPrior: bp !== '' ? parseFloat(bp) : null
     };
     const data = load();
-    const idx = data.journal.findIndex(x => x.id === id);
+    const idx = data.journal.findIndex(x => x.id == id);
     if (idx >= 0) Object.assign(data.journal[idx], upd);
     save(data); closeEditModal(); renderJournal();
 }
@@ -3407,8 +3407,8 @@ function renderJournal() {
                     ${s.mood ? `<div class="je-section"><div class="je-label">Mood</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${s.mood.split(',').filter(Boolean).map(m=>`<span style="font-size:12px;">${MOOD_EMOJIS[m]||''} ${m}</span>`).join('')}</div></div>` : ''}
                     ${imgStrip(s.imgs)}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editJournal(${s.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteJournal(${s.id})">Delete</button>
+                        <button class="act-btn act-edit" onclick="editJournal('${s.id}')">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteJournal('${s.id}')">Delete</button>
                     </div>
                 </div>
             </div>`;
