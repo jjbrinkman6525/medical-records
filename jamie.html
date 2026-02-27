@@ -81,7 +81,11 @@ async function saveToFirebase(data) {
 
 // ── Drop-in replacements for load() and save() ────────────────────────────
 window.load = function() {
-    return window._dbCache || JSON.parse(localStorage.getItem('jamie_records_cache') || 'null') || { ...EMPTY };
+    const raw = window._dbCache || JSON.parse(localStorage.getItem('jamie_records_cache') || 'null') || {};
+    // Always guarantee every key from EMPTY exists so renders never crash on undefined
+    const result = { ...EMPTY, ...raw };
+    Object.keys(EMPTY).forEach(k => { if (!Array.isArray(result[k])) result[k] = []; });
+    return result;
 };
 window.save = function(data) {
     saveToFirebase(data);
@@ -156,12 +160,64 @@ function startRealtimeSync() {
     });
 }
 
+// ── One-time lab normalization: merges index.html jb5lr format into Firebase ──
+async function normalizeLabs() {
+    if (localStorage.getItem('jamie_labs_normalized')) return;
+    const data = window.load();
+    let dirty = false;
+
+    // 1. Remap any labs that used "facility" instead of "source"
+    data.labs = data.labs.map(l => {
+        if (l.facility && !l.source) {
+            dirty = true;
+            return { ...l, source: l.facility };
+        }
+        return l;
+    });
+
+    // 2. Pull in any lab panels from index.html's jb5lr localStorage key
+    try {
+        const oldPanels = JSON.parse(localStorage.getItem('jb5lr') || '[]');
+        const existingIds = new Set(data.labs.map(l => String(l.id)));
+        const toAdd = oldPanels
+            .filter(p => !existingIds.has(String(p.id)))
+            .map(p => ({
+                id: p.id,
+                date: p.date || '',
+                source: p.facility || p.source || '',
+                notes: p.notes || '',
+                rows: (p.rows || []).map(r => ({
+                    name:   r.name   || '',
+                    result: r.result || '',
+                    unit:   r.unit   || r.qual || '',
+                    ref:    r.ref    || '',
+                    flag:   r.flag   || '',
+                    note:   r.note   || ''
+                })),
+                imgs: p.imgs || []
+            }));
+        if (toAdd.length) {
+            data.labs.push(...toAdd);
+            dirty = true;
+            console.log('normalizeLabs: migrated ' + toAdd.length + ' panels from jb5lr');
+        }
+    } catch(e) {
+        console.warn('normalizeLabs jb5lr merge failed:', e);
+    }
+
+    if (dirty) {
+        await saveToFirebase(data);
+    }
+    localStorage.setItem('jamie_labs_normalized', '1');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
     window._firebaseReady = true;
     setSyncStatus('syncing');
     await Promise.all([loadFromFirebase(), loadMeta()]);
     setSyncStatus('live');
+    await normalizeLabs();
     startRealtimeSync();
     // Auth check — show lock screen or app depending on session
     checkAuth();
@@ -1516,9 +1572,13 @@ function dismissMigration() {
 
 const KEY = 'jamie_records';
 function load() {
-    if (window._dbCache) return window._dbCache;
-    const c = localStorage.getItem('jamie_records_cache');
-    return c ? JSON.parse(c) : {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
+    // window.load is set by the Firebase module; use it if available, otherwise fall back
+    if (typeof window.load === 'function' && window.load !== load) return window.load();
+    const raw = window._dbCache || JSON.parse(localStorage.getItem('jamie_records_cache') || 'null') || {};
+    const _EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
+    const result = { ..._EMPTY, ...raw };
+    Object.keys(_EMPTY).forEach(k => { if (!Array.isArray(result[k])) result[k] = []; });
+    return result;
 }
 function save(data) {
     if (window.save && window.save !== save) { window.save(data); return; }
@@ -1606,7 +1666,21 @@ function showView(v) {
     const viewEl = document.getElementById('view-' + v);
     if (viewEl) viewEl.classList.add('active');
     const renders = { overview: renderOverview, timeline: renderTimeline, visits: renderVisits, labs: renderLabs, imaging: renderImaging, journal: renderJournal, messages: renderMessages, dx: renderDX, mentalhealth: renderMH, iep: renderIEP };
-    if (renders[v]) renders[v]();
+    if (renders[v]) {
+        // If Firebase hasn't loaded yet, wait for it then re-render
+        if (!window._dbCache) {
+            const poll = setInterval(() => {
+                if (window._dbCache) {
+                    clearInterval(poll);
+                    if (currentView === v) renders[v]();
+                }
+            }, 100);
+            // Also render immediately with whatever we have (shows empty state, not crash)
+            renders[v]();
+        } else {
+            renders[v]();
+        }
+    }
 }
 
 // ─── Form toggle ───────────────────────────────────────────────────────────
@@ -1642,7 +1716,7 @@ function setStatus(msg) {
 
 // ─── Appointments ──────────────────────────────────────────────────────────
 function renderApptBar() {
-    const appts = loadAppts().filter(a => a.date >= new Date().toISOString().slice(0,10)).sort((a,b) => a.date.localeCompare(b.date));
+    const appts = loadAppts().filter(a => a.date >= new Date().toISOString().slice(0,10)).sort((a,b) => (a.date||"").localeCompare(b.date||""));
     const el = document.getElementById('appt-display');
     if (!el) return;
     if (!appts.length) { el.textContent = 'No upcoming appointments'; return; }
@@ -1912,7 +1986,7 @@ function saveEditTL(id) {
 
 function renderTimeline() {
     const data = load();
-    const list = [...data.timeline].sort((a,b) => b.date.localeCompare(a.date));
+    const list = [...data.timeline].sort((a,b) => (b.date||"").localeCompare(a.date||""));
     if (!list.length) { document.getElementById('tl-list').innerHTML = '<div class="empty-state">No events yet.</div>'; return; }
     const { byYear, years } = yrGroup(list, e => e.date);
     let h = '<div class="yr-spine">';
@@ -2095,7 +2169,7 @@ function saveEditVisit(id) {
 function renderVisits() {
     const q = (document.getElementById('v-search')?.value || '').toLowerCase();
     const data = load();
-    let list = [...data.visits].sort((a,b) => b.d.localeCompare(a.d));
+    let list = [...data.visits].sort((a,b) => (b.d||"").localeCompare(a.d||""));
     if (q) list = list.filter(v => Object.values(v).join(' ').toLowerCase().includes(q));
     if (!list.length) { document.getElementById('v-list').innerHTML = '<div class="empty-state">No visits found.</div>'; return; }
     const { byYear, years } = yrGroup(list, v => v.d);
@@ -2253,7 +2327,7 @@ function saveEditMH(id) {
 function renderMH() {
     const q = (document.getElementById('mh-search')?.value || '').toLowerCase();
     const data = load();
-    const list = [...(data.mentalhealth || [])].sort((a,b) => b.d.localeCompare(a.d))
+    const list = [...(data.mentalhealth || [])].sort((a,b) => (b.d||"").localeCompare(a.d||""))
         .filter(v => !q || Object.values(v).join(' ').toLowerCase().includes(q));
     if (!list.length) { document.getElementById('mh-list').innerHTML = '<div class="empty-state">No mental health records found.</div>'; return; }
     const { byYear, years } = yrGroup(list, v => v.d);
@@ -2441,7 +2515,7 @@ function saveEditIEP(id) {
 function renderIEP() {
     const q = (document.getElementById('iep-search')?.value || '').toLowerCase();
     const data = load();
-    const list = [...(data.iep || [])].sort((a,b) => b.d.localeCompare(a.d))
+    const list = [...(data.iep || [])].sort((a,b) => (b.d||"").localeCompare(a.d||""))
         .filter(v => !q || JSON.stringify(v).toLowerCase().includes(q));
     if (!list.length) { document.getElementById('iep-list').innerHTML = '<div class="empty-state">No IEP or academic records yet.</div>'; return; }
     const { byYear, years } = yrGroup(list, v => v.d);
@@ -2591,7 +2665,7 @@ function saveEditIEPCorr(id) {
 function renderIEPCorr() {
     const q = (document.getElementById('iepc-search')?.value || '').toLowerCase();
     const data = load();
-    const list = [...(data.iepcorr || [])].sort((a,b) => b.d.localeCompare(a.d))
+    const list = [...(data.iepcorr || [])].sort((a,b) => (b.d||"").localeCompare(a.d||""))
         .filter(v => !q || JSON.stringify(v).toLowerCase().includes(q));
     if (!list.length) { document.getElementById('iepc-list').innerHTML = '<div class="empty-state">No correspondence records yet.</div>'; return; }
     const { byYear, years } = yrGroup(list, v => v.d);
@@ -2688,7 +2762,7 @@ function deleteLR(id) {
 function renderLabs() {
     const q = (document.getElementById('lr-search')?.value || '').toLowerCase();
     const data = load();
-    let list = [...data.labs].sort((a,b) => b.date.localeCompare(a.date));
+    let list = [...data.labs].map(l => ({ ...l, rows: Array.isArray(l.rows) ? l.rows : [] })).sort((a,b) => (b.date||"").localeCompare(a.date||""));
     if (q) list = list.filter(l => (l.source + ' ' + l.notes + ' ' + l.rows.map(r => r.name + ' ' + r.result).join(' ')).toLowerCase().includes(q));
     if (!list.length) { document.getElementById('lr-list').innerHTML = '<div class="empty-state">No lab results yet.</div>'; return; }
     const { byYear, years } = yrGroup(list, l => l.date);
@@ -2703,7 +2777,7 @@ function renderLabs() {
                     <div style="display:flex;align-items:center;gap:12px;">
                         <div style="width:2px;height:16px;background:var(--ac);flex-shrink:0;"></div>
                         <div>
-                            <div style="font-weight:600;font-size:13px;">Lab Panel — ${esc(l.source || 'Unknown Source')}</div>
+                            <div style="font-weight:600;font-size:13px;">Lab Panel — ${esc(l.source || l.facility || 'Unknown Source')}</div>
                             <div style="font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;">${l.rows.length} result${l.rows.length !== 1 ? 's' : ''}</div>
                         </div>
                     </div>
@@ -2711,13 +2785,14 @@ function renderLabs() {
                 </div>
                 <div class="lab-panel-b">
                     <table class="lab-table">
-                        <thead><tr><th>Test</th><th>Result</th><th>Unit</th><th>Reference</th><th>Flag</th></tr></thead>
+                        <thead><tr><th>Test</th><th>Result</th><th>Unit</th><th>Reference</th><th>Flag</th><th>Note</th></tr></thead>
                         <tbody>${l.rows.map(r => `<tr>
                             <td>${esc(r.name)}</td>
                             <td style="font-family:'IBM Plex Mono',monospace;">${esc(r.result)}</td>
-                            <td style="color:var(--tx3);">${esc(r.unit)}</td>
+                            <td style="color:var(--tx3);">${esc(r.unit||r.qual||'')}</td>
                             <td style="color:var(--tx3);font-size:11px;">${esc(r.ref)}</td>
                             <td>${r.flag ? `<span class="${flagClass(r.flag)}">${esc(r.flag)}</span>` : '—'}</td>
+                            <td style="color:var(--tx3);font-size:11px;font-style:italic;">${esc(r.note||'')}</td>
                         </tr>`).join('')}</tbody>
                     </table>
                     ${l.notes ? `<div style="padding:12px 16px;font-size:12px;color:var(--tx3);border-top:1px solid var(--bd);">${/<[a-z][\s\S]*>/i.test(l.notes)?`<div class="rt-content">${l.notes}</div>`:esc(l.notes)}</div>` : ''}
@@ -2794,7 +2869,7 @@ function saveEditImaging(id) {
 
 function renderImaging() {
     const data = load();
-    const list = [...data.imaging].sort((a,b) => b.date.localeCompare(a.date));
+    const list = [...data.imaging].sort((a,b) => (b.date||"").localeCompare(a.date||""));
     if (!list.length) { document.getElementById('i-list').innerHTML = '<div class="empty-state">No imaging records yet.</div>'; return; }
     const { byYear, years } = yrGroup(list, i => i.date);
     let h = '<div class="yr-spine">';
@@ -3260,7 +3335,7 @@ function saveEditPM(id) {
 function renderMessages() {
     const q = (document.getElementById('pm-search')?.value || '').toLowerCase();
     const data = load();
-    let list = [...data.messages].sort((a,b) => b.date.localeCompare(a.date));
+    let list = [...data.messages].sort((a,b) => (b.date||"").localeCompare(a.date||""));
     if (q) list = list.filter(m => (m.subject + ' ' + m.from + ' ' + m.to + ' ' + m.body + ' ' + m.facility).toLowerCase().includes(q));
     if (!list.length) { document.getElementById('pm-list').innerHTML = '<div class="empty-state">No portal messages yet.</div>'; return; }
     let h = '';
@@ -3368,7 +3443,7 @@ function saveEditDX(id) {
 function renderDX() {
     const q = (document.getElementById('dx-search')?.value || '').toLowerCase();
     const data = load();
-    let list = [...data.dx].sort((a,b) => b.date.localeCompare(a.date));
+    let list = [...data.dx].sort((a,b) => (b.date||"").localeCompare(a.date||""));
     if (q) list = list.filter(d => (d.name + ' ' + d.code + ' ' + d.status + ' ' + d.notes).toLowerCase().includes(q));
     if (!list.length) { document.getElementById('dx-list').innerHTML = '<div class="empty-state">No diagnoses yet.</div>'; return; }
     let h = '<table class="dx-table"><thead><tr><th>Date</th><th>Diagnosis</th><th>Code</th><th>Status</th><th>Provider</th><th></th></tr></thead><tbody>';
@@ -3521,7 +3596,7 @@ function renderOverview() {
     renderPCPCard();
 
     // Prescriptions — pull from most recent visit with mx field
-    const rxVisits = [...data.visits].filter(v => v.mx && v.mx.trim()).sort((a,b) => b.d.localeCompare(a.d));
+    const rxVisits = [...data.visits].filter(v => v.mx && v.mx.trim()).sort((a,b) => (b.d||"").localeCompare(a.d||""));
     const rxEl = document.getElementById('rx-display');
     const rxSub = document.getElementById('rx-sub');
     const rxPill = document.getElementById('rx-pill');
@@ -3538,7 +3613,7 @@ function renderOverview() {
     }
 
     // Diagnoses — pull from most recent visit with dx field
-    const dxVisits = [...data.visits].filter(v => v.dx && v.dx.trim()).sort((a,b) => b.d.localeCompare(a.d));
+    const dxVisits = [...data.visits].filter(v => v.dx && v.dx.trim()).sort((a,b) => (b.d||"").localeCompare(a.d||""));
     const dxEl = document.getElementById('dx-display');
     const dxSub = document.getElementById('dx-sub');
     const dxPill = document.getElementById('dx-pill');
@@ -3555,7 +3630,7 @@ function renderOverview() {
     }
 
     // Allergies — pull from most recent visit with al field
-    const alVisits = [...data.visits].filter(v => v.al && v.al.trim()).sort((a,b) => b.d.localeCompare(a.d));
+    const alVisits = [...data.visits].filter(v => v.al && v.al.trim()).sort((a,b) => (b.d||"").localeCompare(a.d||""));
     const alEl = document.getElementById('al-display');
     const alSub = document.getElementById('al-sub');
     const alPill = document.getElementById('al-pill');
@@ -3580,7 +3655,7 @@ function renderOverview() {
         ...data.messages.map(m => ({ date: m.date, label: m.subject || 'Message', type: 'messages', id: m.id })),
         ...data.timeline.map(t => ({ date: t.date, label: t.label, type: 'timeline', id: t.id })),
         ...data.dx.map(d => ({ date: d.date, label: d.name, type: 'dx', id: d.id }))
-    ].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 8);
+    ].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 8);
 
     if (!all.length) {
         document.getElementById('recent-list').innerHTML = '<div class="empty-state">No records yet. Start by adding a visit, lab result, or journal entry.</div>';
