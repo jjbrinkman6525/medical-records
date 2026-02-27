@@ -161,6 +161,39 @@ function startRealtimeSync() {
 }
 
 // ── One-time cleanup: remove flat-field labs (no rows array) from Firebase ──
+async function migrateFromIndex() {
+    if (localStorage.getItem('jamie_index_migrated')) return;
+    const data = window.load();
+    let dirty = false;
+    const existingImagingIds = new Set(data.imaging.map(x => String(x.id)));
+    const existingJournalIds = new Set(data.journal.map(x => String(x.id)));
+
+    // Pull imaging from jb5i
+    try {
+        const oldImaging = JSON.parse(localStorage.getItem('jb5i') || '[]');
+        const toAdd = oldImaging.filter(e => !existingImagingIds.has(String(e.id)));
+        if (toAdd.length) {
+            data.imaging.push(...toAdd);
+            dirty = true;
+            console.log('migrateFromIndex: added ' + toAdd.length + ' imaging entries');
+        }
+    } catch(e) { console.warn('imaging migration failed:', e); }
+
+    // Pull journal from jb5j
+    try {
+        const oldJournal = JSON.parse(localStorage.getItem('jb5j') || '[]');
+        const toAdd = oldJournal.filter(e => !existingJournalIds.has(String(e.id)));
+        if (toAdd.length) {
+            data.journal.push(...toAdd);
+            dirty = true;
+            console.log('migrateFromIndex: added ' + toAdd.length + ' journal entries');
+        }
+    } catch(e) { console.warn('journal migration failed:', e); }
+
+    if (dirty) await saveToFirebase(data);
+    localStorage.setItem('jamie_index_migrated', '1');
+}
+
 async function cleanupLabs() {
     if (localStorage.getItem('jamie_labs_cleaned')) return;
     const data = window.load();
@@ -233,6 +266,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     setSyncStatus('syncing');
     await Promise.all([loadFromFirebase(), loadMeta()]);
     setSyncStatus('live');
+    await migrateFromIndex();
     await cleanupLabs();
     await normalizeLabs();
     startRealtimeSync();
