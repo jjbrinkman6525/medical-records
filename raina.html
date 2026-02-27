@@ -86,6 +86,8 @@ window.load = function() {
 window.save = function(data) {
     saveToFirebase(data);
 };
+window.loadFromFirebase = loadFromFirebase;
+window.loadMeta = loadMeta;
 
 // ── PCP & Appointments stored in meta doc ─────────────────────────────────
 window._metaCache = null;
@@ -104,6 +106,7 @@ async function saveMeta(meta) {
     window._metaCache = meta;
     try { await setDoc(META_DOC, meta); } catch(e) { console.error('Meta save failed:', e); }
 }
+window.saveMeta = saveMeta;
 
 // Override PCP and appointments storage to use Firestore meta doc
 window.loadPCP = function() { return (window._metaCache || {}).pcp || {}; };
@@ -1441,8 +1444,7 @@ async function runMigration() {
             if (rawPCP)     { const p = JSON.parse(rawPCP);     if (p && Object.keys(p).length)  meta.pcp          = p; }
             if (rawAppts)   { const a = JSON.parse(rawAppts);   if (Array.isArray(a) && a.length) meta.appointments = a; }
             if (rawProfile) { const p = JSON.parse(rawProfile); if (p && Object.keys(p).length)  meta.profile      = p; }
-            // saveMeta is in module scope and already has setDoc reference
-            await saveMeta(meta);
+            await window.saveMeta(meta);
             log('✓ Meta saved.');
         }
 
@@ -1451,7 +1453,7 @@ async function runMigration() {
         log('✓ Migration complete! All data is now in Firestore.', '#22c55e');
 
         // Reload everything from Firestore and refresh UI
-        await Promise.all([loadFromFirebase(), loadMeta()]);
+        await Promise.all([window.loadFromFirebase(), window.loadMeta()]);
         setTimeout(() => {
             document.getElementById('migration-banner')?.remove();
             showView('overview');
