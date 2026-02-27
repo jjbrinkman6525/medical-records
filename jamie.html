@@ -160,6 +160,22 @@ function startRealtimeSync() {
     });
 }
 
+// ── One-time cleanup: remove flat-field labs (no rows array) from Firebase ──
+async function cleanupLabs() {
+    if (localStorage.getItem('jamie_labs_cleaned')) return;
+    const data = window.load();
+    const before = data.labs.length;
+    // Keep only entries that have a rows array (real lab panels)
+    // Flat-field entries (hgb, hct, wbc etc.) have no rows and no source/facility
+    data.labs = data.labs.filter(l => Array.isArray(l.rows) && l.rows.length > 0);
+    const removed = before - data.labs.length;
+    if (removed > 0) {
+        console.log('cleanupLabs: removed ' + removed + ' flat-field entries');
+        await saveToFirebase(data);
+    }
+    localStorage.setItem('jamie_labs_cleaned', '1');
+}
+
 // ── One-time lab normalization: merges index.html jb5lr format into Firebase ──
 async function normalizeLabs() {
     if (localStorage.getItem('jamie_labs_normalized')) return;
@@ -217,6 +233,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     setSyncStatus('syncing');
     await Promise.all([loadFromFirebase(), loadMeta()]);
     setSyncStatus('live');
+    await cleanupLabs();
     await normalizeLabs();
     startRealtimeSync();
     // Auth check — show lock screen or app depending on session
