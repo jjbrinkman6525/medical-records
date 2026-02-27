@@ -702,6 +702,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             </select>
             <input id="tl-lb" placeholder="What happened" style="flex:2;">
           </div>
+          <div class="lbl" style="margin-bottom:4px;margin-top:8px;">Images (Google Drive links)</div>
+          <div id="tl-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('tl-imgs-wrap')">+ Add Image URL</button>
           <div class="save-row">
             <button class="btn-save" onclick="saveTL()">Save Event</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-timeline')">Cancel</button>
@@ -737,6 +740,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           <div class="rte-wrap"><div class="rte-label">Allergies (new or updated)</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-al" contenteditable="true" spellcheck="true"></div></div>
           <input class="fi" id="v-mr" placeholder="Medical records info">
           <div class="rte-wrap"><div class="rte-label">Your Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-nt" contenteditable="true" spellcheck="true"></div></div>
+          <div class="lbl" style="margin-bottom:4px;margin-top:8px;">Images (Google Drive links)</div>
+          <div id="v-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('v-imgs-wrap')">+ Add Image URL</button>
           <div class="save-row">
             <button class="btn-save" onclick="saveVisit()">Save Visit</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-visits')">Cancel</button>
@@ -767,6 +773,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <label>Panel Notes</label>
             <div class="rte-wrap"><div class="rte-label">Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="lr-notes" contenteditable="true" spellcheck="true"></div></div>
           </div>
+          <div class="lbl" style="margin-bottom:4px;margin-top:8px;">Images (Google Drive links)</div>
+          <div id="lr-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('lr-imgs-wrap')">+ Add Image URL</button>
           <div class="save-row">
             <button class="btn-save" onclick="saveLR()">Save Panel</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-labs')">Cancel</button>
@@ -997,6 +1006,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           </div>
           <input class="fi" id="pm-subj" placeholder="Subject">
           <div class="rte-wrap"><div class="rte-label">Message Body</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="pm-body" contenteditable="true" spellcheck="true"></div></div>
+          <div class="lbl" style="margin-bottom:4px;margin-top:8px;">Images / Attachments (Google Drive links)</div>
+          <div id="pm-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('pm-imgs-wrap')">+ Add Image URL</button>
           <div class="save-row">
             <button class="btn-save" onclick="savePM()">Save Message</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-messages')">Cancel</button>
@@ -1026,6 +1038,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <input id="dx-provider" placeholder="Diagnosing provider" style="flex:1;">
           </div>
           <div class="rte-wrap"><div class="rte-label">Clinical Notes / Context</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="dx-notes" contenteditable="true" spellcheck="true"></div></div>
+          <div class="lbl" style="margin-bottom:4px;margin-top:8px;">Images / Documents (Google Drive links)</div>
+          <div id="dx-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('dx-imgs-wrap')">+ Add Image URL</button>
           <div class="save-row">
             <button class="btn-save" onclick="saveDX()">Save Diagnosis</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-dx')">Cancel</button>
@@ -1063,6 +1078,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           <div class="rte-wrap"><div class="rte-label">Allergies (new or updated)</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-al" contenteditable="true" spellcheck="true"></div></div>
           <input class="fi" id="mh-mr" placeholder="Medical records info">
           <div class="rte-wrap"><div class="rte-label">Your Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-nt" contenteditable="true" spellcheck="true"></div></div>
+          <div class="lbl" style="margin-bottom:4px;margin-top:8px;">Images (Google Drive links)</div>
+          <div id="mh-imgs-wrap"></div>
+          <button class="add-row-btn" onclick="addImgRow('mh-imgs-wrap')">+ Add Image URL</button>
           <div class="save-row">
             <button class="btn-save" onclick="saveMH()">Save Record</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-mh')">Cancel</button>
@@ -1735,9 +1753,11 @@ function saveTL() {
     const lb = document.getElementById('tl-lb').value.trim();
     if (!d || !lb) { alert('Date and description required'); return; }
     const data = load();
-    data.timeline.push({ id: Date.now(), date: d, type: document.getElementById('tl-t').value, label: lb });
+    const imgs = collectImgs('tl-imgs-wrap');
+    data.timeline.push({ id: Date.now(), date: d, type: document.getElementById('tl-t').value, label: lb, imgs });
     save(data);
     document.getElementById('tl-lb').value = '';
+    document.getElementById('tl-imgs-wrap').innerHTML = '';
     flash('sv-tl');
     setStatus('SYSTEM: EVENT SAVED');
     renderTimeline();
@@ -1754,6 +1774,7 @@ function editTL(id) {
     const data = load();
     const e = data.timeline.find(x => x.id === id);
     if (!e) return;
+    const existingImgs = buildImgRows(e.imgs);
     openEditModal(`
         <h2>Edit Timeline Event</h2>
         <div class="ir" style="margin-bottom:10px;">
@@ -1765,6 +1786,9 @@ function editTL(id) {
             </select>
         </div>
         <textarea id="etl-lb" rows="3" style="width:100%;">${esc(e.label)}</textarea>
+        <label>Images (Google Drive links)</label>
+        <div id="etl-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('etl-imgs-wrap')">+ Add Image URL</button>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditTL(${id})">Save</button>
@@ -1777,7 +1801,7 @@ function saveEditTL(id) {
     if (!d || !lb) { alert('Date and description required'); return; }
     const data = load();
     const idx = data.timeline.findIndex(x => x.id === id);
-    if (idx >= 0) { data.timeline[idx].date = d; data.timeline[idx].label = lb; data.timeline[idx].type = document.getElementById('etl-t').value; }
+    if (idx >= 0) { data.timeline[idx].date = d; data.timeline[idx].label = lb; data.timeline[idx].type = document.getElementById('etl-t').value; data.timeline[idx].imgs = collectImgs('etl-imgs-wrap'); }
     save(data); closeEditModal(); renderTimeline();
 }
 
@@ -1790,14 +1814,16 @@ function renderTimeline() {
     years.forEach(yr => {
         h += `<div class="yr-hdr"><span>${yr}</span></div>`;
         byYear[yr].forEach(e => {
-            h += `<div class="tl-entry">
+            const tlImgs = imgStrip(e.imgs);
+            h += `<div class="tl-entry${tlImgs ? ' tl-has-imgs' : ''}" style="${tlImgs ? 'flex-wrap:wrap;' : ''}">
                 <div class="tl-dot ${esc(e.type)}"></div>
                 <div class="tl-date">${esc(e.date)}</div>
-                <div class="tl-label">${esc(e.label)}</div>
+                <div class="tl-label" style="flex:1;">${esc(e.label)}</div>
                 <div class="tl-actions">
                     <button class="tl-act act-edit" onclick="editTL(${e.id})">edit</button>
                     <button class="tl-act act-delete" onclick="deleteTL(${e.id})">del</button>
                 </div>
+                ${tlImgs ? `<div style="width:100%;padding-left:28px;padding-top:6px;">${tlImgs}</div>` : ''}
             </div>`;
         });
     });
@@ -1825,11 +1851,13 @@ function saveVisit() {
         dx: getRteContent('v-dx'),
         al: getRteContent('v-al'),
         mr: document.getElementById('v-mr').value,
-        nt: getRteContent('v-nt')
+        nt: getRteContent('v-nt'),
+        imgs: collectImgs('v-imgs-wrap')
     });
     save(data);
     ['v-t','v-f','v-dr','v-vt','v-mr'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
     ['v-dn','v-lb','v-im','v-mx','v-dx','v-al','v-nt'].forEach(id=>setRteContent(id,''));
+    document.getElementById('v-imgs-wrap').innerHTML = '';
     flash('sv-v'); setStatus('SYSTEM: VISIT SAVED'); renderVisits();
 }
 
@@ -2537,11 +2565,13 @@ function saveLR() {
     });
     if (!rows.length) { alert('Add at least one result row'); return; }
     const data = load();
-    data.labs.push({ id: Date.now(), date: d, source: document.getElementById('lr-src').value, notes: getRteContent('lr-notes'), rows });
+    const imgs = collectImgs('lr-imgs-wrap');
+    data.labs.push({ id: Date.now(), date: d, source: document.getElementById('lr-src').value, notes: getRteContent('lr-notes'), rows, imgs });
     save(data);
     document.getElementById('lr-rows').innerHTML = '';
     document.getElementById('lr-src').value = '';
-    getRteContent('lr-notes') = '';
+    setRteContent('lr-notes', '');
+    document.getElementById('lr-imgs-wrap').innerHTML = '';
     flash('sv-lr'); setStatus('SYSTEM: LAB PANEL SAVED'); renderLabs();
 }
 
@@ -2585,7 +2615,8 @@ function renderLabs() {
                             <td>${r.flag ? `<span class="${flagClass(r.flag)}">${esc(r.flag)}</span>` : '—'}</td>
                         </tr>`).join('')}</tbody>
                     </table>
-                    ${l.notes ? `<div style="padding:12px 16px;font-size:12px;color:var(--tx3);border-top:1px solid var(--bd);">${esc(l.notes)}</div>` : ''}
+                    ${l.notes ? `<div style="padding:12px 16px;font-size:12px;color:var(--tx3);border-top:1px solid var(--bd);">${/<[a-z][\s\S]*>/i.test(l.notes)?`<div class="rt-content">${l.notes}</div>`:esc(l.notes)}</div>` : ''}
+                    ${l.imgs && l.imgs.length ? `<div style="padding:8px 16px;border-top:1px solid var(--bd);">${imgStrip(l.imgs)}</div>` : ''}
                     <div style="padding:10px 16px;border-top:1px solid var(--bd);">
                         <button class="act-btn act-delete" onclick="deleteLR(${l.id})">Delete Panel</button>
                     </div>
@@ -3062,11 +3093,13 @@ function savePM() {
         to: document.getElementById('pm-to').value,
         facility: document.getElementById('pm-fac').value,
         subject: document.getElementById('pm-subj').value,
-        body: getRteContent('pm-body')
+        body: getRteContent('pm-body'),
+        imgs: collectImgs('pm-imgs-wrap')
     });
     save(data);
     ['pm-from','pm-to','pm-fac','pm-subj'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
     setRteContent('pm-body','');
+    document.getElementById('pm-imgs-wrap').innerHTML = '';
     flash('sv-pm'); setStatus('SYSTEM: MESSAGE SAVED'); renderMessages();
 }
 
@@ -3080,6 +3113,7 @@ function editPM(id) {
     const m = data.messages.find(x => x.id === id);
     if (!m) return;
     const g = k => esc(m[k] || '');
+    const existingImgs = buildImgRows(m.imgs);
     openEditModal(`
         <h2>Edit Portal Message</h2>
         <div class="ir" style="flex-wrap:wrap;">
@@ -3090,12 +3124,15 @@ function editPM(id) {
         </div>
         <label>Subject</label><input class="fi" id="epm-subj" value="${g('subject')}">
         <div class="rte-wrap"><div class="rte-label">Message Body</div>${rteToolbar('epm-body')}</div>
+        <label>Images / Attachments (Google Drive links)</label>
+        <div id="epm-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('epm-imgs-wrap')">+ Add Image URL</button>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditPM(${id})">Save</button>
         </div>`);
     requestAnimationFrame(() => {
-        setRteContent('epm-body', v.body || '');
+        setRteContent('epm-body', m.body || '');
     });
 }
 
@@ -3109,7 +3146,8 @@ function saveEditPM(id) {
         to: document.getElementById('epm-to').value,
         facility: document.getElementById('epm-fac').value,
         subject: document.getElementById('epm-subj').value,
-        body: getRteContent('epm-body')
+        body: getRteContent('epm-body'),
+        imgs: collectImgs('epm-imgs-wrap')
     });
     save(data); closeEditModal(); renderMessages();
 }
@@ -3137,6 +3175,7 @@ function renderMessages() {
             </div>
             <div class="pm-b">
                 ${/<[a-z][\s\S]*>/i.test(m.body||'')?`<div class="pm-body rt-content">${m.body}</div>`:`<div class="pm-body">${esc(m.body)}</div>`}
+                ${imgStrip(m.imgs)}
                 <div class="entry-actions">
                     <button class="act-btn act-edit" onclick="editPM(${m.id})">Edit</button>
                     <button class="act-btn act-delete" onclick="deletePM(${m.id})">Delete</button>
@@ -3160,11 +3199,13 @@ function saveDX() {
         code: document.getElementById('dx-code').value,
         status: document.getElementById('dx-status').value,
         provider: document.getElementById('dx-provider').value,
-        notes: getRteContent('dx-notes')
+        notes: getRteContent('dx-notes'),
+        imgs: collectImgs('dx-imgs-wrap')
     });
     save(data);
     ['dx-name','dx-code','dx-status','dx-provider'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
     setRteContent('dx-notes','');
+    document.getElementById('dx-imgs-wrap').innerHTML = '';
     flash('sv-dx'); setStatus('SYSTEM: DIAGNOSIS SAVED'); renderDX();
 }
 
@@ -3178,6 +3219,7 @@ function editDX(id) {
     const d = data.dx.find(x => x.id === id);
     if (!d) return;
     const g = k => esc(d[k] || '');
+    const existingImgs = buildImgRows(d.imgs);
     openEditModal(`
         <h2>Edit Diagnosis</h2>
         <div class="ir">
@@ -3190,12 +3232,15 @@ function editDX(id) {
             <input id="edx-provider" value="${g('provider')}" placeholder="Provider" style="flex:1;">
         </div>
         <div class="rte-wrap"><div class="rte-label">Clinical Notes / Context</div>${rteToolbar('edx-notes')}</div>
+        <label>Images / Documents (Google Drive links)</label>
+        <div id="edx-imgs-wrap">${existingImgs}</div>
+        <button class="add-row-btn" onclick="addImgRow('edx-imgs-wrap')">+ Add Image URL</button>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditDX(${id})">Save</button>
         </div>`);
     requestAnimationFrame(() => {
-        setRteContent('edx-notes', v.notes || '');
+        setRteContent('edx-notes', d.notes || '');
     });
 }
 
@@ -3209,7 +3254,8 @@ function saveEditDX(id) {
         code: document.getElementById('edx-code').value,
         status: document.getElementById('edx-status').value,
         provider: document.getElementById('edx-provider').value,
-        notes: getRteContent('edx-notes')
+        notes: getRteContent('edx-notes'),
+        imgs: collectImgs('edx-imgs-wrap')
     });
     save(data); closeEditModal(); renderDX();
 }
@@ -3222,17 +3268,24 @@ function renderDX() {
     if (!list.length) { document.getElementById('dx-list').innerHTML = '<div class="empty-state">No diagnoses yet.</div>'; return; }
     let h = '<table class="dx-table"><thead><tr><th>Date</th><th>Diagnosis</th><th>Code</th><th>Status</th><th>Provider</th><th></th></tr></thead><tbody>';
     list.forEach(d => {
+        const uid = `dx${d.id}`;
+        const hasExtra = !!(d.notes || (d.imgs && d.imgs.length));
         h += `<tr>
             <td>${esc(d.date)}</td>
-            <td style="color:var(--tx);font-weight:500;">${esc(d.name)}${d.notes?`<div style="font-size:11px;color:var(--tx3);margin-top:3px;font-weight:400;">${/<[a-z][\s\S]*>/i.test(d.notes)?d.notes:esc(d.notes)}</div>`:''}</td>
+            <td style="color:var(--tx);font-weight:500;">${esc(d.name)}</td>
             <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">${esc(d.code)}</span></td>
             <td><span class="pill ac">${esc(d.status || 'Confirmed')}</span></td>
             <td style="font-size:12px;">${esc(d.provider)}</td>
             <td style="white-space:nowrap;">
+                ${hasExtra ? `<button class="act-btn" onclick="toggleEntry('${uid}')" style="margin-right:4px;">▾</button>` : ''}
                 <button class="act-btn act-edit" onclick="editDX(${d.id})">Edit</button>
-                <button class="act-btn act-delete" style="margin-left:8px;" onclick="deleteDX(${d.id})">Del</button>
+                <button class="act-btn act-delete" style="margin-left:4px;" onclick="deleteDX(${d.id})">Del</button>
             </td>
-        </tr>`;
+        </tr>
+        ${hasExtra ? `<tr id="${uid}" style="display:none;"><td colspan="6" style="padding:10px 14px;background:var(--sf2);">
+            ${d.notes ? `<div style="font-size:12px;color:var(--tx2);margin-bottom:8px;">${/<[a-z][\s\S]*>/i.test(d.notes)?`<div class="rt-content">${d.notes}</div>`:esc(d.notes)}</div>` : ''}
+            ${imgStrip(d.imgs)}
+        </td></tr>` : ''}`.replace(/\n\s*\n/g,'\n');
     });
     h += '</tbody></table>';
     document.getElementById('dx-list').innerHTML = h;
