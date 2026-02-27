@@ -147,7 +147,7 @@ function startRealtimeSync() {
             iep: window.renderIEP
         };
         const cur = window.currentView;
-        if (cur && renders[cur]) renders[cur]();
+        if (cur && renders[cur]) { renders[cur](); setTimeout(restoreOpenEntries, 50); }
         setSyncStatus('live');
     }, (err) => { console.warn('Snapshot error:', err); setSyncStatus('error'); });
 
@@ -834,7 +834,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
         <div style="width:36px;height:36px;background:var(--sf2);border:1px solid var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ac);font-weight:bold;font-family:'Playfair Display';font-size:18px;">J</div>
         <div style="flex:1;">
           <div style="font-weight:600;font-size:13px;">Jamie</div>
-          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;">MR:BB00110557</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;">IR00023630</div>
         </div>
         <button onclick="doLogout()" title="Logout" style="background:transparent;border:1px solid var(--bd);color:var(--tx3);border-radius:4px;padding:4px 8px;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;">⏏ Out</button>
       </div>
@@ -1756,13 +1756,40 @@ function showView(v) {
 }
 
 // ─── Form toggle ───────────────────────────────────────────────────────────
+// Track open entries so re-renders restore state
+const _openEntries = new Set();
+
 function toggleEntry(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.classList.toggle('open');
-    if (el.classList.contains('open')) {
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    // Handle both CSS-class-driven entries and inline-style tr rows (DX table)
+    const isTr = el.tagName === 'TR';
+    if (isTr) {
+        const isOpen = el.style.display !== 'none' && el.style.display !== '';
+        el.style.display = isOpen ? 'none' : 'table-row';
+        if (!isOpen) { _openEntries.add(id); setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50); }
+        else _openEntries.delete(id);
+    } else {
+        el.classList.toggle('open');
+        if (el.classList.contains('open')) {
+            _openEntries.add(id);
+            setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+        } else {
+            _openEntries.delete(id);
+        }
     }
+}
+
+function restoreOpenEntries() {
+    _openEntries.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.tagName === 'TR') {
+            el.style.display = 'table-row';
+        } else {
+            el.classList.add('open');
+        }
+    });
 }
 
 function toggleForm(id) {
@@ -2017,7 +2044,7 @@ function saveTL() {
 function deleteTL(id) {
     if (!confirm('Delete this event?')) return;
     const data = load();
-    data.timeline = data.timeline.filter(e => e.id !== id);
+    data.timeline = data.timeline.filter(e => e.id != id);
     save(data); renderTimeline();
 }
 
@@ -2114,7 +2141,7 @@ function saveVisit() {
 
 function deleteVisit(id) {
     if (!confirm('Delete this visit?')) return;
-    const data = load(); data.visits = data.visits.filter(v => v.id !== id); save(data); renderVisits();
+    const data = load(); data.visits = data.visits.filter(v => v.id != id); save(data); renderVisits();
 }
 
 // ── Rich text editor helpers ───────────────────────────────────────────────
@@ -2175,7 +2202,7 @@ function getRteContent(id) {
 
 function editVisit(id) {
     const data = load();
-    const v = data.visits.find(x => x.id === id);
+    const v = data.visits.find(x => x.id == id);
     if (!v) return;
     const g = k => v[k] || '';
     const existingImgs = buildImgRows(v.imgs);
@@ -2326,7 +2353,7 @@ function saveMH() {
 function deleteMH(id) {
     if (!confirm('Delete this record?')) return;
     const data = load();
-    data.mentalhealth = (data.mentalhealth || []).filter(v => v.id !== id);
+    data.mentalhealth = (data.mentalhealth || []).filter(v => v.id != id);
     save(data); renderMH();
 }
 
@@ -2506,7 +2533,7 @@ function saveIEP() {
 function deleteIEP(id) {
     if (!confirm('Delete this record?')) return;
     const data = load();
-    data.iep = (data.iep || []).filter(v => v.id !== id);
+    data.iep = (data.iep || []).filter(v => v.id != id);
     save(data); renderIEP();
 }
 
@@ -2671,7 +2698,7 @@ function saveIEPCorr() {
 function deleteIEPCorr(id) {
     if (!confirm('Delete this correspondence?')) return;
     const data = load();
-    data.iepcorr = (data.iepcorr || []).filter(v => v.id !== id);
+    data.iepcorr = (data.iepcorr || []).filter(v => v.id != id);
     save(data); renderIEPCorr();
 }
 
@@ -2783,6 +2810,8 @@ function renderIEPCorr() {
     h += '</div>';
     document.getElementById('iepc-list').innerHTML = h;
 }
+
+const LR_FLAGS = ['','High','Low','Critical High','Critical Low','Abnormal','Equivocal','Borderline','Reactive','Non-Reactive','Positive','Negative','Indeterminate','See Note'];
 
 // ══════════════════════════════════════════════════════════════════════════
 // LAB RESULTS
@@ -3891,8 +3920,6 @@ function lrCheckUnit(row){
 }
 
 
-const LR_FLAGS = ['','High','Low','Critical High','Critical Low','Abnormal','Equivocal','Borderline','Reactive','Non-Reactive','Positive','Negative','Indeterminate','See Note'];
-
 
 function saveLR() {
     const d = document.getElementById('lr-d').value;
@@ -3945,7 +3972,7 @@ function saveLR() {
 
 function deleteLR(id) {
     if (!confirm('Delete this lab panel?')) return;
-    const data = load(); data.labs = data.labs.filter(l => l.id !== id); save(data); renderLabs();
+    const data = load(); data.labs = data.labs.filter(l => l.id != id); save(data); renderLabs();
 }
 
 
@@ -4075,12 +4102,12 @@ function saveImaging() {
 
 function deleteImaging(id) {
     if (!confirm('Delete this imaging record?')) return;
-    const data = load(); data.imaging = data.imaging.filter(i => i.id !== id); save(data); renderImaging();
+    const data = load(); data.imaging = data.imaging.filter(i => i.id != id); save(data); renderImaging();
 }
 
 function editImaging(id) {
     const data = load();
-    const v = data.imaging.find(x => x.id === id);
+    const v = data.imaging.find(x => x.id == id);
     if (!v) return;
     const existingImgs = buildImgRows(v.imgs);
     const g = k => esc(v[k] || '');
@@ -4246,12 +4273,12 @@ function saveJournal() {
 
 function deleteJournal(id) {
     if (!confirm('Delete this journal entry?')) return;
-    const data = load(); data.journal = data.journal.filter(j => j.id !== id); save(data); renderJournal();
+    const data = load(); data.journal = data.journal.filter(j => j.id != id); save(data); renderJournal();
 }
 
 function editJournal(id) {
     const data = load();
-    const s = data.journal.find(x => x.id === id);
+    const s = data.journal.find(x => x.id == id);
     if (!s) return;
     const safetyLabels = ['','Safe — No danger','Fear / Concern','Self-Mutilation Occurring','Suicidal / Homicidal','⚠ Life in Danger'];
     const safetyOpts = [1,2,3,4,5].map(n => `
@@ -4533,7 +4560,7 @@ function savePM() {
 
 function deletePM(id) {
     if (!confirm('Delete this message?')) return;
-    const data = load(); data.messages = data.messages.filter(m => m.id !== id); save(data); renderMessages();
+    const data = load(); data.messages = data.messages.filter(m => m.id != id); save(data); renderMessages();
 }
 
 function editPM(id) {
@@ -4639,7 +4666,7 @@ function saveDX() {
 
 function deleteDX(id) {
     if (!confirm('Delete this diagnosis?')) return;
-    const data = load(); data.dx = data.dx.filter(d => d.id !== id); save(data); renderDX();
+    const data = load(); data.dx = data.dx.filter(d => d.id != id); save(data); renderDX();
 }
 
 function editDX(id) {
