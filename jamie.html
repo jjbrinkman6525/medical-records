@@ -161,6 +161,23 @@ function startRealtimeSync() {
 }
 
 // ── One-time cleanup: remove flat-field labs (no rows array) from Firebase ──
+async function cleanupImaging() {
+    if (localStorage.getItem('jamie_imaging_cleaned')) return;
+    // Also reset the index migration flag so imaging gets re-pulled from jb5i
+    localStorage.removeItem('jamie_index_migrated');
+    const data = window.load();
+    const before = data.imaging.length;
+    // Keep only entries that have a report field — blank entries came from
+    // the old migration bucketing visit-embedded imaging by type flag
+    data.imaging = data.imaging.filter(i => i.report && i.report.trim());
+    const removed = before - data.imaging.length;
+    if (removed > 0) {
+        console.log('cleanupImaging: removed ' + removed + ' blank entries');
+        await saveToFirebase(data);
+    }
+    localStorage.setItem('jamie_imaging_cleaned', '1');
+}
+
 async function migrateFromIndex() {
     if (localStorage.getItem('jamie_index_migrated')) return;
     const data = window.load();
@@ -266,6 +283,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     setSyncStatus('syncing');
     await Promise.all([loadFromFirebase(), loadMeta()]);
     setSyncStatus('live');
+    await cleanupImaging();
     await migrateFromIndex();
     await cleanupLabs();
     await normalizeLabs();
