@@ -534,6 +534,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 .rte-btn.active { background: var(--ac); color: #000; }
 .rte-divider { width: 1px; height: 20px; background: var(--bd); margin: 4px 2px; }
 .rte-color-btn { width: 28px; height: 28px; border: 1px solid var(--bd); border-radius: 4px; cursor: pointer; flex-shrink: 0; }
+.rte-editor:empty:before{content:attr(data-placeholder);color:var(--tx3);pointer-events:none;font-style:italic;}
 .rte-editor { min-height: 80px; padding: 10px 12px; background: var(--sf2); border: 1px solid var(--bd); border-radius: 0 0 6px 6px; color: var(--tx); font-size: 13px; line-height: 1.7; outline: none; font-family: 'IBM Plex Sans', sans-serif; }
 .rte-editor:focus { border-color: var(--ac); }
 .rte-editor ul, .rte-editor ol { padding-left: 20px; }
@@ -727,15 +728,15 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <input id="v-f" placeholder="Facility" style="flex:1;">
             <input id="v-dr" placeholder="Provider(s)" style="flex:1;">
           </div>
-          <textarea class="fi" id="v-dn" rows="3" placeholder="Physician notes / reports"></textarea>
-          <textarea class="fi" id="v-lb" rows="2" placeholder="Labs"></textarea>
-          <textarea class="fi" id="v-im" rows="2" placeholder="Imaging / Diagnostics"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Physician Notes / Reports</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-dn" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Labs</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-lb" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Imaging / Diagnostics</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-im" contenteditable="true" spellcheck="true"></div></div>
           <input class="fi" id="v-vt" placeholder="Vitals">
-          <textarea class="fi" id="v-mx" rows="2" placeholder="Medications"></textarea>
-          <textarea class="fi" id="v-dx" rows="2" placeholder="Diagnosis"></textarea>
-          <textarea class="fi" id="v-al" rows="2" placeholder="Allergies (new or updated)"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Medications</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-mx" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Diagnosis</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-dx" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Allergies (new or updated)</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-al" contenteditable="true" spellcheck="true"></div></div>
           <input class="fi" id="v-mr" placeholder="Medical records info">
-          <textarea class="fi" id="v-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Your Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="v-nt" contenteditable="true" spellcheck="true"></div></div>
           <div class="save-row">
             <button class="btn-save" onclick="saveVisit()">Save Visit</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-visits')">Cancel</button>
@@ -764,7 +765,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           <button class="add-row-btn" onclick="addLRRow()">+ Add Result Row</button>
           <div class="form-row">
             <label>Panel Notes</label>
-            <textarea id="lr-notes" rows="2" placeholder="e.g. Fasting sample, drawn during admission..."></textarea>
+            <div class="rte-wrap"><div class="rte-label">Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="lr-notes" contenteditable="true" spellcheck="true"></div></div>
           </div>
           <div class="save-row">
             <button class="btn-save" onclick="saveLR()">Save Panel</button>
@@ -793,8 +794,8 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <input id="i-f" placeholder="Facility" style="flex:1;">
             <input id="i-dr" placeholder="Radiologist" style="flex:1;">
           </div>
-          <textarea class="fi" id="i-rpt" rows="5" placeholder="Full imaging report"></textarea>
-          <textarea class="fi" id="i-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Full Report</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="i-rpt" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Your Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="i-nt" contenteditable="true" spellcheck="true"></div></div>
           <div class="lbl" style="margin-bottom:4px;">Images (Google Drive links)</div>
           <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">In Drive: right-click → Share → Copy link. Paste below.</div>
           <div id="i-imgs-wrap"></div>
@@ -827,15 +828,15 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 
           <!-- 2. General Description -->
           <div class="j-section-label"><span class="j-section-num">2</span> General Description</div>
-          <textarea class="fi" id="j-tx" rows="4" placeholder="General description of the day / event / how you are feeling..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Description / Main Entry</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-tx" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 3. Surrounding Circumstances & Individuals Involved -->
           <div class="j-section-label"><span class="j-section-num">3</span> Surrounding Circumstances &amp; Individuals Involved</div>
-          <textarea class="fi" id="j-circ" rows="3" placeholder="Who was present, what was happening, context leading up to the entry..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Circumstances / Context</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-circ" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 4. Law Enforcement Involvement -->
           <div class="j-section-label"><span class="j-section-num">4</span> Law Enforcement Involvement</div>
-          <textarea class="fi" id="j-le" rows="2" placeholder="Any police, EMS, or legal system contact — agency, badge #, incident #, outcome..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Law Enforcement / Legal Contact</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-le" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 5. Safety Rating -->
           <div class="j-section-label"><span class="j-section-num">5</span> Safety Rating</div>
@@ -864,23 +865,23 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 
           <!-- 6. Psychological -->
           <div class="j-section-label"><span class="j-section-num">6</span> Psychological Observations / Complaints</div>
-          <textarea class="fi" id="j-psych" rows="3" placeholder="Anxiety, depression, dissociation, paranoia, intrusive thoughts, emotional state..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Psychological / Emotional Symptoms</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-psych" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 7. Physical -->
           <div class="j-section-label"><span class="j-section-num">7</span> Physical Observations / Complaints</div>
-          <textarea class="fi" id="j-phys" rows="3" placeholder="Body symptoms, pain locations, fatigue, tremors, nausea, neurological symptoms..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Physical Symptoms</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-phys" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 8. Academic / Workplace -->
           <div class="j-section-label"><span class="j-section-num">8</span> Academic / Workplace Observations / Complaints</div>
-          <textarea class="fi" id="j-work" rows="2" placeholder="Cognitive function, attendance, performance, incidents at school or work..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Work / School Functioning</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-work" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 9. Dietary -->
           <div class="j-section-label"><span class="j-section-num">9</span> Dietary Concerns</div>
-          <textarea class="fi" id="j-diet" rows="2" placeholder="What was eaten, appetite changes, restrictions, restrictions violated, feeding concerns..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Diet / Nutrition / Feeding</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-diet" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 10. Substance Use -->
           <div class="j-section-label"><span class="j-section-num">10</span> Prescription, Self-Medication, Alcohol, Illicit Drug Usage</div>
-          <textarea class="fi" id="j-sub" rows="2" placeholder="Medications taken as prescribed, missed doses, OTC use, alcohol, cannabis, other substances..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Substances / Medications Taken</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-sub" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 11. Pain Level -->
           <div class="j-section-label"><span class="j-section-num">11</span> Pain Level <span style="font-size:10px;color:var(--tx3);font-weight:400;text-transform:none;margin-left:6px;">1 = No pain &nbsp;·&nbsp; 10 = Extreme pain</span></div>
@@ -933,15 +934,15 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 
           <!-- 14. Professional / Medical Interventions -->
           <div class="j-section-label"><span class="j-section-num">14</span> Professional / Medical Interventions</div>
-          <textarea class="fi" id="j-interv" rows="2" placeholder="Therapy sessions, doctor calls, ER visits, hospitalizations, crisis line contact..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Interventions / Medical Contact</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-interv" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 15. Coping Methods -->
           <div class="j-section-label"><span class="j-section-num">15</span> Coping Methods Used</div>
-          <textarea class="fi" id="j-cope" rows="2" placeholder="Breathing exercises, grounding techniques, distraction, support person, rest, journaling..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Coping Strategies Used</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-cope" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- 16. Therapeutic Methods -->
           <div class="j-section-label"><span class="j-section-num">16</span> Therapeutic Methods Applied</div>
-          <textarea class="fi" id="j-therapy" rows="2" placeholder="DBT skills, CBT techniques, EMDR, mindfulness, somatic work, art therapy..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Therapy Techniques Applied</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-therapy" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- Weather & Location (preserved) -->
           <div class="j-section-label" style="margin-top:6px;">&#127780; Weather &amp; Location</div>
@@ -952,7 +953,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <input id="j-temp-prior" type="number" step="0.1" placeholder="Prior day temp (°F)" style="flex:1;min-width:140px;">
             <input id="j-baro-prior" type="number" step="0.01" placeholder="Prior day baro (inHg)" style="flex:1;min-width:150px;">
           </div>
-          <textarea class="fi" id="j-wx" rows="2" placeholder="Weather narrative (e.g. front moving in, pressure dropping...)"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Weather Narrative</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="j-wx" contenteditable="true" spellcheck="true"></div></div>
 
           <!-- Images -->
           <div class="lbl" style="margin-bottom:4px;margin-top:4px;">Images (Google Drive links)</div>
@@ -995,7 +996,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <input id="pm-fac" placeholder="Facility / Portal" style="flex:1;">
           </div>
           <input class="fi" id="pm-subj" placeholder="Subject">
-          <textarea class="fi" id="pm-body" rows="5" placeholder="Message body"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Message Body</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="pm-body" contenteditable="true" spellcheck="true"></div></div>
           <div class="save-row">
             <button class="btn-save" onclick="savePM()">Save Message</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-messages')">Cancel</button>
@@ -1024,7 +1025,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <input id="dx-status" placeholder="Status (Confirmed, Suspected, Ruled Out...)" style="flex:1;">
             <input id="dx-provider" placeholder="Diagnosing provider" style="flex:1;">
           </div>
-          <textarea class="fi" id="dx-notes" rows="3" placeholder="Clinical notes, evidence, context..."></textarea>
+          <div class="rte-wrap"><div class="rte-label">Clinical Notes / Context</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="dx-notes" contenteditable="true" spellcheck="true"></div></div>
           <div class="save-row">
             <button class="btn-save" onclick="saveDX()">Save Diagnosis</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-dx')">Cancel</button>
@@ -1053,15 +1054,15 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <input id="mh-f" placeholder="Facility" style="flex:1;">
             <input id="mh-dr" placeholder="Provider(s)" style="flex:1;">
           </div>
-          <textarea class="fi" id="mh-dn" rows="3" placeholder="Session notes / reports"></textarea>
-          <textarea class="fi" id="mh-lb" rows="2" placeholder="Labs / assessments"></textarea>
-          <textarea class="fi" id="mh-im" rows="2" placeholder="Psychological testing / diagnostics"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Session Notes / Reports</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-dn" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Labs / Assessments</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-lb" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Psychological Testing / Diagnostics</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-im" contenteditable="true" spellcheck="true"></div></div>
           <input class="fi" id="mh-vt" placeholder="Vitals">
-          <textarea class="fi" id="mh-mx" rows="2" placeholder="Medications"></textarea>
-          <textarea class="fi" id="mh-dx" rows="2" placeholder="Diagnosis (DSM-5)"></textarea>
-          <textarea class="fi" id="mh-al" rows="2" placeholder="Allergies (new or updated)"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Medications</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-mx" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Diagnosis (DSM-5)</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-dx" contenteditable="true" spellcheck="true"></div></div>
+          <div class="rte-wrap"><div class="rte-label">Allergies (new or updated)</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-al" contenteditable="true" spellcheck="true"></div></div>
           <input class="fi" id="mh-mr" placeholder="Medical records info">
-          <textarea class="fi" id="mh-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+          <div class="rte-wrap"><div class="rte-label">Your Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="mh-nt" contenteditable="true" spellcheck="true"></div></div>
           <div class="save-row">
             <button class="btn-save" onclick="saveMH()">Save Record</button>
             <button class="btn-cancel-form" onclick="toggleForm('form-mh')">Cancel</button>
@@ -1114,17 +1115,17 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
               <input id="iep-teacher" placeholder="Teacher / Case Manager" style="flex:1;">
               <input id="iep-attendees" placeholder="Meeting Attendees" style="flex:1;">
             </div>
-            <textarea class="fi" id="iep-goals" rows="3" placeholder="IEP Goals / Objectives"></textarea>
-            <textarea class="fi" id="iep-services" rows="2" placeholder="Services &amp; Accommodations (e.g. Speech, OT, extended time...)"></textarea>
-            <textarea class="fi" id="iep-progress" rows="3" placeholder="Progress Notes / Academic Performance"></textarea>
-            <textarea class="fi" id="iep-grades" rows="2" placeholder="Grades / GPA / Report Card Summary"></textarea>
-            <textarea class="fi" id="iep-testing" rows="2" placeholder="Standardized Testing / Evaluations (scores, dates, instruments)"></textarea>
-            <textarea class="fi" id="iep-behavior" rows="2" placeholder="Behavioral Observations / Incidents"></textarea>
-            <textarea class="fi" id="iep-concerns" rows="2" placeholder="Parental Concerns Noted"></textarea>
+            <div class="rte-wrap"><div class="rte-label">IEP Goals / Objectives</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-goals" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Services & Accommodations</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-services" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Progress Notes / Academic Performance</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-progress" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Grades / GPA / Report Card Summary</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-grades" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Standardized Testing / Evaluations</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-testing" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Behavioral Observations / Incidents</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-behavior" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Parental Concerns Noted</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-concerns" contenteditable="true" spellcheck="true"></div></div>
             <input class="fi" id="iep-nextiep" type="date" placeholder="" style="min-width:0;">
             <label style="margin-top:-6px;margin-bottom:8px;display:block;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;">Next IEP / Review Date</label>
             <input class="fi" id="iep-mr" placeholder="Record / File reference number">
-            <textarea class="fi" id="iep-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+            <div class="rte-wrap"><div class="rte-label">Your Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iep-nt" contenteditable="true" spellcheck="true"></div></div>
             <div class="lbl" style="margin-bottom:4px;">Documents &amp; Images (Google Drive links)</div>
             <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">In Drive: right-click → Share → Copy link. Paste below.</div>
             <div id="iep-imgs-wrap"></div>
@@ -1168,9 +1169,9 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
               <input id="iepc-school" placeholder="School / District" style="flex:1;">
               <input id="iepc-re" placeholder="Re: (subject / topic)" style="flex:1;">
             </div>
-            <textarea class="fi" id="iepc-body" rows="6" placeholder="Transcribe the full letter or email here..."></textarea>
-            <textarea class="fi" id="iepc-response" rows="3" placeholder="Response / Action taken (if any)"></textarea>
-            <textarea class="fi" id="iepc-nt" rows="2" placeholder="YOUR NOTES"></textarea>
+            <div class="rte-wrap"><div class="rte-label">Full Letter / Email Body</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iepc-body" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Response / Action Taken</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iepc-response" contenteditable="true" spellcheck="true"></div></div>
+            <div class="rte-wrap"><div class="rte-label">Your Notes</div><div class="rte-toolbar" onmousedown="event.preventDefault()"><button class="rte-btn" title="Bold" onclick="rtCmd('bold')"><b>B</b></button><button class="rte-btn" title="Italic" onclick="rtCmd('italic')"><i>I</i></button><button class="rte-btn" title="Underline" onclick="rtCmd('underline')"><u>U</u></button><div class="rte-divider"></div><button class="rte-btn" title="Bullet list" onclick="rtCmd('insertUnorderedList')">&#8226;&#8212;</button><button class="rte-btn" title="Numbered list" onclick="rtCmd('insertOrderedList')">1&#8212;</button><div class="rte-divider"></div><button class="rte-btn" title="Highlight" onclick="rtHighlight()" style="font-size:11px;">&#9642;HL</button><button class="rte-btn" title="Remove formatting" onclick="rtCmd('removeFormat')" style="font-size:11px;">&#10005;fmt</button><div class="rte-divider"></div><button class="rte-btn" title="Undo" onclick="rtCmd('undo')">&#8617;</button><button class="rte-btn" title="Redo" onclick="rtCmd('redo')">&#8618;</button></div><div class="rte-editor" id="iepc-nt" contenteditable="true" spellcheck="true"></div></div>
             <div class="lbl" style="margin-bottom:4px;">Upload Letter / Document Images (Google Drive links)</div>
             <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;">In Drive: right-click → Share → Copy link. Paste below.</div>
             <div id="iepc-imgs-wrap"></div>
@@ -1816,18 +1817,19 @@ function saveVisit() {
         t: document.getElementById('v-t').value,
         f: document.getElementById('v-f').value,
         dr: document.getElementById('v-dr').value,
-        dn: document.getElementById('v-dn').value,
-        lb: document.getElementById('v-lb').value,
-        im: document.getElementById('v-im').value,
+        dn: getRteContent('v-dn'),
+        lb: getRteContent('v-lb'),
+        im: getRteContent('v-im'),
         vt: document.getElementById('v-vt').value,
-        mx: document.getElementById('v-mx').value,
-        dx: document.getElementById('v-dx').value,
-        al: document.getElementById('v-al').value,
+        mx: getRteContent('v-mx'),
+        dx: getRteContent('v-dx'),
+        al: getRteContent('v-al'),
         mr: document.getElementById('v-mr').value,
-        nt: document.getElementById('v-nt').value
+        nt: getRteContent('v-nt')
     });
     save(data);
-    ['v-t','v-f','v-dr','v-dn','v-lb','v-im','v-vt','v-mx','v-dx','v-al','v-mr','v-nt'].forEach(id => document.getElementById(id).value = '');
+    ['v-t','v-f','v-dr','v-vt','v-mr'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    ['v-dn','v-lb','v-im','v-mx','v-dx','v-al','v-nt'].forEach(id=>setRteContent(id,''));
     flash('sv-v'); setStatus('SYSTEM: VISIT SAVED'); renderVisits();
 }
 
@@ -2024,21 +2026,20 @@ function saveMH() {
         t:  document.getElementById('mh-t').value,
         f:  document.getElementById('mh-f').value,
         dr: document.getElementById('mh-dr').value,
-        dn: document.getElementById('mh-dn').value,
-        lb: document.getElementById('mh-lb').value,
-        im: document.getElementById('mh-im').value,
+        dn: getRteContent('mh-dn'),
+        lb: getRteContent('mh-lb'),
+        im: getRteContent('mh-im'),
         vt: document.getElementById('mh-vt').value,
-        mx: document.getElementById('mh-mx').value,
-        dx: document.getElementById('mh-dx').value,
-        al: document.getElementById('mh-al').value,
+        mx: getRteContent('mh-mx'),
+        dx: getRteContent('mh-dx'),
+        al: getRteContent('mh-al'),
         mr: document.getElementById('mh-mr').value,
-        nt: document.getElementById('mh-nt').value,
+        nt: getRteContent('mh-nt'),
         imgs
     });
     save(data);
-    ['mh-d','mh-t','mh-f','mh-dr','mh-dn','mh-lb','mh-im','mh-vt','mh-mx','mh-dx','mh-al','mh-mr','mh-nt'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.value = '';
-    });
+    ['mh-d','mh-t','mh-f','mh-dr','mh-vt','mh-mr'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    ['mh-dn','mh-lb','mh-im','mh-mx','mh-dx','mh-al','mh-nt'].forEach(id=>setRteContent(id,''));
     document.getElementById('mh-imgs-wrap').innerHTML = '';
     flash('sv-mh'); renderMH();
 }
@@ -2066,15 +2067,15 @@ function editMH(id) {
             <input id="emh-f" value="${g('f')}" placeholder="Facility" style="flex:1;">
             <input id="emh-dr" value="${g('dr')}" placeholder="Provider(s)" style="flex:1;">
         </div>
-        <label>Session Notes / Reports</label><textarea class="fi" id="emh-dn" rows="3">${g('dn')}</textarea>
-        <label>Labs / Assessments</label><textarea class="fi" id="emh-lb" rows="2">${g('lb')}</textarea>
-        <label>Psychological Testing / Diagnostics</label><textarea class="fi" id="emh-im" rows="2">${g('im')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Session Notes / Reports</div>${rteToolbar('emh-dn')}</div>
+        <div class="rte-wrap"><div class="rte-label">Labs / Assessments</div>${rteToolbar('emh-lb')}</div>
+        <div class="rte-wrap"><div class="rte-label">Psychological Testing / Diagnostics</div>${rteToolbar('emh-im')}</div>
         <label>Vitals</label><input class="fi" id="emh-vt" value="${g('vt')}">
-        <label>Medications</label><textarea class="fi" id="emh-mx" rows="2">${g('mx')}</textarea>
-        <label>Diagnosis (DSM-5)</label><textarea class="fi" id="emh-dx" rows="2">${g('dx')}</textarea>
-        <label>Allergies</label><textarea class="fi" id="emh-al" rows="2">${g('al')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Medications</div>${rteToolbar('emh-mx')}</div>
+        <div class="rte-wrap"><div class="rte-label">Diagnosis (DSM-5)</div>${rteToolbar('emh-dx')}</div>
+        <div class="rte-wrap"><div class="rte-label">Allergies (new or updated)</div>${rteToolbar('emh-al')}</div>
         <label>Medical Records Info</label><input class="fi" id="emh-mr" value="${g('mr')}">
-        <label>Your Notes</label><textarea class="fi" id="emh-nt" rows="2">${g('nt')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Your Notes</div>${rteToolbar('emh-nt')}</div>
         <label>Images / Documents (Google Drive links)</label>
         <div id="emh-imgs-wrap">${existingImgs}</div>
         <button class="add-row-btn" onclick="addImgRow('emh-imgs-wrap')">+ Add Image URL</button>
@@ -2082,6 +2083,15 @@ function editMH(id) {
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditMH(${id})">Save</button>
         </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('emh-dn', v.dn || '');
+        setRteContent('emh-lb', v.lb || '');
+        setRteContent('emh-im', v.im || '');
+        setRteContent('emh-mx', v.mx || '');
+        setRteContent('emh-dx', v.dx || '');
+        setRteContent('emh-al', v.al || '');
+        setRteContent('emh-nt', v.nt || '');
+    });
     requestAnimationFrame(() => {
         setRteContent('emh-dn', v.dn || '');
         setRteContent('emh-lb', v.lb || '');
@@ -2194,24 +2204,21 @@ function saveIEP() {
         grade:     document.getElementById('iep-grade').value.trim(),
         teacher:   document.getElementById('iep-teacher').value.trim(),
         attendees: document.getElementById('iep-attendees').value.trim(),
-        goals:     tv('iep-goals'),
-        services:  tv('iep-services'),
-        progress:  tv('iep-progress'),
-        grades:    tv('iep-grades'),
-        testing:   tv('iep-testing'),
-        behavior:  tv('iep-behavior'),
-        concerns:  tv('iep-concerns'),
+        goals:     getRteContent('iep-goals'),
+        services:  getRteContent('iep-services'),
+        progress:  getRteContent('iep-progress'),
+        grades:    getRteContent('iep-grades'),
+        testing:   getRteContent('iep-testing'),
+        behavior:  getRteContent('iep-behavior'),
+        concerns:  getRteContent('iep-concerns'),
         nextiep:   document.getElementById('iep-nextiep').value,
         mr:        document.getElementById('iep-mr').value.trim(),
-        nt:        tv('iep-nt'),
+        nt:        getRteContent('iep-nt'),
         imgs
     });
     save(data);
-    ['iep-d','iep-school','iep-grade','iep-teacher','iep-attendees','iep-goals',
-     'iep-services','iep-progress','iep-grades','iep-testing','iep-behavior',
-     'iep-concerns','iep-nextiep','iep-mr','iep-nt'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.value = '';
-    });
+    ['iep-d','iep-school','iep-grade','iep-teacher','iep-attendees','iep-nextiep','iep-mr'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    ['iep-goals','iep-services','iep-progress','iep-grades','iep-testing','iep-behavior','iep-concerns','iep-nt'].forEach(id=>setRteContent(id,''));
     document.getElementById('iep-type').value = '';
     document.getElementById('iep-imgs-wrap').innerHTML = '';
     flash('sv-iep'); renderIEP();
@@ -2369,15 +2376,14 @@ function saveIEPCorr() {
         to:       document.getElementById('iepc-to').value.trim(),
         school:   document.getElementById('iepc-school').value.trim(),
         re:       document.getElementById('iepc-re').value.trim(),
-        body:     tv('iepc-body'),
-        response: tv('iepc-response'),
-        nt:       tv('iepc-nt'),
+        body:     getRteContent('iepc-body'),
+        response: getRteContent('iepc-response'),
+        nt:       getRteContent('iepc-nt'),
         imgs
     });
     save(data);
-    ['iepc-d','iepc-from','iepc-to','iepc-school','iepc-re','iepc-body','iepc-response','iepc-nt'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.value = '';
-    });
+    ['iepc-d','iepc-from','iepc-to','iepc-school','iepc-re'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    ['iepc-body','iepc-response','iepc-nt'].forEach(id=>setRteContent(id,''));
     document.getElementById('iepc-type').value = '';
     document.getElementById('iepc-imgs-wrap').innerHTML = '';
     flash('sv-iepc'); renderIEPCorr();
@@ -2531,11 +2537,11 @@ function saveLR() {
     });
     if (!rows.length) { alert('Add at least one result row'); return; }
     const data = load();
-    data.labs.push({ id: Date.now(), date: d, source: document.getElementById('lr-src').value, notes: document.getElementById('lr-notes').value, rows });
+    data.labs.push({ id: Date.now(), date: d, source: document.getElementById('lr-src').value, notes: getRteContent('lr-notes'), rows });
     save(data);
     document.getElementById('lr-rows').innerHTML = '';
     document.getElementById('lr-src').value = '';
-    document.getElementById('lr-notes').value = '';
+    getRteContent('lr-notes') = '';
     flash('sv-lr'); setStatus('SYSTEM: LAB PANEL SAVED'); renderLabs();
 }
 
@@ -2596,13 +2602,14 @@ function renderLabs() {
 // ══════════════════════════════════════════════════════════════════════════
 function saveImaging() {
     const d = document.getElementById('i-d').value;
-    const rpt = document.getElementById('i-rpt').value.trim();
+    const rpt = getRteContent('i-rpt');
     if (!d || !rpt) { alert('Date and report required'); return; }
     const imgs = collectImgs('i-imgs-wrap');
     const data = load();
-    data.imaging.push({ id: Date.now(), date: d, type: document.getElementById('i-t').value, facility: document.getElementById('i-f').value, doctor: document.getElementById('i-dr').value, report: rpt, notes: document.getElementById('i-nt').value, imgs });
+    data.imaging.push({ id: Date.now(), date: d, type: document.getElementById('i-t').value, facility: document.getElementById('i-f').value, doctor: document.getElementById('i-dr').value, report: rpt, notes: getRteContent('i-nt'), imgs });
     save(data);
-    ['i-t','i-f','i-dr','i-rpt','i-nt'].forEach(id => document.getElementById(id).value = '');
+    ['i-t','i-f','i-dr'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    ['i-rpt','i-nt'].forEach(id=>setRteContent(id,''));
     document.getElementById('i-imgs-wrap').innerHTML = '';
     flash('sv-i'); setStatus('SYSTEM: IMAGING SAVED'); renderImaging();
 }
@@ -2622,8 +2629,8 @@ function editImaging(id) {
         <h2>Edit Imaging Report</h2>
         <div class="ir"><input type="date" id="ei-d" value="${g('date')}" style="flex:1;"><input id="ei-t" value="${g('type')}" placeholder="Type" style="flex:1;"></div>
         <div class="ir"><input id="ei-f" value="${g('facility')}" placeholder="Facility" style="flex:1;"><input id="ei-dr" value="${g('doctor')}" placeholder="Radiologist" style="flex:1;"></div>
-        <label>Full Report</label><textarea class="fi" id="ei-rpt" rows="6">${g('report')}</textarea>
-        <label>Your Notes</label><textarea class="fi" id="ei-nt" rows="3">${g('notes')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Full Report</div>${rteToolbar('ei-rpt')}</div>
+        <div class="rte-wrap"><div class="rte-label">Your Notes</div>${rteToolbar('ei-nt')}</div>
         <label>Images (Google Drive links)</label>
         <div id="ei-imgs-wrap">${existingImgs}</div>
         <button class="add-row-btn" onclick="addImgRow('ei-imgs-wrap')">+ Add Image URL</button>
@@ -2631,17 +2638,21 @@ function editImaging(id) {
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditImaging(${id})">Save</button>
         </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('ei-rpt', v.report || '');
+        setRteContent('ei-nt', v.notes || '');
+    });
 }
 
 function saveEditImaging(id) {
     const d = document.getElementById('ei-d').value;
-    const rpt = document.getElementById('ei-rpt').value.trim();
+    const rpt = getRteContent('ei-rpt');
     if (!d || !rpt) { alert('Date and report required'); return; }
     const imgs = collectImgs('ei-imgs-wrap');
     const data = load();
     const idx = data.imaging.findIndex(x => x.id === id);
     if (idx < 0) return;
-    Object.assign(data.imaging[idx], { date: d, type: document.getElementById('ei-t').value, facility: document.getElementById('ei-f').value, doctor: document.getElementById('ei-dr').value, report: rpt, notes: document.getElementById('ei-nt').value, imgs });
+    Object.assign(data.imaging[idx], { date: d, type: document.getElementById('ei-t').value, facility: document.getElementById('ei-f').value, doctor: document.getElementById('ei-dr').value, report: rpt, notes: getRteContent('ei-nt'), imgs });
     save(data); closeEditModal(); renderImaging();
 }
 
@@ -2666,8 +2677,8 @@ function renderImaging() {
                 <div class="entry-b">
                     ${v.doctor ? `<div style="color:var(--tx3);font-size:12px;margin-bottom:10px;"><b>Radiologist:</b> ${esc(v.doctor)}</div>` : ''}
                     <div class="sc-label">Full Report</div>
-                    <div class="f-value" style="margin-bottom:8px;">${esc(v.report)}</div>
-                    ${v.notes ? `<div class="sc-label">Your Notes</div><div class="f-value" style="margin-bottom:8px;">${esc(v.notes)}</div>` : ''}
+                    ${/<[a-z][\s\S]*>/i.test(v.report||'')?`<div class="rt-content" style="margin-bottom:8px;">${v.report}</div>`:`<div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(v.report)}</div>`}
+                    ${v.notes?`<div class="sc-label">Your Notes</div>${/<[a-z][\s\S]*>/i.test(v.notes)?`<div class="rt-content" style="margin-bottom:8px;">${v.notes}</div>`:`<div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(v.notes)}</div>`}`:''}
                     ${imgStrip(v.imgs)}
                     <div class="entry-actions">
                         <button class="act-btn act-edit" onclick="editImaging(${v.id})">Edit</button>
@@ -2724,21 +2735,21 @@ function resetJournalUI() {
 // ══════════════════════════════════════════════════════════════════════════
 function saveJournal() {
     const d = document.getElementById('j-d').value;
-    const tx = document.getElementById('j-tx').value.trim();
+    const tx = getRteContent('j-tx');
     if (!d) { alert('Date required'); return; }
     const imgs = collectImgs('j-imgs-wrap');
     const entry = {
         id: Date.now(), date: d,
         time: document.getElementById('j-tm').value,
         message: tx,
-        circ: document.getElementById('j-circ').value.trim(),
-        le: document.getElementById('j-le').value.trim(),
+        circ: getRteContent('j-circ'),
+        le: getRteContent('j-le'),
         safety: _selectedSafety,
-        psych: document.getElementById('j-psych').value.trim(),
-        phys: document.getElementById('j-phys').value.trim(),
-        work: document.getElementById('j-work').value.trim(),
-        diet: document.getElementById('j-diet').value.trim(),
-        sub: document.getElementById('j-sub').value.trim(),
+        psych: getRteContent('j-psych'),
+        phys: getRteContent('j-phys'),
+        work: getRteContent('j-work'),
+        diet: getRteContent('j-diet'),
+        sub: getRteContent('j-sub'),
         pain: _selectedPain,
         vt_bp: document.getElementById('j-vt-bp').value.trim(),
         vt_hr: document.getElementById('j-vt-hr').value.trim(),
@@ -2747,11 +2758,11 @@ function saveJournal() {
         vt_rr: document.getElementById('j-vt-rr').value.trim(),
         vt_wt: document.getElementById('j-vt-wt').value.trim(),
         mood: document.getElementById('j-mood').value,
-        interv: document.getElementById('j-interv').value.trim(),
-        cope: document.getElementById('j-cope').value.trim(),
-        therapy: document.getElementById('j-therapy').value.trim(),
+        interv: getRteContent('j-interv'),
+        cope: getRteContent('j-cope'),
+        therapy: getRteContent('j-therapy'),
         location: document.getElementById('j-loc').value.trim(),
-        wxNarrative: document.getElementById('j-wx').value.trim(),
+        wxNarrative: getRteContent('j-wx'),
         imgs
     };
     const tt = document.getElementById('j-temp-today').value;
@@ -2765,9 +2776,8 @@ function saveJournal() {
     const data = load();
     data.journal.push(entry);
     save(data);
-    ['j-tx','j-circ','j-le','j-psych','j-phys','j-work','j-diet','j-sub',
-     'j-vt-bp','j-vt-hr','j-vt-temp','j-vt-o2','j-vt-rr','j-vt-wt',
-     'j-interv','j-cope','j-therapy','j-loc','j-wx'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+    ['j-vt-bp','j-vt-hr','j-vt-temp','j-vt-o2','j-vt-rr','j-vt-wt','j-loc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    ['j-tx','j-circ','j-le','j-psych','j-phys','j-work','j-diet','j-sub','j-interv','j-cope','j-therapy','j-wx'].forEach(id=>setRteContent(id,''));
     ['j-temp-today','j-baro-today','j-temp-prior','j-baro-prior'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('j-imgs-wrap').innerHTML = '';
     resetJournalUI();
@@ -2816,32 +2826,32 @@ function editJournal(id) {
         <div class="ir"><input type="date" id="ej-d" value="${g('date')}" style="flex:1;"><input type="time" id="ej-tm" value="${g('time')}" style="flex:1;"></div>
 
         <div class="j-section-label"><span class="j-section-num">2</span> General Description</div>
-        <textarea class="fi" id="ej-tx" rows="3">${g('message')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Description / Main Entry</div>${rteToolbar('ej-tx')}</div>
 
         <div class="j-section-label"><span class="j-section-num">3</span> Surrounding Circumstances</div>
-        <textarea class="fi" id="ej-circ" rows="2">${g('circ')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Circumstances / Context</div>${rteToolbar('ej-circ')}</div>
 
         <div class="j-section-label"><span class="j-section-num">4</span> Law Enforcement Involvement</div>
-        <textarea class="fi" id="ej-le" rows="2">${g('le')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Law Enforcement / Legal Contact</div>${rteToolbar('ej-le')}</div>
 
         <div class="j-section-label"><span class="j-section-num">5</span> Safety Rating</div>
         <input type="hidden" id="ej-safety" value="${s.safety||''}">
         <div class="safety-opts">${safetyOpts}</div>
 
         <div class="j-section-label"><span class="j-section-num">6</span> Psychological</div>
-        <textarea class="fi" id="ej-psych" rows="2">${g('psych')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Psychological / Emotional Symptoms</div>${rteToolbar('ej-psych')}</div>
 
         <div class="j-section-label"><span class="j-section-num">7</span> Physical</div>
-        <textarea class="fi" id="ej-phys" rows="2">${g('phys')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Physical Symptoms</div>${rteToolbar('ej-phys')}</div>
 
         <div class="j-section-label"><span class="j-section-num">8</span> Academic / Workplace</div>
-        <textarea class="fi" id="ej-work" rows="2">${g('work')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Work / School Functioning</div>${rteToolbar('ej-work')}</div>
 
         <div class="j-section-label"><span class="j-section-num">9</span> Dietary Concerns</div>
-        <textarea class="fi" id="ej-diet" rows="2">${g('diet')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Diet / Nutrition / Feeding</div>${rteToolbar('ej-diet')}</div>
 
         <div class="j-section-label"><span class="j-section-num">10</span> Substance Use</div>
-        <textarea class="fi" id="ej-sub" rows="2">${g('sub')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Substances / Medications Taken</div>${rteToolbar('ej-sub')}</div>
 
         <div class="j-section-label"><span class="j-section-num">11</span> Pain Level</div>
         <input type="hidden" id="ej-pain" value="${s.pain||''}">
@@ -2862,13 +2872,13 @@ function editJournal(id) {
         <div class="mood-btns">${moodBtns}</div>
 
         <div class="j-section-label"><span class="j-section-num">14</span> Professional / Medical Interventions</div>
-        <textarea class="fi" id="ej-interv" rows="2">${g('interv')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Interventions / Medical Contact</div>${rteToolbar('ej-interv')}</div>
 
         <div class="j-section-label"><span class="j-section-num">15</span> Coping Methods</div>
-        <textarea class="fi" id="ej-cope" rows="2">${g('cope')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Coping Strategies Used</div>${rteToolbar('ej-cope')}</div>
 
         <div class="j-section-label"><span class="j-section-num">16</span> Therapeutic Methods</div>
-        <textarea class="fi" id="ej-therapy" rows="2">${g('therapy')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Therapy Techniques Applied</div>${rteToolbar('ej-therapy')}</div>
 
         <div class="j-section-label">&#127780; Weather &amp; Location</div>
         <input class="fi" id="ej-loc" value="${g('location')}" placeholder="Location">
@@ -2878,7 +2888,7 @@ function editJournal(id) {
             <div><label>Prior Temp (°F)</label><input id="ej-tp" type="number" step="0.1" value="${s.tempPrior!=null?s.tempPrior:''}"></div>
             <div><label>Prior Baro (inHg)</label><input id="ej-bp" type="number" step="0.01" value="${s.baroPrior!=null?s.baroPrior:''}"></div>
         </div>
-        <textarea class="fi" id="ej-wx" rows="2">${g('wxNarrative')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Weather Narrative</div>${rteToolbar('ej-wx')}</div>
 
         <label>Images (Google Drive links)</label>
         <div id="ej-imgs-wrap">${existingImgs}</div>
@@ -2889,6 +2899,20 @@ function editJournal(id) {
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditJournal(${id})">Save</button>
         </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('ej-tx', s.message || '');
+        setRteContent('ej-circ', s.circ || '');
+        setRteContent('ej-le', s.le || '');
+        setRteContent('ej-psych', s.psych || '');
+        setRteContent('ej-phys', s.phys || '');
+        setRteContent('ej-work', s.work || '');
+        setRteContent('ej-diet', s.diet || '');
+        setRteContent('ej-sub', s.sub || '');
+        setRteContent('ej-interv', s.interv || '');
+        setRteContent('ej-cope', s.cope || '');
+        setRteContent('ej-therapy', s.therapy || '');
+        setRteContent('ej-wx', s.wxNarrative || '');
+    });
 }
 
 function saveEditJournal(id) {
@@ -2901,15 +2925,15 @@ function saveEditJournal(id) {
     const bp = document.getElementById('ej-bp').value;
     const upd = {
         date: d, time: document.getElementById('ej-tm').value,
-        message: document.getElementById('ej-tx').value.trim(),
-        circ: document.getElementById('ej-circ').value.trim(),
-        le: document.getElementById('ej-le').value.trim(),
+        message: getRteContent('ej-tx'),
+        circ: getRteContent('ej-circ'),
+        le: getRteContent('ej-le'),
         safety: parseInt(document.getElementById('ej-safety').value) || null,
-        psych: document.getElementById('ej-psych').value.trim(),
-        phys: document.getElementById('ej-phys').value.trim(),
-        work: document.getElementById('ej-work').value.trim(),
-        diet: document.getElementById('ej-diet').value.trim(),
-        sub: document.getElementById('ej-sub').value.trim(),
+        psych: getRteContent('ej-psych'),
+        phys: getRteContent('ej-phys'),
+        work: getRteContent('ej-work'),
+        diet: getRteContent('ej-diet'),
+        sub: getRteContent('ej-sub'),
         pain: parseInt(document.getElementById('ej-pain').value) || null,
         vt_bp: document.getElementById('ej-vt-bp').value.trim(),
         vt_hr: document.getElementById('ej-vt-hr').value.trim(),
@@ -2918,11 +2942,11 @@ function saveEditJournal(id) {
         vt_rr: document.getElementById('ej-vt-rr').value.trim(),
         vt_wt: document.getElementById('ej-vt-wt').value.trim(),
         mood: document.getElementById('ej-mood').value,
-        interv: document.getElementById('ej-interv').value.trim(),
-        cope: document.getElementById('ej-cope').value.trim(),
-        therapy: document.getElementById('ej-therapy').value.trim(),
+        interv: getRteContent('ej-interv'),
+        cope: getRteContent('ej-cope'),
+        therapy: getRteContent('ej-therapy'),
         location: document.getElementById('ej-loc').value.trim(),
-        wxNarrative: document.getElementById('ej-wx').value.trim(),
+        wxNarrative: getRteContent('ej-wx'),
         imgs,
         tempToday: tt !== '' ? parseFloat(tt) : null,
         baroToday: bt !== '' ? parseFloat(bt) : null,
@@ -2939,6 +2963,8 @@ const SAFETY_LABELS = ['','Safe','Fear/Concern','Self-Mutilation','Suicidal/Homi
 const SAFETY_COLORS = ['','#22c55e','#eab308','#f97316','#ef4444','#dc2626'];
 const MOOD_EMOJIS = {Joyful:'😄',Content:'🙂',Neutral:'😐',Anxious:'😰',Sad:'😢',Angry:'😠',Hopeless:'😞',Confused:'😵',Overwhelmed:'🤯',Numb:'😶',Irritable:'😤',Fearful:'😨',Grateful:'🥹',Dissociated:'🫥',Motivated:'💪',Exhausted:'😩'};
 
+
+function jeVal(c){if(!c)return '';return /<[a-z][\s\S]*>/i.test(c)?`<div class="rt-content" style="margin-bottom:4px;">${c}</div>`:`<div class="je-val">${esc(c)}</div>`;}
 function renderJournal() {
     const q = (document.getElementById('j-search')?.value || '').toLowerCase();
     const cf = document.getElementById('j-filter')?.value || '';
@@ -3036,10 +3062,11 @@ function savePM() {
         to: document.getElementById('pm-to').value,
         facility: document.getElementById('pm-fac').value,
         subject: document.getElementById('pm-subj').value,
-        body: document.getElementById('pm-body').value
+        body: getRteContent('pm-body')
     });
     save(data);
-    ['pm-from','pm-to','pm-fac','pm-subj','pm-body'].forEach(id => document.getElementById(id).value = '');
+    ['pm-from','pm-to','pm-fac','pm-subj'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    setRteContent('pm-body','');
     flash('sv-pm'); setStatus('SYSTEM: MESSAGE SAVED'); renderMessages();
 }
 
@@ -3062,11 +3089,14 @@ function editPM(id) {
             <input id="epm-fac" value="${g('facility')}" placeholder="Facility / Portal" style="flex:1;">
         </div>
         <label>Subject</label><input class="fi" id="epm-subj" value="${g('subject')}">
-        <label>Message Body</label><textarea class="fi" id="epm-body" rows="6">${g('body')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Message Body</div>${rteToolbar('epm-body')}</div>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditPM(${id})">Save</button>
         </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('epm-body', v.body || '');
+    });
 }
 
 function saveEditPM(id) {
@@ -3079,7 +3109,7 @@ function saveEditPM(id) {
         to: document.getElementById('epm-to').value,
         facility: document.getElementById('epm-fac').value,
         subject: document.getElementById('epm-subj').value,
-        body: document.getElementById('epm-body').value
+        body: getRteContent('epm-body')
     });
     save(data); closeEditModal(); renderMessages();
 }
@@ -3106,7 +3136,7 @@ function renderMessages() {
                 </div>
             </div>
             <div class="pm-b">
-                <div class="pm-body">${esc(m.body)}</div>
+                ${/<[a-z][\s\S]*>/i.test(m.body||'')?`<div class="pm-body rt-content">${m.body}</div>`:`<div class="pm-body">${esc(m.body)}</div>`}
                 <div class="entry-actions">
                     <button class="act-btn act-edit" onclick="editPM(${m.id})">Edit</button>
                     <button class="act-btn act-delete" onclick="deletePM(${m.id})">Delete</button>
@@ -3130,10 +3160,11 @@ function saveDX() {
         code: document.getElementById('dx-code').value,
         status: document.getElementById('dx-status').value,
         provider: document.getElementById('dx-provider').value,
-        notes: document.getElementById('dx-notes').value
+        notes: getRteContent('dx-notes')
     });
     save(data);
-    ['dx-name','dx-code','dx-status','dx-provider','dx-notes'].forEach(id => document.getElementById(id).value = '');
+    ['dx-name','dx-code','dx-status','dx-provider'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+    setRteContent('dx-notes','');
     flash('sv-dx'); setStatus('SYSTEM: DIAGNOSIS SAVED'); renderDX();
 }
 
@@ -3158,11 +3189,14 @@ function editDX(id) {
             <input id="edx-status" value="${g('status')}" placeholder="Status" style="flex:1;">
             <input id="edx-provider" value="${g('provider')}" placeholder="Provider" style="flex:1;">
         </div>
-        <label>Notes</label><textarea class="fi" id="edx-notes" rows="4">${g('notes')}</textarea>
+        <div class="rte-wrap"><div class="rte-label">Clinical Notes / Context</div>${rteToolbar('edx-notes')}</div>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
             <button class="btn-save" onclick="saveEditDX(${id})">Save</button>
         </div>`);
+    requestAnimationFrame(() => {
+        setRteContent('edx-notes', v.notes || '');
+    });
 }
 
 function saveEditDX(id) {
@@ -3175,7 +3209,7 @@ function saveEditDX(id) {
         code: document.getElementById('edx-code').value,
         status: document.getElementById('edx-status').value,
         provider: document.getElementById('edx-provider').value,
-        notes: document.getElementById('edx-notes').value
+        notes: getRteContent('edx-notes')
     });
     save(data); closeEditModal(); renderDX();
 }
@@ -3190,7 +3224,7 @@ function renderDX() {
     list.forEach(d => {
         h += `<tr>
             <td>${esc(d.date)}</td>
-            <td style="color:var(--tx);font-weight:500;">${esc(d.name)}${d.notes ? `<div style="font-size:11px;color:var(--tx3);margin-top:3px;font-weight:400;">${esc(d.notes)}</div>` : ''}</td>
+            <td style="color:var(--tx);font-weight:500;">${esc(d.name)}${d.notes?`<div style="font-size:11px;color:var(--tx3);margin-top:3px;font-weight:400;">${/<[a-z][\s\S]*>/i.test(d.notes)?d.notes:esc(d.notes)}</div>`:''}</td>
             <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">${esc(d.code)}</span></td>
             <td><span class="pill ac">${esc(d.status || 'Confirmed')}</span></td>
             <td style="font-size:12px;">${esc(d.provider)}</td>
