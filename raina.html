@@ -1324,9 +1324,7 @@ function checkMigration() {
     const hasMeta    = !!(oldPCP || oldAppts || oldProfile);
     const hasAnything = hasRecords || hasMeta;
 
-    // Always show the banner — even if previously dismissed — so a forced
-    // re-run is always available.  "Dismiss" now only hides the banner for
-    // this session; it no longer sets raina_migrated permanently.
+    if (alreadyMigrated) return;
     if (!hasAnything) return;
 
     document.getElementById('migration-banner')?.remove();
@@ -1373,7 +1371,7 @@ function checkMigration() {
         </div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
             <button onclick="runMigration()" style="padding:10px 22px;background:var(--ac);color:#000;border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">Migrate Now</button>
-            <button onclick="this.closest('#migration-banner').remove()" style="padding:10px 20px;background:transparent;color:var(--tx3);border:1px solid var(--bd);border-radius:6px;font-size:13px;cursor:pointer;">Dismiss</button>
+            <button onclick="localStorage.setItem('raina_migrated','true');this.closest('#migration-banner').remove()" style="padding:10px 20px;background:transparent;color:var(--tx3);border:1px solid var(--bd);border-radius:6px;font-size:13px;cursor:pointer;">Dismiss</button>
         </div>
         <div id="migration-status" style="font-size:11px;color:var(--tx3);margin-top:12px;min-height:14px;text-align:center;"></div>`;
     document.body.appendChild(banner);
