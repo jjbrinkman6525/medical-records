@@ -23,7 +23,7 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
-const DOC_ID = 'raina';
+const DOC_ID = 'killian';
 const PATIENT_DOC = doc(db, 'patients', DOC_ID);
 const META_DOC = doc(db, 'meta', DOC_ID);
 
@@ -54,11 +54,11 @@ async function loadFromFirebase() {
         // Ensure all keys exist
         Object.keys(EMPTY).forEach(k => { if (!data[k]) data[k] = []; });
         window._dbCache = data;
-        localStorage.setItem('raina_records_cache', JSON.stringify(data));
+        localStorage.setItem('killian_records_cache', JSON.stringify(data));
         return data;
     } catch(e) {
         console.warn('Firebase load failed, using cache:', e);
-        const cached = localStorage.getItem('raina_records_cache');
+        const cached = localStorage.getItem('killian_records_cache');
         window._dbCache = cached ? JSON.parse(cached) : { ...EMPTY };
         setSyncStatus('error');
         return window._dbCache;
@@ -68,7 +68,7 @@ async function loadFromFirebase() {
 async function saveToFirebase(data) {
     setSyncStatus('syncing');
     window._dbCache = data;
-    localStorage.setItem('raina_records_cache', JSON.stringify(data));
+    localStorage.setItem('killian_records_cache', JSON.stringify(data));
     try {
         await setDoc(PATIENT_DOC, data);
         setSyncStatus('saved');
@@ -81,7 +81,7 @@ async function saveToFirebase(data) {
 
 // ── Drop-in replacements for load() and save() ────────────────────────────
 window.load = function() {
-    return window._dbCache || JSON.parse(localStorage.getItem('raina_records_cache') || 'null') || { ...EMPTY };
+    return window._dbCache || JSON.parse(localStorage.getItem('killian_records_cache') || 'null') || { ...EMPTY };
 };
 window.save = function(data) {
     saveToFirebase(data);
@@ -132,7 +132,7 @@ function startRealtimeSync() {
         const data = snap.data();
         Object.keys(EMPTY).forEach(k => { if (!data[k]) data[k] = []; });
         window._dbCache = data;
-        localStorage.setItem('raina_records_cache', JSON.stringify(data));
+        localStorage.setItem('killian_records_cache', JSON.stringify(data));
         // Re-render current view silently
         const renders = {
             overview: window.renderOverview, timeline: window.renderTimeline,
@@ -1211,7 +1211,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 const PW_READ = '2458';
 const PW_ADMIN = '8456';
 const PW_RAINA = '2929';
-const AUTH_KEY = 'raina_auth';
+const AUTH_KEY = 'killian_auth';
 
 let isAdmin = false;
 let isAuthed = false;
@@ -1308,11 +1308,11 @@ function checkAuth() {
 
 // ── One-time migration from localStorage to Firebase ──────────────────────
 function checkMigration() {
-    const oldData = localStorage.getItem('raina_records');
-    const oldPCP = localStorage.getItem('raina_pcp');
-    const oldAppts = localStorage.getItem('raina_appointments');
-    const oldProfile = localStorage.getItem('raina_profile');
-    const alreadyMigrated = localStorage.getItem('raina_migrated');
+    const oldData = localStorage.getItem('killian_records');
+    const oldPCP = localStorage.getItem('killian_pcp');
+    const oldAppts = localStorage.getItem('killian_appointments');
+    const oldProfile = localStorage.getItem('killian_profile');
+    const alreadyMigrated = localStorage.getItem('killian_migrated');
 
     if (alreadyMigrated) return;
     if (!oldData && !oldPCP && !oldAppts && !oldProfile) return;
@@ -1338,7 +1338,7 @@ async function runMigration() {
 
     try {
         // Migrate main records
-        const oldData = localStorage.getItem('raina_records');
+        const oldData = localStorage.getItem('killian_records');
         if (oldData) {
             let parsed = JSON.parse(oldData);
             if (Array.isArray(parsed)) {
@@ -1353,9 +1353,9 @@ async function runMigration() {
 
         // Migrate meta (PCP, profile, appointments)
         const meta = window._metaCache || {};
-        const oldPCP = localStorage.getItem('raina_pcp');
-        const oldAppts = localStorage.getItem('raina_appointments');
-        const oldProfile = localStorage.getItem('raina_profile');
+        const oldPCP = localStorage.getItem('killian_pcp');
+        const oldAppts = localStorage.getItem('killian_appointments');
+        const oldProfile = localStorage.getItem('killian_profile');
         if (oldPCP) meta.pcp = JSON.parse(oldPCP);
         if (oldAppts) meta.appointments = JSON.parse(oldAppts);
         if (oldProfile) meta.profile = JSON.parse(oldProfile);
@@ -1367,7 +1367,7 @@ async function runMigration() {
             if (window.savePCP) window.savePCP(meta.pcp || {});
         }
 
-        localStorage.setItem('raina_migrated', 'true');
+        localStorage.setItem('killian_migrated', 'true');
         statusEl.style.color = '#22c55e';
         statusEl.textContent = '✓ Migration complete! Data is now in Firebase.';
 
@@ -1386,24 +1386,24 @@ async function runMigration() {
 }
 
 function dismissMigration() {
-    localStorage.setItem('raina_migrated', 'true');
+    localStorage.setItem('killian_migrated', 'true');
     document.getElementById('migration-banner')?.remove();
 }
 
-const KEY = 'raina_records';
+const KEY = 'killian_records';
 function load() {
     if (window._dbCache) return window._dbCache;
-    const c = localStorage.getItem('raina_records_cache');
+    const c = localStorage.getItem('killian_records_cache');
     return c ? JSON.parse(c) : {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
 }
 function save(data) {
     if (window.save && window.save !== save) { window.save(data); return; }
-    localStorage.setItem('raina_records_cache', JSON.stringify(data));
+    localStorage.setItem('killian_records_cache', JSON.stringify(data));
 }
 
-const PCP_KEY = 'raina_pcp';
-const APPT_KEY = 'raina_appointments';
-const PROFILE_KEY = 'raina_profile';
+const PCP_KEY = 'killian_pcp';
+const APPT_KEY = 'killian_appointments';
+const PROFILE_KEY = 'killian_profile';
 function loadPCP() { return window._metaCache?.pcp || JSON.parse(localStorage.getItem(PCP_KEY)||'{}'); }
 function savePCP(p) { if(window.savePCP&&window.savePCP!==savePCP){window.savePCP(p);return;} localStorage.setItem(PCP_KEY,JSON.stringify(p)); }
 function loadAppts() { return window._metaCache?.appointments || JSON.parse(localStorage.getItem(APPT_KEY)||'[]'); }
