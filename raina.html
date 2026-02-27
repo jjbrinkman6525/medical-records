@@ -86,8 +86,6 @@ window.load = function() {
 window.save = function(data) {
     saveToFirebase(data);
 };
-window.loadFromFirebase = loadFromFirebase;
-window.loadMeta = loadMeta;
 
 // ── PCP & Appointments stored in meta doc ─────────────────────────────────
 window._metaCache = null;
@@ -106,7 +104,6 @@ async function saveMeta(meta) {
     window._metaCache = meta;
     try { await setDoc(META_DOC, meta); } catch(e) { console.error('Meta save failed:', e); }
 }
-window.saveMeta = saveMeta;
 
 // Override PCP and appointments storage to use Firestore meta doc
 window.loadPCP = function() { return (window._metaCache || {}).pcp || {}; };
@@ -1312,146 +1309,69 @@ function checkAuth() {
 
 // ── One-time migration from localStorage to Firebase ──────────────────────
 function checkMigration() {
-    const oldData    = localStorage.getItem('raina_records');
-    const oldCache   = localStorage.getItem('raina_records_cache');
-    const oldPCP     = localStorage.getItem('raina_pcp');
-    const oldAppts   = localStorage.getItem('raina_appointments');
+    const oldData = localStorage.getItem('raina_records');
+    const oldPCP = localStorage.getItem('raina_pcp');
+    const oldAppts = localStorage.getItem('raina_appointments');
     const oldProfile = localStorage.getItem('raina_profile');
     const alreadyMigrated = localStorage.getItem('raina_migrated');
 
-    // Count what we have
-    const hasRecords = !!(oldData || oldCache);
-    const hasMeta    = !!(oldPCP || oldAppts || oldProfile);
-    const hasAnything = hasRecords || hasMeta;
-
     if (alreadyMigrated) return;
-    if (!hasAnything) return;
+    if (!oldData && !oldPCP && !oldAppts && !oldProfile) return;
 
-    document.getElementById('migration-banner')?.remove();
+    // Show migration banner
     const banner = document.createElement('div');
     banner.id = 'migration-banner';
-    banner.style.cssText = [
-        'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);',
-        'background:#0d0d1a;border:2px solid var(--ac);border-radius:12px;',
-        'padding:20px 28px;z-index:99999;max-width:460px;width:92%;',
-        'box-shadow:0 8px 40px rgba(0,0,0,0.7);font-family:inherit;'
-    ].join('');
-
-    // Build a readable inventory of what's found
-    const items = [];
-    const _rd = oldData || oldCache;
-    if (_rd) {
-        try {
-            const p = JSON.parse(_rd);
-            const counts = [];
-            const keys = ['visits','labs','imaging','journal','messages','timeline','dx','mentalhealth','iep','iepcorr'];
-            keys.forEach(k => { const a = Array.isArray(p[k]) ? p[k] : []; if(a.length) counts.push(`${a.length} ${k}`); });
-            if (counts.length) items.push('Records: ' + counts.join(', '));
-            else if (Array.isArray(p)) items.push(`Records: ${p.length} entries (legacy format)`);
-            else items.push('Records: found (structure unknown)');
-        } catch(e) { items.push('Records: found (unparseable)'); }
-    }
-    if (oldPCP)     { try { const p=JSON.parse(oldPCP);    items.push('PCP: ' + (p.name||'on file')); } catch{items.push('PCP: on file');} }
-    if (oldAppts)   { try { const a=JSON.parse(oldAppts);  items.push(`Appointments: ${Array.isArray(a)?a.length:1} entries`); } catch{items.push('Appointments: on file');} }
-    if (oldProfile) { try { const pr=JSON.parse(oldProfile);items.push('Profile: ' + (pr.legal_name||pr.name||'on file')); } catch{items.push('Profile: on file');} }
-
-    const alreadyNote = alreadyMigrated
-        ? '<div style="font-size:11px;color:#f97316;margin-bottom:10px;padding:6px 10px;background:#1a0f00;border-radius:4px;">⚠ A previous migration was run or dismissed. This will merge local data with whatever is already in Firestore (local wins on conflict).</div>'
-        : '';
-
+    banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:2px solid var(--ac);border-radius:12px;padding:20px 28px;z-index:99999;text-align:center;max-width:420px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.6);';
     banner.innerHTML = `
-        <div style="font-size:14px;font-weight:700;color:var(--ac);margin-bottom:8px;">📦 Local Data Found — Migrate to Firestore</div>
-        ${alreadyNote}
-        <div style="font-size:11px;color:var(--tx3);background:#111;border:1px solid var(--bd);border-radius:6px;padding:10px 12px;margin-bottom:14px;line-height:1.8;text-align:left;">
-            ${items.map(i=>`<div>• ${i}</div>`).join('')}
+        <div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:6px;">📦 Old Data Found</div>
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;line-height:1.6;">Your previous portal data is still in this browser. Click below to migrate it to Firebase so it syncs across all devices.</div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button onclick="runMigration()" style="padding:10px 20px;background:var(--ac);color:#000;border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">Migrate Now</button>
+            <button onclick="dismissMigration()" style="padding:10px 20px;background:transparent;color:var(--tx3);border:1px solid var(--bd);border-radius:6px;font-size:13px;cursor:pointer;">Dismiss</button>
         </div>
-        <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;line-height:1.6;text-align:center;">
-            Migrate this data to Firestore so it syncs across all devices.<br>
-            Existing Firestore records will be <b>merged</b> (not overwritten).
-        </div>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-            <button onclick="runMigration()" style="padding:10px 22px;background:var(--ac);color:#000;border:none;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;">Migrate Now</button>
-            <button onclick="localStorage.setItem('raina_migrated','true');this.closest('#migration-banner').remove()" style="padding:10px 20px;background:transparent;color:var(--tx3);border:1px solid var(--bd);border-radius:6px;font-size:13px;cursor:pointer;">Dismiss</button>
-        </div>
-        <div id="migration-status" style="font-size:11px;color:var(--tx3);margin-top:12px;min-height:14px;text-align:center;"></div>`;
+        <div id="migration-status" style="font-size:11px;color:var(--tx3);margin-top:10px;min-height:14px;"></div>`;
     document.body.appendChild(banner);
 }
 
 async function runMigration() {
     const statusEl = document.getElementById('migration-status');
-    const btn = document.querySelector('#migration-banner button');
-    if (btn) { btn.disabled = true; btn.textContent = 'Migrating…'; }
-    statusEl.style.color = 'var(--tx3)';
-    statusEl.textContent = 'Starting migration…';
-
-    const log = (msg, color) => {
-        statusEl.style.color = color || 'var(--tx3)';
-        statusEl.textContent = msg;
-        console.log('[Migration]', msg);
-    };
+    statusEl.textContent = 'Migrating...';
 
     try {
-        // ── 1. Main records ───────────────────────────────────────────────
-        const rawRecords = localStorage.getItem('raina_records') || localStorage.getItem('raina_records_cache');
-        if (rawRecords) {
-            log('Parsing local records…');
-            let local = JSON.parse(rawRecords);
-
-            // Legacy: flat array with a .type field
-            if (Array.isArray(local)) {
-                const bucket = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
-                local.forEach(e => { const t = e.type || 'visits'; if (bucket[t]) bucket[t].push(e); else bucket.visits.push(e); });
-                local = bucket;
+        // Migrate main records
+        const oldData = localStorage.getItem('raina_records');
+        if (oldData) {
+            let parsed = JSON.parse(oldData);
+            if (Array.isArray(parsed)) {
+                const migrated = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[]};
+                parsed.forEach(e => { const t = e.type||'visits'; if(migrated[t]) migrated[t].push(e); });
+                parsed = migrated;
             }
-
-            // Ensure all known keys exist
-            const KEYS = ['visits','labs','imaging','journal','messages','timeline','dx','mentalhealth','iep','iepcorr'];
-            KEYS.forEach(k => { if (!Array.isArray(local[k])) local[k] = []; });
-
-            // Merge with existing Firestore data (local wins on id conflict)
-            log('Merging with Firestore records…');
-            const existing = load();   // reads from window._dbCache or Firestore cache
-            const merged = {};
-            KEYS.forEach(k => {
-                const existingArr = Array.isArray(existing[k]) ? existing[k] : [];
-                const localArr    = Array.isArray(local[k])    ? local[k]    : [];
-                // Index existing by id
-                const byId = {};
-                existingArr.forEach(e => { if (e.id) byId[e.id] = e; });
-                // Local wins on duplicate id
-                localArr.forEach(e => { if (e.id) byId[e.id] = e; });
-                merged[k] = Object.values(byId);
-                // Items without id from local (shouldn't happen but be safe)
-                localArr.filter(e => !e.id).forEach(e => merged[k].push(e));
-            });
-
-            log(`Saving merged records to Firestore…`);
-            await window.save(merged);
-            log(`✓ Records saved.`);
+            const EMPTY = {visits:[],labs:[],imaging:[],journal:[],messages:[],timeline:[],dx:[],mentalhealth:[],iep:[],iepcorr:[]};
+            Object.keys(EMPTY).forEach(k => { if(!parsed[k]) parsed[k]=[]; });
+            await window.save(parsed);
         }
 
-        // ── 2. Meta: PCP, appointments, profile ───────────────────────────
-        const rawPCP     = localStorage.getItem('raina_pcp');
-        const rawAppts   = localStorage.getItem('raina_appointments');
-        const rawProfile = localStorage.getItem('raina_profile');
-
-        if (rawPCP || rawAppts || rawProfile) {
-            log('Migrating profile / PCP / appointments…');
-            // Start from current Firestore meta, only overwrite if local has data
-            const meta = { ...(window._metaCache || {}) };
-            if (rawPCP)     { const p = JSON.parse(rawPCP);     if (p && Object.keys(p).length)  meta.pcp          = p; }
-            if (rawAppts)   { const a = JSON.parse(rawAppts);   if (Array.isArray(a) && a.length) meta.appointments = a; }
-            if (rawProfile) { const p = JSON.parse(rawProfile); if (p && Object.keys(p).length)  meta.profile      = p; }
-            await window.saveMeta(meta);
-            log('✓ Meta saved.');
+        // Migrate meta (PCP, profile, appointments)
+        const meta = window._metaCache || {};
+        const oldPCP = localStorage.getItem('raina_pcp');
+        const oldAppts = localStorage.getItem('raina_appointments');
+        const oldProfile = localStorage.getItem('raina_profile');
+        if (oldPCP) meta.pcp = JSON.parse(oldPCP);
+        if (oldAppts) meta.appointments = JSON.parse(oldAppts);
+        if (oldProfile) meta.profile = JSON.parse(oldProfile);
+        if (oldPCP || oldAppts || oldProfile) {
+            const { getFirestore, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+            // saveMeta is already defined in the module scope, use window._metaCache update
+            window._metaCache = meta;
+            // Trigger meta save via the existing savePCP pathway
+            if (window.savePCP) window.savePCP(meta.pcp || {});
         }
 
-        // ── 3. Mark complete ──────────────────────────────────────────────
         localStorage.setItem('raina_migrated', 'true');
-        log('✓ Migration complete! All data is now in Firestore.', '#22c55e');
+        statusEl.style.color = '#22c55e';
+        statusEl.textContent = '✓ Migration complete! Data is now in Firebase.';
 
-        // Reload everything from Firestore and refresh UI
-        await Promise.all([window.loadFromFirebase(), window.loadMeta()]);
         setTimeout(() => {
             document.getElementById('migration-banner')?.remove();
             showView('overview');
@@ -1459,19 +1379,17 @@ async function runMigration() {
             renderApptBar();
         }, 2500);
 
-    } catch(err) {
-        log('✗ Migration failed: ' + err.message, '#ef4444');
-        console.error('[Migration error]', err);
-        const btn2 = document.querySelector('#migration-banner button');
-        if (btn2) { btn2.disabled = false; btn2.textContent = 'Retry'; }
+    } catch(e) {
+        statusEl.style.color = '#ef4444';
+        statusEl.textContent = 'Migration failed: ' + e.message;
+        console.error('Migration error:', e);
     }
 }
 
-// Exposed so you can force re-run from the browser console: forceReMigration()
-window.forceReMigration = function() {
-    localStorage.removeItem('raina_migrated');
-    checkMigration();
-};
+function dismissMigration() {
+    localStorage.setItem('raina_migrated', 'true');
+    document.getElementById('migration-banner')?.remove();
+}
 
 const KEY = 'raina_records';
 function load() {
