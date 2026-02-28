@@ -856,6 +856,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="sync-status" style="font-size:10px;font-family:'IBM Plex Mono',monospace;color:#22c55e;">● Live</span>
+        <button onclick="if(window.forceReloadFromFirestore)window.forceReloadFromFirestore()" title="Force reload from Firestore" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--tx2);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;">↺ Reload</button>
         <div class="user-id" id="view-indicator">LOC: DATA_NODE_01</div>
       </div>
     </div>
