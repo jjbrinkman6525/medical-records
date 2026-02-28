@@ -2055,7 +2055,7 @@ function deleteTL(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this event?')) return;
     const data = load();
-    data.timeline = data.timeline.filter(e => e.id !== id);
+    data.timeline = data.timeline.filter(e => String(e.id) !== String(id));
     save(data); renderTimeline();
 }
 
@@ -2153,7 +2153,7 @@ function saveVisit() {
 function deleteVisit(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID. Please refresh and try again.'); return; }
     if (!confirm('Delete this visit?')) return;
-    const data = load(); data.visits = data.visits.filter(v => v.id !== id); save(data); renderVisits();
+    const data = load(); data.visits = data.visits.filter(v => String(v.id) !== String(id)); save(data); renderVisits();
 }
 
 // ── Rich text editor helpers ───────────────────────────────────────────────
@@ -2262,8 +2262,8 @@ function editVisit(id) {
 
 function saveEditVisit(id) {
     const data = load();
-    const idx = data.visits.findIndex(x => x.id === id);
-    if (idx < 0) return;
+    const idx = data.visits.findIndex(x => x.id == id || String(x.id) === String(id));
+    if (idx < 0) { alert('Save failed: could not find entry with id: ' + id); return; }
     // Plain fields
     ['d','t','f','dr','vt','mr'].forEach(k => {
         const el = document.getElementById('ev-' + k);
@@ -2366,7 +2366,7 @@ function deleteMH(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this record?')) return;
     const data = load();
-    data.mentalhealth = (data.mentalhealth || []).filter(v => v.id !== id);
+    data.mentalhealth = (data.mentalhealth || []).filter(v => String(v.id) !== String(id));
     save(data); renderMH();
 }
 
@@ -2424,8 +2424,8 @@ function editMH(id) {
 
 function saveEditMH(id) {
     const data = load();
-    const idx = (data.mentalhealth || []).findIndex(x => x.id === id);
-    if (idx < 0) return;
+    const idx = (data.mentalhealth || []).findIndex(x => x.id == id || String(x.id) === String(id));
+    if (idx < 0) { alert('Save failed: could not find entry (id: ' + id + ')'); return; }
     ['d','t','f','dr','vt','mr'].forEach(k => {
         const el = document.getElementById('emh-' + k); if (el) data.mentalhealth[idx][k] = el.value;
     });
@@ -2547,7 +2547,7 @@ function deleteIEP(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this record?')) return;
     const data = load();
-    data.iep = (data.iep || []).filter(v => v.id !== id);
+    data.iep = (data.iep || []).filter(v => String(v.id) !== String(id));
     save(data); renderIEP();
 }
 
@@ -2607,8 +2607,8 @@ function editIEP(id) {
 
 function saveEditIEP(id) {
     const data = load();
-    const idx = (data.iep || []).findIndex(x => x.id === id);
-    if (idx < 0) return;
+    const idx = (data.iep || []).findIndex(x => x.id == id || String(x.id) === String(id));
+    if (idx < 0) { alert('Save failed: could not find entry (id: ' + id + ')'); return; }
     const r = data.iep[idx];
     r.d         = document.getElementById('eiep-d').value;
     r.type      = document.getElementById('eiep-type').value;
@@ -2713,7 +2713,7 @@ function deleteIEPCorr(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this correspondence?')) return;
     const data = load();
-    data.iepcorr = (data.iepcorr || []).filter(v => v.id !== id);
+    data.iepcorr = (data.iepcorr || []).filter(v => String(v.id) !== String(id));
     save(data); renderIEPCorr();
 }
 
@@ -2762,8 +2762,8 @@ function editIEPCorr(id) {
 
 function saveEditIEPCorr(id) {
     const data = load();
-    const idx = (data.iepcorr || []).findIndex(x => x.id === id);
-    if (idx < 0) return;
+    const idx = (data.iepcorr || []).findIndex(x => x.id == id || String(x.id) === String(id));
+    if (idx < 0) { alert('Save failed: could not find entry (id: ' + id + ')'); return; }
     const r = data.iepcorr[idx];
     r.d      = document.getElementById('eiepc-d').value;
     r.type   = document.getElementById('eiepc-type').value;
@@ -3988,7 +3988,7 @@ function saveLR() {
 function deleteLR(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this lab panel?')) return;
-    const data = load(); data.labs = data.labs.filter(l => l.id !== id); save(data); renderLabs();
+    const data = load(); data.labs = data.labs.filter(l => String(l.id) !== String(id)); save(data); renderLabs();
 }
 
 
@@ -4119,7 +4119,7 @@ function saveImaging() {
 function deleteImaging(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this imaging record?')) return;
-    const data = load(); data.imaging = data.imaging.filter(i => i.id !== id); save(data); renderImaging();
+    const data = load(); data.imaging = data.imaging.filter(i => String(i.id) !== String(id)); save(data); renderImaging();
 }
 
 function editImaging(id) {
@@ -4159,7 +4159,7 @@ function saveEditImaging(id) {
     const imgs = collectImgs('ei-imgs-wrap');
     const data = load();
     const idx = data.imaging.findIndex(x => x.id == id || String(x.id) === String(id));
-    if (idx < 0) return;
+    if (idx < 0) { alert('Save failed: could not find entry with id: ' + id); return; }
     Object.assign(data.imaging[idx], { date: d, type: document.getElementById('ei-t').value, facility: document.getElementById('ei-f').value, doctor: document.getElementById('ei-dr').value, report: rpt, notes: getRteContent('ei-nt'), imgs });
     save(data); closeEditModal(); renderImaging();
 }
@@ -4296,7 +4296,7 @@ function saveJournal() {
 function deleteJournal(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this journal entry?')) return;
-    const data = load(); data.journal = data.journal.filter(j => j.id !== id); save(data); renderJournal();
+    const data = load(); data.journal = data.journal.filter(j => String(j.id) !== String(id)); save(data); renderJournal();
 }
 
 function editJournal(id) {
@@ -4463,7 +4463,7 @@ function saveEditJournal(id) {
         baroPrior: bp !== '' ? parseFloat(bp) : null
     };
     const data = load();
-    const idx = data.journal.findIndex(x => x.id === id);
+    const idx = data.journal.findIndex(x => x.id == id || String(x.id) === String(id));
     if (idx >= 0) Object.assign(data.journal[idx], upd);
     save(data); closeEditModal(); renderJournal();
 }
@@ -4476,26 +4476,30 @@ const MOOD_EMOJIS = {Joyful:'😄',Content:'🙂',Neutral:'😐',Anxious:'😰',
 function jeVal(c){if(!c)return '';return /<[a-z][\s\S]*>/i.test(c)?`<div class="rt-content" style="margin-bottom:4px;">${c}</div>`:`<div class="je-val">${esc(c)}</div>`;}
 function cleanupEmptyJournal() {
     const data = load();
-    // Find entries with no valid ID or no date (phantom/duplicate entries)
-    const bad = data.journal.filter(s => !s.id || !s.date);
-    // Also find duplicate IDs (keep last occurrence)
-    const seen = new Set();
-    const dupes = [];
-    [...data.journal].reverse().forEach(s => {
-        if (s.id && seen.has(s.id)) dupes.push(s.id);
-        else if (s.id) seen.add(s.id);
+    const before = data.journal.length;
+    // Step 1: remove entries with no ID and no meaningful content
+    // Step 2: detect content-duplicates (same date + same message text)
+    const seenIds = new Set();
+    const seenContent = new Set();
+    const kept = [];
+    // Sort oldest-first so we keep the original and remove the duplicate copy
+    const sorted = [...data.journal].sort((a,b) => String(a.id).localeCompare(String(b.id)));
+    sorted.forEach(s => {
+        // Remove if no ID AND no date AND no message
+        if (!s.id && !s.date && !s.message) return;
+        // Remove exact ID duplicates (keep first seen)
+        if (s.id && seenIds.has(String(s.id))) return;
+        if (s.id) seenIds.add(String(s.id));
+        // Remove content duplicates: same date + same message text (first 100 chars)
+        const contentKey = (s.date || '') + '|' + (s.message || '').replace(/<[^>]+>/g,'').trim().substring(0,100);
+        if (seenContent.has(contentKey)) return;
+        seenContent.add(contentKey);
+        kept.push(s);
     });
-    const total = bad.length + dupes.length;
-    if (!total) { alert('No empty or duplicate entries found.'); return; }
-    if (!confirm(`Remove ${total} problem entr${total !== 1 ? 'ies' : 'y'}? (${bad.length} empty/no-ID + ${dupes.length} duplicates)`)) return;
-    // Remove bad entries and duplicates (keep first occurrence)
-    const keepIds = new Set();
-    data.journal = data.journal.filter(s => {
-        if (!s.id || !s.date) return false; // remove no-ID / no-date
-        if (keepIds.has(s.id)) return false; // remove duplicate
-        keepIds.add(s.id);
-        return true;
-    });
+    const removed = before - kept.length;
+    if (!removed) { alert('No duplicate or empty entries found.'); return; }
+    if (!confirm('Remove ' + removed + ' duplicate/empty entr' + (removed !== 1 ? 'ies' : 'y') + '?')) return;
+    data.journal = kept;
     save(data);
     renderJournal();
 }
@@ -4611,7 +4615,7 @@ function savePM() {
 function deletePM(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this message?')) return;
-    const data = load(); data.messages = data.messages.filter(m => m.id !== id); save(data); renderMessages();
+    const data = load(); data.messages = data.messages.filter(m => String(m.id) !== String(id)); save(data); renderMessages();
 }
 
 function editPM(id) {
@@ -4644,8 +4648,8 @@ function editPM(id) {
 
 function saveEditPM(id) {
     const data = load();
-    const idx = data.messages.findIndex(x => x.id === id);
-    if (idx < 0) return;
+    const idx = data.messages.findIndex(x => x.id == id || String(x.id) === String(id));
+    if (idx < 0) { alert('Save failed: could not find entry (id: ' + id + ')'); return; }
     Object.assign(data.messages[idx], {
         date: document.getElementById('epm-d').value,
         from: document.getElementById('epm-from').value,
@@ -4738,7 +4742,7 @@ function saveDX() {
 function deleteDX(id) {
     if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this diagnosis?')) return;
-    const data = load(); data.dx = data.dx.filter(d => d.id !== id); save(data); renderDX();
+    const data = load(); data.dx = data.dx.filter(d => String(d.id) !== String(id)); save(data); renderDX();
 }
 
 function editDX(id) {
@@ -4773,8 +4777,8 @@ function editDX(id) {
 
 function saveEditDX(id) {
     const data = load();
-    const idx = data.dx.findIndex(x => x.id === id);
-    if (idx < 0) return;
+    const idx = data.dx.findIndex(x => x.id == id || String(x.id) === String(id));
+    if (idx < 0) { alert('Save failed: could not find entry (id: ' + id + ')'); return; }
     Object.assign(data.dx[idx], {
         date: document.getElementById('edx-d').value,
         name: document.getElementById('edx-name').value,
