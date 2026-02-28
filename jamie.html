@@ -1453,7 +1453,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
 <div class="sb-overlay" id="sb-overlay" onclick="closeMobMenu()"></div>
 
 <!-- Edit Modal -->
-<div class="modal-overlay" id="edit-modal">
+<div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
   <div class="modal-box">
     <div id="edit-modal-body" style="display:flex;flex-direction:column;flex:1;min-height:0;"></div>
   </div>
@@ -2025,6 +2025,12 @@ function openEditModal(html) {
 function closeEditModal() {
     document.getElementById('edit-modal').classList.remove('open');
 }
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEditModal();
+        closeLabHistory();
+    }
+});
 document.getElementById('edit-modal').addEventListener('click', e => { if (e.target === document.getElementById('edit-modal')) closeEditModal(); });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -4118,10 +4124,15 @@ function deleteImaging(id) {
 
 function editImaging(id) {
     const data = load();
-    const v = data.imaging.find(x => x.id == id);
-    if (!v) return;
+    // Match by loose equality and string comparison to handle type mismatches
+    const v = data.imaging.find(x => x.id == id || String(x.id) === String(id));
+    if (!v) {
+        alert('Could not find imaging entry (id: ' + id + '). Try refreshing.');
+        return;
+    }
     const existingImgs = buildImgRows(v.imgs);
     const g = k => esc(v[k] || '');
+    const vid = v.id;
     openEditModal(`
         <h2>Edit Imaging Report</h2>
         <div class="ir"><input type="date" id="ei-d" value="${g('date')}" style="flex:1;"><input id="ei-t" value="${g('type')}" placeholder="Type" style="flex:1;"></div>
@@ -4133,21 +4144,21 @@ function editImaging(id) {
         <button class="add-row-btn" onclick="addImgRow('ei-imgs-wrap')">+ Add Image URL</button>
         <div class="modal-acts">
             <button class="btn-cancel-form" onclick="closeEditModal()">Cancel</button>
-            <button class="btn-save" onclick="saveEditImaging(${id})">Save</button>
+            <button class="btn-save" onclick="saveEditImaging('${vid}')">Save</button>
         </div>`);
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         setRteContent('ei-rpt', v.report || '');
         setRteContent('ei-nt', v.notes || '');
-    });
+    }, 80);
 }
 
 function saveEditImaging(id) {
     const d = document.getElementById('ei-d').value;
     const rpt = getRteContent('ei-rpt');
-    if (!d || !rpt) { alert('Date and report required'); return; }
+    if (!d) { alert('Date required'); return; }
     const imgs = collectImgs('ei-imgs-wrap');
     const data = load();
-    const idx = data.imaging.findIndex(x => x.id === id);
+    const idx = data.imaging.findIndex(x => x.id == id || String(x.id) === String(id));
     if (idx < 0) return;
     Object.assign(data.imaging[idx], { date: d, type: document.getElementById('ei-t').value, facility: document.getElementById('ei-f').value, doctor: document.getElementById('ei-dr').value, report: rpt, notes: getRteContent('ei-nt'), imgs });
     save(data); closeEditModal(); renderImaging();
