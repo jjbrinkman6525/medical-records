@@ -2042,9 +2042,10 @@ function saveTL() {
 }
 
 function deleteTL(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this event?')) return;
     const data = load();
-    data.timeline = data.timeline.filter(e => e.id != id);
+    data.timeline = data.timeline.filter(e => e.id !== id);
     save(data); renderTimeline();
 }
 
@@ -2140,8 +2141,9 @@ function saveVisit() {
 }
 
 function deleteVisit(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID. Please refresh and try again.'); return; }
     if (!confirm('Delete this visit?')) return;
-    const data = load(); data.visits = data.visits.filter(v => v.id != id); save(data); renderVisits();
+    const data = load(); data.visits = data.visits.filter(v => v.id !== id); save(data); renderVisits();
 }
 
 // ── Rich text editor helpers ───────────────────────────────────────────────
@@ -2351,9 +2353,10 @@ function saveMH() {
 }
 
 function deleteMH(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this record?')) return;
     const data = load();
-    data.mentalhealth = (data.mentalhealth || []).filter(v => v.id != id);
+    data.mentalhealth = (data.mentalhealth || []).filter(v => v.id !== id);
     save(data); renderMH();
 }
 
@@ -2531,9 +2534,10 @@ function saveIEP() {
 }
 
 function deleteIEP(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this record?')) return;
     const data = load();
-    data.iep = (data.iep || []).filter(v => v.id != id);
+    data.iep = (data.iep || []).filter(v => v.id !== id);
     save(data); renderIEP();
 }
 
@@ -2696,9 +2700,10 @@ function saveIEPCorr() {
 }
 
 function deleteIEPCorr(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this correspondence?')) return;
     const data = load();
-    data.iepcorr = (data.iepcorr || []).filter(v => v.id != id);
+    data.iepcorr = (data.iepcorr || []).filter(v => v.id !== id);
     save(data); renderIEPCorr();
 }
 
@@ -3971,8 +3976,9 @@ function saveLR() {
 }
 
 function deleteLR(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this lab panel?')) return;
-    const data = load(); data.labs = data.labs.filter(l => l.id != id); save(data); renderLabs();
+    const data = load(); data.labs = data.labs.filter(l => l.id !== id); save(data); renderLabs();
 }
 
 
@@ -4101,8 +4107,9 @@ function saveImaging() {
 }
 
 function deleteImaging(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this imaging record?')) return;
-    const data = load(); data.imaging = data.imaging.filter(i => i.id != id); save(data); renderImaging();
+    const data = load(); data.imaging = data.imaging.filter(i => i.id !== id); save(data); renderImaging();
 }
 
 function editImaging(id) {
@@ -4272,8 +4279,9 @@ function saveJournal() {
 }
 
 function deleteJournal(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this journal entry?')) return;
-    const data = load(); data.journal = data.journal.filter(j => j.id != id); save(data); renderJournal();
+    const data = load(); data.journal = data.journal.filter(j => j.id !== id); save(data); renderJournal();
 }
 
 function editJournal(id) {
@@ -4520,7 +4528,7 @@ function renderJournal() {
                 <div class="entry-b">
                     ${secs.map(([l,v]) => `<div class="je-section"><div class="je-label">${l}</div><div class="je-val">${esc(v)}</div></div>`).join('')}
                     ${vitals.length ? `<div class="je-section"><div class="je-label">Vitals</div><div class="je-val" style="font-family:'IBM Plex Mono',monospace;font-size:12px;">${vitals.join(' &nbsp;·&nbsp; ')}</div></div>` : ''}
-                    ${wxParts.length ? `<div class="je-section"><div class="je-label">Weather &amp; Location</div><div style="font-size:12px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;display:flex;flex-wrap:wrap;gap:12px;">${wxParts.join('')}</div>${s.wxNarrative?`<div style="font-size:12px;color:var(--tx3);font-style:italic;margin-top:3px;">${esc(s.wxNarrative)}</div>`:''}</div>` : ''}
+                    ${(wxParts.length || s.wxNarrative) ? `<div class="je-section"><div class="je-label">Weather &amp; Location</div>${wxParts.length ? `<div style="font-size:12px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;display:flex;flex-wrap:wrap;gap:12px;margin-bottom:4px;">${wxParts.join('')}</div>` : ''} ${s.wxNarrative ? `<div style="font-size:12px;color:var(--tx3);font-style:italic;">${/<[a-z][\s\S]*>/i.test(s.wxNarrative) ? `<div class="rt-content">${s.wxNarrative}</div>` : esc(s.wxNarrative)}</div>` : ''}</div>` : ''}
                     ${s.mood ? `<div class="je-section"><div class="je-label">Mood</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${s.mood.split(',').filter(Boolean).map(m=>`<span style="font-size:12px;">${MOOD_EMOJIS[m]||''} ${m}</span>`).join('')}</div></div>` : ''}
                     ${imgStrip(s.imgs)}
                     <div class="entry-actions">
@@ -4559,8 +4567,9 @@ function savePM() {
 }
 
 function deletePM(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this message?')) return;
-    const data = load(); data.messages = data.messages.filter(m => m.id != id); save(data); renderMessages();
+    const data = load(); data.messages = data.messages.filter(m => m.id !== id); save(data); renderMessages();
 }
 
 function editPM(id) {
@@ -4665,8 +4674,9 @@ function saveDX() {
 }
 
 function deleteDX(id) {
+    if (!id && id !== 0) { alert('Cannot delete: entry has no valid ID.'); return; }
     if (!confirm('Delete this diagnosis?')) return;
-    const data = load(); data.dx = data.dx.filter(d => d.id != id); save(data); renderDX();
+    const data = load(); data.dx = data.dx.filter(d => d.id !== id); save(data); renderDX();
 }
 
 function editDX(id) {
