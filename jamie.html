@@ -91,6 +91,35 @@ window.save = function(data) {
     saveToFirebase(data);
 };
 
+window.recoverFromLocalStorage = function() {
+    // Scan all localStorage keys for jamie data
+    const results = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw || raw[0] !== '{' && raw[0] !== '[') continue;
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.visits && Array.isArray(parsed.visits) && parsed.visits.length > 0) {
+                results.push({ key, visits: parsed.visits.length, labs: (parsed.labs||[]).length, data: parsed });
+            }
+        } catch(e) {}
+    }
+    if (!results.length) {
+        alert('No cached visit data found in localStorage.\n\nYou will need to restore from Firestore backup.\nGo to: console.firebase.google.com → Firestore → your project → Backups');
+        return;
+    }
+    const best = results.sort((a,b) => b.visits - a.visits)[0];
+    if (confirm('Found cached data!\nKey: ' + best.key + '\nVisits: ' + best.visits + '\nLabs: ' + best.labs + '\n\nRestore this to Firestore?')) {
+        saveToFirebase(best.data);
+        window._dbCache = best.data;
+        alert('Restored! Visits: ' + best.visits + '. Saving to Firestore now...');
+        if (window.renderVisits) window.renderVisits();
+        if (window.renderOverview) window.renderOverview();
+    }
+};
+
 window.forceReloadFromFirestore = async function() {
     try {
         const snap = await getDoc(PATIENT_DOC);
@@ -876,6 +905,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
       <div style="display:flex;align-items:center;gap:10px;">
         <span id="sync-status" style="font-size:10px;font-family:'IBM Plex Mono',monospace;color:#22c55e;">● Live</span>
         <button onclick="if(window.forceReloadFromFirestore)window.forceReloadFromFirestore()" title="Force reload from Firestore" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--tx2);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;">↺ Reload</button>
+        <button onclick="if(window.recoverFromLocalStorage)window.recoverFromLocalStorage()" title="Recover from browser cache" style="background:rgba(255,165,0,0.15);border:1px solid rgba(255,165,0,0.4);color:orange;border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:700;">⚠ Recover Cache</button>
         <div class="user-id" id="view-indicator">LOC: DATA_NODE_01</div>
       </div>
     </div>
