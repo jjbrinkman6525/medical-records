@@ -1248,7 +1248,10 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <span class="saved-msg" id="sv-pm">Saved</span>
           </div>
         </div>
-        <div class="search-bar"><input id="pm-search" placeholder="Search messages..." oninput="renderMessages()"></div>
+        <div class="search-bar" style="display:flex;gap:10px;align-items:center;">
+          <input id="pm-search" placeholder="Search messages..." oninput="renderMessages()" style="flex:1;">
+          <button id="pm-cleanup-btn" onclick="cleanupEmptyMessages()" style="display:none;background:rgba(255,77,77,0.15);color:#ff4d4d;border:1px solid rgba(255,77,77,0.3);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🗑 Delete All Empty</button>
+        </div>
         <div id="pm-list"></div>
       </div>
 
@@ -4616,12 +4619,28 @@ function saveEditPM(id) {
     save(data); closeEditModal(); renderMessages();
 }
 
+function cleanupEmptyMessages() {
+    const data = load();
+    const empty = data.messages.filter(m => !m.subject && !m.body && !m.from && !m.to);
+    if (!empty.length) { alert('No empty messages found.'); return; }
+    if (!confirm(`Delete ${empty.length} empty message${empty.length !== 1 ? 's' : ''}?`)) return;
+    data.messages = data.messages.filter(m => m.subject || m.body || m.from || m.to);
+    save(data);
+    renderMessages();
+}
+
 function renderMessages() {
     const q = (document.getElementById('pm-search')?.value || '').toLowerCase();
     const data = load();
     let list = [...data.messages].sort((a,b) => (b.date||"").localeCompare(a.date||""));
     if (q) list = list.filter(m => (m.subject + ' ' + m.from + ' ' + m.to + ' ' + m.body + ' ' + m.facility).toLowerCase().includes(q));
-    if (!list.length) { document.getElementById('pm-list').innerHTML = '<div class="empty-state">No portal messages yet.</div>'; return; }
+    if (!list.length) {
+        document.getElementById('pm-list').innerHTML = '<div class="empty-state">No portal messages yet.</div>';
+        const _allEmpty = data.messages.filter(m => !m.subject && !m.body && !m.from && !m.to).length;
+        const _cleanBtn = document.getElementById('pm-cleanup-btn');
+        if (_cleanBtn) _cleanBtn.style.display = _allEmpty > 0 ? 'block' : 'none';
+        return;
+    }
     let h = '';
     list.forEach(m => {
         const uid = `pm${m.id}`;
@@ -4648,6 +4667,10 @@ function renderMessages() {
         </div>`;
     });
     document.getElementById('pm-list').innerHTML = h;
+    // Show cleanup button if there are empty entries
+    const _emptyCount = data.messages.filter(m => !m.subject && !m.body && !m.from && !m.to).length;
+    const _cleanBtn = document.getElementById('pm-cleanup-btn');
+    if (_cleanBtn) _cleanBtn.style.display = _emptyCount > 0 ? 'block' : 'none';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
