@@ -91,6 +91,25 @@ window.save = function(data) {
     saveToFirebase(data);
 };
 
+window.forceReloadFromFirestore = async function() {
+    try {
+        const snap = await getDoc(PATIENT_DOC);
+        if (!snap.exists()) { alert('No data found in Firestore.'); return; }
+        const data = snap.data();
+        Object.keys(EMPTY).forEach(k => { if (!data[k]) data[k] = []; });
+        window._dbCache = data;
+        localStorage.setItem('jamie_records_cache', JSON.stringify(data));
+        alert('Reloaded from Firestore!\nVisits: ' + data.visits.length + '\nLabs: ' + data.labs.length + '\nImaging: ' + data.imaging.length + '\nJournal: ' + data.journal.length);
+        if (window.renderVisits) window.renderVisits();
+        if (window.renderLabs) window.renderLabs();
+        if (window.renderImaging) window.renderImaging();
+        if (window.renderJournal) window.renderJournal();
+        if (window.renderOverview) window.renderOverview();
+    } catch(e) {
+        alert('Reload failed: ' + e.message);
+    }
+};
+
 // ── PCP & Appointments stored in meta doc ─────────────────────────────────
 window._metaCache = null;
 
