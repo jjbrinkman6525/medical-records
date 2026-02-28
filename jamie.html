@@ -1218,7 +1218,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <option value="safety-3">Safety Level 3</option>
             <option value="high-pain">Pain 7+</option>
           </select>
-          <button id="j-cleanup-btn" onclick="cleanupEmptyJournal()" style="display:none;background:rgba(255,77,77,0.15);color:#ff4d4d;border:1px solid rgba(255,77,77,0.3);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🗑 Delete Duplicates / Empty</button>
+          <button id="j-cleanup-btn" onclick="cleanupEmptyJournal()" style="display:inline-flex;background:rgba(255,77,77,0.15);color:#ff4d4d;border:1px solid rgba(255,77,77,0.3);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🗑 Delete Duplicates / Empty</button>
         </div>
         <div id="j-list" style="margin-top:12px;"></div>
       </div>
@@ -2109,8 +2109,8 @@ function renderTimeline() {
                 <div class="tl-date">${esc(e.date)}</div>
                 <div class="tl-label" style="flex:1;">${esc(e.label)}</div>
                 <div class="tl-actions">
-                    <button class="tl-act act-edit" onclick="editTL(${e.id})">edit</button>
-                    <button class="tl-act act-delete" onclick="deleteTL(${e.id})">del</button>
+                    <button class="tl-act act-edit" onclick="editTL('${e.id}')">edit</button>
+                    <button class="tl-act act-delete" onclick="deleteTL('${e.id}')">del</button>
                 </div>
                 ${tlImgs ? `<div style="width:100%;padding-left:28px;padding-top:6px;">${tlImgs}</div>` : ''}
             </div>`;
@@ -2319,8 +2319,8 @@ function renderVisits() {
                     }).join('')}
                     ${imgStrip(v.imgs)}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editVisit(${v.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteVisit(${v.id})">Delete</button>
+                        <button class="act-btn act-edit" onclick="editVisit('${v.id}')">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteVisit('${v.id}')">Delete</button>
                     </div>
                 </div>
             </div>`;
@@ -2476,8 +2476,8 @@ function renderMH() {
                     }).join('')}
                     ${imgStrip(v.imgs)}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editMH(${v.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteMH(${v.id})">Delete</button>
+                        <button class="act-btn act-edit" onclick="editMH('${v.id}')">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteMH('${v.id}')">Delete</button>
                     </div>
                 </div>
             </div>`;
@@ -2671,8 +2671,8 @@ function renderIEP() {
                     ${v.mr ? `<div class="sc-label">Record Reference</div><div class="f-value" style="margin-bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;">${esc(v.mr)}</div>` : ''}
                     ${imgStrip(v.imgs)}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editIEP(${v.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteIEP(${v.id})">Delete</button>
+                        <button class="act-btn act-edit" onclick="editIEP('${v.id}')">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteIEP('${v.id}')">Delete</button>
                     </div>
                 </div>
             </div>`;
@@ -2815,8 +2815,8 @@ function renderIEPCorr() {
                     }).join('')}
                     ${imgStrip(v.imgs)}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editIEPCorr(${v.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteIEPCorr(${v.id})">Delete</button>
+                        <button class="act-btn act-edit" onclick="editIEPCorr('${v.id}')">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteIEPCorr('${v.id}')">Delete</button>
                     </div>
                 </div>
             </div>`;
@@ -4089,7 +4089,7 @@ function renderLabs() {
                     ${l.notes ? `<div style="padding:12px 16px;font-size:12px;color:var(--tx3);border-top:1px solid var(--bd);">${/<[a-z][\s\S]*>/i.test(l.notes)?`<div class="rt-content">${l.notes}</div>`:esc(l.notes)}</div>` : ''}
                     ${l.imgs && l.imgs.length ? `<div style="padding:8px 16px;border-top:1px solid var(--bd);">${imgStrip(l.imgs)}</div>` : ''}
                     <div style="padding:10px 16px;border-top:1px solid var(--bd);">
-                        <button class="act-btn act-delete" onclick="deleteLR(${l.id})">Delete Panel</button>
+                        <button class="act-btn act-delete" onclick="deleteLR('${l.id}')">Delete Panel</button>
                     </div>
                 </div>
             </div>`;
@@ -4127,7 +4127,7 @@ function editImaging(id) {
     // Match by loose equality and string comparison to handle type mismatches
     const v = data.imaging.find(x => x.id == id || String(x.id) === String(id));
     if (!v) {
-        alert('Could not find imaging entry (id: ' + id + '). Try refreshing.');
+        alert('Could not find imaging entry. Try refreshing the page.');
         return;
     }
     const existingImgs = buildImgRows(v.imgs);
@@ -4189,8 +4189,8 @@ function renderImaging() {
                     ${v.notes?`<div class="sc-label">Your Notes</div>${/<[a-z][\s\S]*>/i.test(v.notes)?`<div class="rt-content" style="margin-bottom:8px;">${v.notes}</div>`:`<div class="f-value" style="margin-bottom:8px;white-space:pre-wrap;">${esc(v.notes)}</div>`}`:''}
                     ${imgStrip(v.imgs)}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editImaging(${v.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteImaging(${v.id})">Delete</button>
+                        <button class="act-btn act-edit" onclick="editImaging('${v.id}')">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteImaging('${v.id}')">Delete</button>
                     </div>
                 </div>
             </div>`;
@@ -4573,8 +4573,8 @@ function renderJournal() {
                     ${s.mood ? `<div class="je-section"><div class="je-label">Mood</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${s.mood.split(',').filter(Boolean).map(m=>`<span style="font-size:12px;">${MOOD_EMOJIS[m]||''} ${m}</span>`).join('')}</div></div>` : ''}
                     ${imgStrip(s.imgs)}
                     <div class="entry-actions">
-                        <button class="act-btn act-edit" onclick="editJournal(${s.id})">Edit</button>
-                        <button class="act-btn act-delete" onclick="deleteJournal(${s.id})">Delete</button>
+                        <button class="act-btn act-edit" onclick="editJournal('${s.id}')">Edit</button>
+                        <button class="act-btn act-delete" onclick="deleteJournal('${s.id}')">Delete</button>
                     </div>
                 </div>
             </div>`;
@@ -4582,11 +4582,7 @@ function renderJournal() {
     });
     h += '</div>';
     document.getElementById('j-list').innerHTML = h;
-    const _jBad = data.journal.filter(s => !s.id || !s.date).length;
-    const _jSeen = new Set(); let _jDupes = 0;
-    data.journal.forEach(s => { if (s.id) { if (_jSeen.has(s.id)) _jDupes++; else _jSeen.add(s.id); } });
-    const _jCleanBtn = document.getElementById('j-cleanup-btn');
-    if (_jCleanBtn) _jCleanBtn.style.display = (_jBad + _jDupes > 0) ? 'block' : 'none';
+
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -4703,8 +4699,8 @@ function renderMessages() {
                 ${/<[a-z][\s\S]*>/i.test(m.body||'')?`<div class="pm-body rt-content">${m.body}</div>`:`<div class="pm-body">${esc(m.body)}</div>`}
                 ${imgStrip(m.imgs)}
                 <div class="entry-actions">
-                    <button class="act-btn act-edit" onclick="editPM(${m.id})">Edit</button>
-                    <button class="act-btn act-delete" onclick="deletePM(${m.id})">Delete</button>
+                    <button class="act-btn act-edit" onclick="editPM('${m.id}')">Edit</button>
+                    <button class="act-btn act-delete" onclick="deletePM('${m.id}')">Delete</button>
                 </div>
             </div>
         </div>`;
@@ -4809,8 +4805,8 @@ function renderDX() {
             <td style="font-size:12px;">${esc(d.provider)}</td>
             <td style="white-space:nowrap;">
                 ${hasExtra ? `<button class="act-btn" onclick="toggleEntry('${uid}')" style="margin-right:4px;">▾</button>` : ''}
-                <button class="act-btn act-edit" onclick="editDX(${d.id})">Edit</button>
-                <button class="act-btn act-delete" style="margin-left:4px;" onclick="deleteDX(${d.id})">Del</button>
+                <button class="act-btn act-edit" onclick="editDX('${d.id}')">Edit</button>
+                <button class="act-btn act-delete" style="margin-left:4px;" onclick="deleteDX('${d.id}')">Del</button>
             </td>
         </tr>
         ${hasExtra ? `<tr id="${uid}" style="display:none;"><td colspan="6" style="padding:10px 14px;background:var(--sf2);">
