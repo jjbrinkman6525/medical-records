@@ -1209,7 +1209,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
           </div>
         </div>
 
-        <div class="search-bar" style="display:flex;gap:10px;">
+        <div class="search-bar" style="display:flex;gap:10px;align-items:center;">
           <input id="j-search" placeholder="Search journal..." oninput="renderJournal()" style="flex:1;">
           <select id="j-filter" onchange="renderJournal()" style="width:160px;">
             <option value="">All Entries</option>
@@ -1218,6 +1218,7 @@ label, .lbl { display: block; font-size: 10px; font-weight: 700; color: var(--tx
             <option value="safety-3">Safety Level 3</option>
             <option value="high-pain">Pain 7+</option>
           </select>
+          <button id="j-cleanup-btn" onclick="cleanupEmptyJournal()" style="display:none;background:rgba(255,77,77,0.15);color:#ff4d4d;border:1px solid rgba(255,77,77,0.3);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🗑 Delete Duplicates / Empty</button>
         </div>
         <div id="j-list" style="margin-top:12px;"></div>
       </div>
@@ -4462,6 +4463,32 @@ const MOOD_EMOJIS = {Joyful:'😄',Content:'🙂',Neutral:'😐',Anxious:'😰',
 
 
 function jeVal(c){if(!c)return '';return /<[a-z][\s\S]*>/i.test(c)?`<div class="rt-content" style="margin-bottom:4px;">${c}</div>`:`<div class="je-val">${esc(c)}</div>`;}
+function cleanupEmptyJournal() {
+    const data = load();
+    // Find entries with no valid ID or no date (phantom/duplicate entries)
+    const bad = data.journal.filter(s => !s.id || !s.date);
+    // Also find duplicate IDs (keep last occurrence)
+    const seen = new Set();
+    const dupes = [];
+    [...data.journal].reverse().forEach(s => {
+        if (s.id && seen.has(s.id)) dupes.push(s.id);
+        else if (s.id) seen.add(s.id);
+    });
+    const total = bad.length + dupes.length;
+    if (!total) { alert('No empty or duplicate entries found.'); return; }
+    if (!confirm(`Remove ${total} problem entr${total !== 1 ? 'ies' : 'y'}? (${bad.length} empty/no-ID + ${dupes.length} duplicates)`)) return;
+    // Remove bad entries and duplicates (keep first occurrence)
+    const keepIds = new Set();
+    data.journal = data.journal.filter(s => {
+        if (!s.id || !s.date) return false; // remove no-ID / no-date
+        if (keepIds.has(s.id)) return false; // remove duplicate
+        keepIds.add(s.id);
+        return true;
+    });
+    save(data);
+    renderJournal();
+}
+
 function renderJournal() {
     const q = (document.getElementById('j-search')?.value || '').toLowerCase();
     const cf = document.getElementById('j-filter')?.value || '';
@@ -4544,6 +4571,11 @@ function renderJournal() {
     });
     h += '</div>';
     document.getElementById('j-list').innerHTML = h;
+    const _jBad = data.journal.filter(s => !s.id || !s.date).length;
+    const _jSeen = new Set(); let _jDupes = 0;
+    data.journal.forEach(s => { if (s.id) { if (_jSeen.has(s.id)) _jDupes++; else _jSeen.add(s.id); } });
+    const _jCleanBtn = document.getElementById('j-cleanup-btn');
+    if (_jCleanBtn) _jCleanBtn.style.display = (_jBad + _jDupes > 0) ? 'block' : 'none';
 }
 
 // ══════════════════════════════════════════════════════════════════════════
