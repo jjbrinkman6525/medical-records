@@ -1770,13 +1770,13 @@ function toggleEntry(id) {
     if (isTr) {
         const isOpen = el.style.display !== 'none' && el.style.display !== '';
         el.style.display = isOpen ? 'none' : 'table-row';
-        if (!isOpen) { _openEntries.add(id); setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50); }
+        if (!isOpen) { _openEntries.add(id); setTimeout(() => { const r = el.getBoundingClientRect(); if (r.top < 0 || r.bottom > (window.innerHeight || document.documentElement.clientHeight)) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50); }
         else _openEntries.delete(id);
     } else {
         el.classList.toggle('open');
         if (el.classList.contains('open')) {
             _openEntries.add(id);
-            setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+            setTimeout(() => { const r = el.getBoundingClientRect(); if (r.top < 0 || r.bottom > (window.innerHeight || document.documentElement.clientHeight)) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
         } else {
             _openEntries.delete(id);
         }
