@@ -297,6 +297,7 @@ mark{background:rgba(96,165,250,.25);color:var(--ac);padding:0 2px;border-radius
 <div class="adm ia" id="ia-pm"><h3 onclick="tia('ia-pm')">+ ADD PORTAL MESSAGE</h3><div class="ib">
 <div class="ir">
   <input type="date" id="pm-d" style="min-width:155px">
+  <input type="time" id="pm-tm" style="min-width:120px">
   <input id="pm-from" placeholder="From (name / role)" style="flex:1">
   <input id="pm-to" placeholder="To (name / role)" style="flex:1">
   <input id="pm-fac" placeholder="Facility / Portal" style="flex:1">
@@ -2079,6 +2080,7 @@ function showLabHistory(name){var all=gU('lr').slice().sort(function(a,b){return
 function aPM(){
   if(!ADMIN)return;
   var d=document.getElementById('pm-d').value;
+  var tm=document.getElementById('pm-tm').value;
   var from=document.getElementById('pm-from').value.trim();
   var to=document.getElementById('pm-to').value.trim();
   var fac=document.getElementById('pm-fac').value.trim();
@@ -2086,9 +2088,10 @@ function aPM(){
   var body=document.getElementById('pm-body').value.trim();
   if(!d||!body){alert('Date and message body required');return}
   var msgs=gU('pm');
-  msgs.push({id:Date.now(),date:d,from:from,to:to,facility:fac,subject:subj,body:body});
+  msgs.push({id:Date.now(),date:d,time:tm,from:from,to:to,facility:fac,subject:subj,body:body});
   sU('pm',msgs);
   document.getElementById('pm-d').value='';
+  document.getElementById('pm-tm').value='';
   document.getElementById('pm-from').value='';
   document.getElementById('pm-to').value='';
   document.getElementById('pm-fac').value='';
@@ -2096,7 +2099,7 @@ function aPM(){
   document.getElementById('pm-body').value='';
   fl('sv-pm');rPM();
 }
-function rPM(){var q=(document.getElementById('pms')?document.getElementById('pms').value||'':'').toLowerCase();var filt=(document.getElementById('pmf')?document.getElementById('pmf').value:'');var all=gU('pm').slice().sort(function(a,b){return(b.date||'').localeCompare(a.date||'')});var filtered=all.filter(function(m){if(filt==='from-me'&&!((m.from||'').toLowerCase().includes('kelsey')||(m.to||'').toLowerCase().includes('doctor')||(m.from||'').toLowerCase().includes('patient')))return false;if(filt==='to-me'&&!((m.to||'').toLowerCase().includes('kelsey')||(m.from||'').toLowerCase().includes('doctor')))return false;if(q){var blob=(m.date+' '+(m.from||'')+' '+(m.to||'')+' '+(m.facility||'')+' '+(m.subject||'')+' '+(m.body||'')).toLowerCase();return blob.includes(q)}return true;});var ec=document.getElementById('pmec');if(ec)ec.textContent='Showing '+filtered.length+' of '+all.length+' message'+(all.length!==1?'s':'');var cntEl=document.getElementById('cnt-pm');if(cntEl)cntEl.textContent=all.length;if(!filtered.length){document.getElementById('pml').innerHTML='<div class="empty">'+(all.length?'No messages match.':'No portal messages yet. Use the form above to add one.')+'</div>';return;}var g=yrGroup(filtered,function(m){return m.date||''});var h=yrOpen();g.years.forEach(function(yr){h+=yrHeader(yr);g.byYear[yr].forEach(function(m){h+='<div class="pm-card">';h+='<div class="pm-card-hd">';h+='<div class="pm-from"><span style="text-transform:uppercase;letter-spacing:.5px;font-size:10px">From</span><strong>'+esc(m.from||'—')+'</strong></div>';h+='<div class="pm-to"><span style="text-transform:uppercase;letter-spacing:.5px;font-size:10px">To</span><strong>'+esc(m.to||'—')+'</strong></div>';h+='<div class="pm-meta">'+esc(m.date||'')+(m.facility?'<br>'+esc(m.facility):'')+'</div>';if(ADMIN)h+='<div style="display:flex;gap:6px"><button class="abtn" onclick="editPM('+m.id+')">edit</button><button class="abtn del" onclick="delPM('+m.id+')">del</button></div>';h+='</div>';if(m.subject)h+='<div class="pm-subj">'+esc(m.subject)+'</div>';h+='<div class="pm-body">'+esc(m.body||'')+'</div>';h+='</div>'});});h+=yrClose();document.getElementById('pml').innerHTML=h;}
+function rPM(){var q=(document.getElementById('pms')?document.getElementById('pms').value||'':'').toLowerCase();var filt=(document.getElementById('pmf')?document.getElementById('pmf').value:'');var all=gU('pm').slice().sort(function(a,b){var ad=(a.date||'')+(a.time?'T'+a.time:'');var bd=(b.date||'')+(b.time?'T'+b.time:'');return bd.localeCompare(ad)});var filtered=all.filter(function(m){if(filt==='from-me'&&!((m.from||'').toLowerCase().includes('kelsey')||(m.to||'').toLowerCase().includes('doctor')||(m.from||'').toLowerCase().includes('patient')))return false;if(filt==='to-me'&&!((m.to||'').toLowerCase().includes('kelsey')||(m.from||'').toLowerCase().includes('doctor')))return false;if(q){var blob=(m.date+' '+(m.from||'')+' '+(m.to||'')+' '+(m.facility||'')+' '+(m.subject||'')+' '+(m.body||'')).toLowerCase();return blob.includes(q)}return true;});var ec=document.getElementById('pmec');if(ec)ec.textContent='Showing '+filtered.length+' of '+all.length+' message'+(all.length!==1?'s':'');var cntEl=document.getElementById('cnt-pm');if(cntEl)cntEl.textContent=all.length;if(!filtered.length){document.getElementById('pml').innerHTML='<div class="empty">'+(all.length?'No messages match.':'No portal messages yet. Use the form above to add one.')+'</div>';return;}var g=yrGroup(filtered,function(m){return m.date||''});var h=yrOpen();g.years.forEach(function(yr){h+=yrHeader(yr);g.byYear[yr].forEach(function(m){h+='<div class="pm-card">';h+='<div class="pm-card-hd">';h+='<div class="pm-from"><span style="text-transform:uppercase;letter-spacing:.5px;font-size:10px">From</span><strong>'+esc(m.from||'—')+'</strong></div>';h+='<div class="pm-to"><span style="text-transform:uppercase;letter-spacing:.5px;font-size:10px">To</span><strong>'+esc(m.to||'—')+'</strong></div>';h+='<div class="pm-meta">'+esc(m.date||'')+(m.time?'<span style="margin-left:6px;font-size:11px;color:var(--tx3)">'+esc(m.time)+'</span>':'')+(m.facility?'<br>'+esc(m.facility):'')+'</div>';if(ADMIN)h+='<div style="display:flex;gap:6px"><button class="abtn" onclick="editPM('+m.id+')">edit</button><button class="abtn del" onclick="delPM('+m.id+')">del</button></div>';h+='</div>';if(m.subject)h+='<div class="pm-subj">'+esc(m.subject)+'</div>';h+='<div class="pm-body">'+esc(m.body||'')+'</div>';h+='</div>'});});h+=yrClose();document.getElementById('pml').innerHTML=h;}
 
 function delPM(id){
   if(!ADMIN)return;
@@ -2108,7 +2111,7 @@ function editPM(id){
   var m=gU('pm').find(function(x){return x.id===id});
   if(!m)return;
   showModal('<h2>Edit Portal Message</h2>'
-    +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">Date</label><input id="epm-d" type="date" value="'+esc(m.date||'')+'" style="flex:1"></div>'
+    +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">Date</label><input id="epm-d" type="date" value="'+esc(m.date||'')+'" style="flex:1"><input id="epm-tm" type="time" value="'+esc(m.time||'')+'" style="min-width:110px"></div>'
     +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">From</label><input id="epm-from" value="'+esc(m.from||'')+'" style="flex:1"></div>'
     +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">To</label><input id="epm-to" value="'+esc(m.to||'')+'" style="flex:1"></div>'
     +'<div class="ir"><label style="min-width:60px;color:var(--tx3)">Facility</label><input id="epm-fac" value="'+esc(m.facility||'')+'" style="flex:1"></div>'
@@ -2123,6 +2126,7 @@ function saveEditPM(id){
   var idx=msgs.findIndex(function(x){return x.id===id});
   if(idx<0)return;
   msgs[idx].date=document.getElementById('epm-d').value;
+  msgs[idx].time=document.getElementById('epm-tm').value;
   msgs[idx].from=document.getElementById('epm-from').value;
   msgs[idx].to=document.getElementById('epm-to').value;
   msgs[idx].facility=document.getElementById('epm-fac').value;
