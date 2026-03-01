@@ -236,8 +236,10 @@ mark{background:rgba(96,165,250,.25);color:var(--ac);padding:0 2px;border-radius
 .pm-thread-toggle{font-size:15px;color:var(--tx3);flex-shrink:0;transition:transform .2s;user-select:none}
 .pm-thread.thread-open .pm-thread-toggle{transform:rotate(180deg)}
 /* Individual message bubble inside thread */
-.pm-msg{border-top:1px solid var(--bd);padding:14px 16px}
-.pm-msg:first-child{border-top:none}
+.pm-msg{border-top:none;padding:14px 16px;margin:10px 14px;border-radius:10px;border:1.5px solid transparent;position:relative}
+.pm-msg:first-child{margin-top:14px}
+.pm-msg.msg-blue{background:linear-gradient(135deg,rgba(96,165,250,.07) 0%,rgba(129,140,248,.05) 100%);border-color:rgba(96,165,250,.35);box-shadow:0 0 18px rgba(96,165,250,.18),0 0 6px rgba(96,165,250,.12),inset 0 0 20px rgba(96,165,250,.04)}
+.pm-msg.msg-orange{background:linear-gradient(135deg,rgba(251,146,60,.07) 0%,rgba(251,191,36,.04) 100%);border-color:rgba(251,146,60,.35);box-shadow:0 0 18px rgba(251,146,60,.18),0 0 6px rgba(251,146,60,.12),inset 0 0 20px rgba(251,146,60,.04)}
 .pm-msg-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
 .pm-msg-from{font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600}
 .pm-msg-from.sent{color:var(--ac)}
@@ -2306,7 +2308,8 @@ function rPM(){
     h+='<div class="pm-thread-body">';
     t.msgs.forEach(function(m,mi){
       var isSent=(m.from||'').toLowerCase().includes('kelsey')||(m.from||'').toLowerCase().includes('patient')||(m.from||'').toLowerCase().includes('jamie');
-      h+='<div class="pm-msg" id="pmm-'+m.id+'">';
+      var glowCls=mi%2===0?'msg-blue':'msg-orange';
+      h+='<div class="pm-msg '+glowCls+'" id="pmm-'+m.id+'">';
       h+='<div class="pm-msg-hd">';
       h+='<span class="pm-msg-from '+(isSent?'sent':'recv')+'">'+esc(m.from||'—')+'</span>';
       if(m.to)h+='<span class="pm-msg-arrow">→</span><span class="pm-msg-to">'+esc(m.to)+'</span>';
