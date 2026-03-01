@@ -269,8 +269,9 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
 .doc-card-body {
   font-size: 13px; color: var(--tx2); white-space: pre-wrap;
   word-break: break-word; line-height: 1.6;
-  max-height: 120px; overflow: hidden; transition: max-height 0.3s;
+  max-height: 200px; overflow: hidden; transition: max-height 0.3s;
 }
+.doc-card-body img { max-width: 100%; border-radius: 6px; margin: 4px 0; display: block; }
 .doc-card-body.expanded { max-height: 2000px; }
 .doc-expand-btn {
   background: none; border: none; color: var(--tx3); font-size: 12px;
@@ -290,10 +291,17 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
 .doc-input {
   width: 100%; background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px;
   color: var(--tx); font-size: 13px; padding: 10px 12px;
-  font-family: 'Nunito Sans', sans-serif; min-height: 90px; resize: vertical;
+  font-family: 'Nunito Sans', sans-serif; min-height: 90px;
   margin-bottom: 8px; line-height: 1.6;
+  overflow-y: auto; word-break: break-word;
+  cursor: text;
 }
 .doc-input:focus { outline: none; border-color: var(--ac); }
+.doc-input:empty:before {
+  content: attr(data-placeholder);
+  color: var(--tx3); pointer-events: none;
+}
+.doc-input img { max-width: 100%; border-radius: 6px; margin: 4px 0; display: block; }
 .doc-form-row { display: flex; gap: 8px; }
 .doc-title-input {
   flex: 1; background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px;
@@ -363,9 +371,13 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
   background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px;
   color: var(--tx); font-size: 13px; padding: 10px 12px;
   font-family: 'Nunito Sans', sans-serif; width: 100%;
-  min-height: 200px; resize: vertical; line-height: 1.6; flex: 1;
-  overflow-y: auto;
+  min-height: 200px; line-height: 1.6; flex: 1;
+  overflow-y: auto; word-break: break-word; cursor: text;
 }
+.edit-modal [contenteditable]:empty:before {
+  content: attr(data-placeholder); color: var(--tx3); pointer-events: none;
+}
+.edit-modal [contenteditable] img { max-width: 100%; border-radius: 6px; margin: 4px 0; display: block; }
 .edit-modal input:focus, .edit-modal textarea:focus { outline: none; border-color: var(--ac); }
 .edit-modal-btns { display: flex; gap: 10px; }
 .edit-modal-btns button {
@@ -464,7 +476,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-assets" style="display:none;">
             <div class="doc-list" id="docs-marc-assets"></div>
             <div class="add-doc-area admin-only" id="add-marc-assets">
-              <textarea class="doc-input" id="input-marc-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','assets')">+ Add</button>
@@ -482,7 +494,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-marc-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-marc-medical_bills">
-              <textarea class="doc-input" id="input-marc-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','medical_bills')">+ Add</button>
@@ -500,7 +512,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-student_loans" style="display:none;">
             <div class="doc-list" id="docs-marc-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-marc-student_loans">
-              <textarea class="doc-input" id="input-marc-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','student_loans')">+ Add</button>
@@ -518,7 +530,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-marc-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-marc-misc_bills">
-              <textarea class="doc-input" id="input-marc-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','misc_bills')">+ Add</button>
@@ -536,7 +548,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-marc-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-marc-identification_documents">
-              <textarea class="doc-input" id="input-marc-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','identification_documents')">+ Add</button>
@@ -554,7 +566,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-marc-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-marc-tax_documents">
-              <textarea class="doc-input" id="input-marc-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','tax_documents')">+ Add</button>
@@ -572,7 +584,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-education" style="display:none;">
             <div class="doc-list" id="docs-marc-education"></div>
             <div class="add-doc-area admin-only" id="add-marc-education">
-              <textarea class="doc-input" id="input-marc-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','education')">+ Add</button>
@@ -590,7 +602,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-occupational" style="display:none;">
             <div class="doc-list" id="docs-marc-occupational"></div>
             <div class="add-doc-area admin-only" id="add-marc-occupational">
-              <textarea class="doc-input" id="input-marc-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','occupational')">+ Add</button>
@@ -608,7 +620,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-legal" style="display:none;">
             <div class="doc-list" id="docs-marc-legal"></div>
             <div class="add-doc-area admin-only" id="add-marc-legal">
-              <textarea class="doc-input" id="input-marc-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','legal')">+ Add</button>
@@ -626,7 +638,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-marc-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-marc-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-marc-miscellaneous">
-              <textarea class="doc-input" id="input-marc-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-marc-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-marc-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('marc','miscellaneous')">+ Add</button>
@@ -655,7 +667,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-assets" style="display:none;">
             <div class="doc-list" id="docs-jamie-assets"></div>
             <div class="add-doc-area admin-only" id="add-jamie-assets">
-              <textarea class="doc-input" id="input-jamie-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','assets')">+ Add</button>
@@ -673,7 +685,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-jamie-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-jamie-medical_bills">
-              <textarea class="doc-input" id="input-jamie-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','medical_bills')">+ Add</button>
@@ -691,7 +703,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-student_loans" style="display:none;">
             <div class="doc-list" id="docs-jamie-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-jamie-student_loans">
-              <textarea class="doc-input" id="input-jamie-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','student_loans')">+ Add</button>
@@ -709,7 +721,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-jamie-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-jamie-misc_bills">
-              <textarea class="doc-input" id="input-jamie-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','misc_bills')">+ Add</button>
@@ -727,7 +739,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-jamie-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-jamie-identification_documents">
-              <textarea class="doc-input" id="input-jamie-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','identification_documents')">+ Add</button>
@@ -745,7 +757,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-jamie-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-jamie-tax_documents">
-              <textarea class="doc-input" id="input-jamie-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','tax_documents')">+ Add</button>
@@ -763,7 +775,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-education" style="display:none;">
             <div class="doc-list" id="docs-jamie-education"></div>
             <div class="add-doc-area admin-only" id="add-jamie-education">
-              <textarea class="doc-input" id="input-jamie-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','education')">+ Add</button>
@@ -781,7 +793,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-occupational" style="display:none;">
             <div class="doc-list" id="docs-jamie-occupational"></div>
             <div class="add-doc-area admin-only" id="add-jamie-occupational">
-              <textarea class="doc-input" id="input-jamie-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','occupational')">+ Add</button>
@@ -799,7 +811,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-legal" style="display:none;">
             <div class="doc-list" id="docs-jamie-legal"></div>
             <div class="add-doc-area admin-only" id="add-jamie-legal">
-              <textarea class="doc-input" id="input-jamie-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','legal')">+ Add</button>
@@ -817,7 +829,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jamie-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-jamie-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-jamie-miscellaneous">
-              <textarea class="doc-input" id="input-jamie-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jamie-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jamie-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jamie','miscellaneous')">+ Add</button>
@@ -846,7 +858,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-assets" style="display:none;">
             <div class="doc-list" id="docs-jesse-assets"></div>
             <div class="add-doc-area admin-only" id="add-jesse-assets">
-              <textarea class="doc-input" id="input-jesse-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','assets')">+ Add</button>
@@ -864,7 +876,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-jesse-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-jesse-medical_bills">
-              <textarea class="doc-input" id="input-jesse-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','medical_bills')">+ Add</button>
@@ -882,7 +894,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-student_loans" style="display:none;">
             <div class="doc-list" id="docs-jesse-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-jesse-student_loans">
-              <textarea class="doc-input" id="input-jesse-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','student_loans')">+ Add</button>
@@ -900,7 +912,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-jesse-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-jesse-misc_bills">
-              <textarea class="doc-input" id="input-jesse-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','misc_bills')">+ Add</button>
@@ -918,7 +930,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-jesse-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-jesse-identification_documents">
-              <textarea class="doc-input" id="input-jesse-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','identification_documents')">+ Add</button>
@@ -936,7 +948,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-jesse-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-jesse-tax_documents">
-              <textarea class="doc-input" id="input-jesse-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','tax_documents')">+ Add</button>
@@ -954,7 +966,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-education" style="display:none;">
             <div class="doc-list" id="docs-jesse-education"></div>
             <div class="add-doc-area admin-only" id="add-jesse-education">
-              <textarea class="doc-input" id="input-jesse-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','education')">+ Add</button>
@@ -972,7 +984,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-occupational" style="display:none;">
             <div class="doc-list" id="docs-jesse-occupational"></div>
             <div class="add-doc-area admin-only" id="add-jesse-occupational">
-              <textarea class="doc-input" id="input-jesse-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','occupational')">+ Add</button>
@@ -990,7 +1002,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-legal" style="display:none;">
             <div class="doc-list" id="docs-jesse-legal"></div>
             <div class="add-doc-area admin-only" id="add-jesse-legal">
-              <textarea class="doc-input" id="input-jesse-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','legal')">+ Add</button>
@@ -1008,7 +1020,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-jesse-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-jesse-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-jesse-miscellaneous">
-              <textarea class="doc-input" id="input-jesse-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-jesse-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-jesse-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('jesse','miscellaneous')">+ Add</button>
@@ -1037,7 +1049,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-assets" style="display:none;">
             <div class="doc-list" id="docs-raina-assets"></div>
             <div class="add-doc-area admin-only" id="add-raina-assets">
-              <textarea class="doc-input" id="input-raina-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','assets')">+ Add</button>
@@ -1055,7 +1067,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-raina-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-raina-medical_bills">
-              <textarea class="doc-input" id="input-raina-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','medical_bills')">+ Add</button>
@@ -1073,7 +1085,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-student_loans" style="display:none;">
             <div class="doc-list" id="docs-raina-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-raina-student_loans">
-              <textarea class="doc-input" id="input-raina-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','student_loans')">+ Add</button>
@@ -1091,7 +1103,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-raina-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-raina-misc_bills">
-              <textarea class="doc-input" id="input-raina-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','misc_bills')">+ Add</button>
@@ -1109,7 +1121,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-raina-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-raina-identification_documents">
-              <textarea class="doc-input" id="input-raina-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','identification_documents')">+ Add</button>
@@ -1127,7 +1139,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-raina-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-raina-tax_documents">
-              <textarea class="doc-input" id="input-raina-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','tax_documents')">+ Add</button>
@@ -1145,7 +1157,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-education" style="display:none;">
             <div class="doc-list" id="docs-raina-education"></div>
             <div class="add-doc-area admin-only" id="add-raina-education">
-              <textarea class="doc-input" id="input-raina-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','education')">+ Add</button>
@@ -1163,7 +1175,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-occupational" style="display:none;">
             <div class="doc-list" id="docs-raina-occupational"></div>
             <div class="add-doc-area admin-only" id="add-raina-occupational">
-              <textarea class="doc-input" id="input-raina-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','occupational')">+ Add</button>
@@ -1181,7 +1193,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-legal" style="display:none;">
             <div class="doc-list" id="docs-raina-legal"></div>
             <div class="add-doc-area admin-only" id="add-raina-legal">
-              <textarea class="doc-input" id="input-raina-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','legal')">+ Add</button>
@@ -1199,7 +1211,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-raina-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-raina-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-raina-miscellaneous">
-              <textarea class="doc-input" id="input-raina-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-raina-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-raina-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('raina','miscellaneous')">+ Add</button>
@@ -1228,7 +1240,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-assets" style="display:none;">
             <div class="doc-list" id="docs-liam-assets"></div>
             <div class="add-doc-area admin-only" id="add-liam-assets">
-              <textarea class="doc-input" id="input-liam-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','assets')">+ Add</button>
@@ -1246,7 +1258,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-liam-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-liam-medical_bills">
-              <textarea class="doc-input" id="input-liam-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','medical_bills')">+ Add</button>
@@ -1264,7 +1276,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-student_loans" style="display:none;">
             <div class="doc-list" id="docs-liam-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-liam-student_loans">
-              <textarea class="doc-input" id="input-liam-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','student_loans')">+ Add</button>
@@ -1282,7 +1294,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-liam-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-liam-misc_bills">
-              <textarea class="doc-input" id="input-liam-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','misc_bills')">+ Add</button>
@@ -1300,7 +1312,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-liam-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-liam-identification_documents">
-              <textarea class="doc-input" id="input-liam-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','identification_documents')">+ Add</button>
@@ -1318,7 +1330,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-liam-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-liam-tax_documents">
-              <textarea class="doc-input" id="input-liam-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','tax_documents')">+ Add</button>
@@ -1336,7 +1348,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-education" style="display:none;">
             <div class="doc-list" id="docs-liam-education"></div>
             <div class="add-doc-area admin-only" id="add-liam-education">
-              <textarea class="doc-input" id="input-liam-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','education')">+ Add</button>
@@ -1354,7 +1366,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-occupational" style="display:none;">
             <div class="doc-list" id="docs-liam-occupational"></div>
             <div class="add-doc-area admin-only" id="add-liam-occupational">
-              <textarea class="doc-input" id="input-liam-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','occupational')">+ Add</button>
@@ -1372,7 +1384,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-legal" style="display:none;">
             <div class="doc-list" id="docs-liam-legal"></div>
             <div class="add-doc-area admin-only" id="add-liam-legal">
-              <textarea class="doc-input" id="input-liam-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','legal')">+ Add</button>
@@ -1390,7 +1402,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-liam-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-liam-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-liam-miscellaneous">
-              <textarea class="doc-input" id="input-liam-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-liam-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-liam-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('liam','miscellaneous')">+ Add</button>
@@ -1419,7 +1431,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-assets" style="display:none;">
             <div class="doc-list" id="docs-killian-assets"></div>
             <div class="add-doc-area admin-only" id="add-killian-assets">
-              <textarea class="doc-input" id="input-killian-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','assets')">+ Add</button>
@@ -1437,7 +1449,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-killian-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-killian-medical_bills">
-              <textarea class="doc-input" id="input-killian-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','medical_bills')">+ Add</button>
@@ -1455,7 +1467,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-student_loans" style="display:none;">
             <div class="doc-list" id="docs-killian-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-killian-student_loans">
-              <textarea class="doc-input" id="input-killian-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','student_loans')">+ Add</button>
@@ -1473,7 +1485,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-killian-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-killian-misc_bills">
-              <textarea class="doc-input" id="input-killian-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','misc_bills')">+ Add</button>
@@ -1491,7 +1503,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-killian-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-killian-identification_documents">
-              <textarea class="doc-input" id="input-killian-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','identification_documents')">+ Add</button>
@@ -1509,7 +1521,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-killian-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-killian-tax_documents">
-              <textarea class="doc-input" id="input-killian-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','tax_documents')">+ Add</button>
@@ -1527,7 +1539,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-education" style="display:none;">
             <div class="doc-list" id="docs-killian-education"></div>
             <div class="add-doc-area admin-only" id="add-killian-education">
-              <textarea class="doc-input" id="input-killian-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','education')">+ Add</button>
@@ -1545,7 +1557,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-occupational" style="display:none;">
             <div class="doc-list" id="docs-killian-occupational"></div>
             <div class="add-doc-area admin-only" id="add-killian-occupational">
-              <textarea class="doc-input" id="input-killian-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','occupational')">+ Add</button>
@@ -1563,7 +1575,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-legal" style="display:none;">
             <div class="doc-list" id="docs-killian-legal"></div>
             <div class="add-doc-area admin-only" id="add-killian-legal">
-              <textarea class="doc-input" id="input-killian-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','legal')">+ Add</button>
@@ -1581,7 +1593,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-killian-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-killian-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-killian-miscellaneous">
-              <textarea class="doc-input" id="input-killian-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-killian-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-killian-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('killian','miscellaneous')">+ Add</button>
@@ -1610,7 +1622,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-assets" style="display:none;">
             <div class="doc-list" id="docs-devon-assets"></div>
             <div class="add-doc-area admin-only" id="add-devon-assets">
-              <textarea class="doc-input" id="input-devon-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','assets')">+ Add</button>
@@ -1628,7 +1640,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-devon-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-devon-medical_bills">
-              <textarea class="doc-input" id="input-devon-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','medical_bills')">+ Add</button>
@@ -1646,7 +1658,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-student_loans" style="display:none;">
             <div class="doc-list" id="docs-devon-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-devon-student_loans">
-              <textarea class="doc-input" id="input-devon-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','student_loans')">+ Add</button>
@@ -1664,7 +1676,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-devon-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-devon-misc_bills">
-              <textarea class="doc-input" id="input-devon-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','misc_bills')">+ Add</button>
@@ -1682,7 +1694,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-devon-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-devon-identification_documents">
-              <textarea class="doc-input" id="input-devon-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','identification_documents')">+ Add</button>
@@ -1700,7 +1712,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-devon-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-devon-tax_documents">
-              <textarea class="doc-input" id="input-devon-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','tax_documents')">+ Add</button>
@@ -1718,7 +1730,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-education" style="display:none;">
             <div class="doc-list" id="docs-devon-education"></div>
             <div class="add-doc-area admin-only" id="add-devon-education">
-              <textarea class="doc-input" id="input-devon-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','education')">+ Add</button>
@@ -1736,7 +1748,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-occupational" style="display:none;">
             <div class="doc-list" id="docs-devon-occupational"></div>
             <div class="add-doc-area admin-only" id="add-devon-occupational">
-              <textarea class="doc-input" id="input-devon-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','occupational')">+ Add</button>
@@ -1754,7 +1766,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-legal" style="display:none;">
             <div class="doc-list" id="docs-devon-legal"></div>
             <div class="add-doc-area admin-only" id="add-devon-legal">
-              <textarea class="doc-input" id="input-devon-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','legal')">+ Add</button>
@@ -1772,7 +1784,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-devon-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-devon-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-devon-miscellaneous">
-              <textarea class="doc-input" id="input-devon-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-devon-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-devon-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('devon','miscellaneous')">+ Add</button>
@@ -1801,7 +1813,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-assets" style="display:none;">
             <div class="doc-list" id="docs-lane-assets"></div>
             <div class="add-doc-area admin-only" id="add-lane-assets">
-              <textarea class="doc-input" id="input-lane-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','assets')">+ Add</button>
@@ -1819,7 +1831,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-lane-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-lane-medical_bills">
-              <textarea class="doc-input" id="input-lane-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','medical_bills')">+ Add</button>
@@ -1837,7 +1849,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-student_loans" style="display:none;">
             <div class="doc-list" id="docs-lane-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-lane-student_loans">
-              <textarea class="doc-input" id="input-lane-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','student_loans')">+ Add</button>
@@ -1855,7 +1867,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-lane-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-lane-misc_bills">
-              <textarea class="doc-input" id="input-lane-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','misc_bills')">+ Add</button>
@@ -1873,7 +1885,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-lane-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-lane-identification_documents">
-              <textarea class="doc-input" id="input-lane-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','identification_documents')">+ Add</button>
@@ -1891,7 +1903,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-lane-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-lane-tax_documents">
-              <textarea class="doc-input" id="input-lane-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','tax_documents')">+ Add</button>
@@ -1909,7 +1921,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-education" style="display:none;">
             <div class="doc-list" id="docs-lane-education"></div>
             <div class="add-doc-area admin-only" id="add-lane-education">
-              <textarea class="doc-input" id="input-lane-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','education')">+ Add</button>
@@ -1927,7 +1939,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-occupational" style="display:none;">
             <div class="doc-list" id="docs-lane-occupational"></div>
             <div class="add-doc-area admin-only" id="add-lane-occupational">
-              <textarea class="doc-input" id="input-lane-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','occupational')">+ Add</button>
@@ -1945,7 +1957,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-legal" style="display:none;">
             <div class="doc-list" id="docs-lane-legal"></div>
             <div class="add-doc-area admin-only" id="add-lane-legal">
-              <textarea class="doc-input" id="input-lane-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','legal')">+ Add</button>
@@ -1963,7 +1975,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-lane-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-lane-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-lane-miscellaneous">
-              <textarea class="doc-input" id="input-lane-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-lane-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-lane-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('lane','miscellaneous')">+ Add</button>
@@ -1992,7 +2004,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-assets" style="display:none;">
             <div class="doc-list" id="docs-austin-assets"></div>
             <div class="add-doc-area admin-only" id="add-austin-assets">
-              <textarea class="doc-input" id="input-austin-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','assets')">+ Add</button>
@@ -2010,7 +2022,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-austin-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-austin-medical_bills">
-              <textarea class="doc-input" id="input-austin-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','medical_bills')">+ Add</button>
@@ -2028,7 +2040,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-student_loans" style="display:none;">
             <div class="doc-list" id="docs-austin-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-austin-student_loans">
-              <textarea class="doc-input" id="input-austin-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','student_loans')">+ Add</button>
@@ -2046,7 +2058,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-austin-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-austin-misc_bills">
-              <textarea class="doc-input" id="input-austin-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','misc_bills')">+ Add</button>
@@ -2064,7 +2076,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-austin-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-austin-identification_documents">
-              <textarea class="doc-input" id="input-austin-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','identification_documents')">+ Add</button>
@@ -2082,7 +2094,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-austin-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-austin-tax_documents">
-              <textarea class="doc-input" id="input-austin-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','tax_documents')">+ Add</button>
@@ -2100,7 +2112,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-education" style="display:none;">
             <div class="doc-list" id="docs-austin-education"></div>
             <div class="add-doc-area admin-only" id="add-austin-education">
-              <textarea class="doc-input" id="input-austin-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','education')">+ Add</button>
@@ -2118,7 +2130,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-occupational" style="display:none;">
             <div class="doc-list" id="docs-austin-occupational"></div>
             <div class="add-doc-area admin-only" id="add-austin-occupational">
-              <textarea class="doc-input" id="input-austin-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','occupational')">+ Add</button>
@@ -2136,7 +2148,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-legal" style="display:none;">
             <div class="doc-list" id="docs-austin-legal"></div>
             <div class="add-doc-area admin-only" id="add-austin-legal">
-              <textarea class="doc-input" id="input-austin-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','legal')">+ Add</button>
@@ -2154,7 +2166,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-austin-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-austin-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-austin-miscellaneous">
-              <textarea class="doc-input" id="input-austin-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-austin-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-austin-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('austin','miscellaneous')">+ Add</button>
@@ -2183,7 +2195,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-assets" style="display:none;">
             <div class="doc-list" id="docs-pets-assets"></div>
             <div class="add-doc-area admin-only" id="add-pets-assets">
-              <textarea class="doc-input" id="input-pets-assets" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-assets" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-assets" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','assets')">+ Add</button>
@@ -2201,7 +2213,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-medical_bills" style="display:none;">
             <div class="doc-list" id="docs-pets-medical_bills"></div>
             <div class="add-doc-area admin-only" id="add-pets-medical_bills">
-              <textarea class="doc-input" id="input-pets-medical_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-medical_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-medical_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','medical_bills')">+ Add</button>
@@ -2219,7 +2231,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-student_loans" style="display:none;">
             <div class="doc-list" id="docs-pets-student_loans"></div>
             <div class="add-doc-area admin-only" id="add-pets-student_loans">
-              <textarea class="doc-input" id="input-pets-student_loans" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-student_loans" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-student_loans" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','student_loans')">+ Add</button>
@@ -2237,7 +2249,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-misc_bills" style="display:none;">
             <div class="doc-list" id="docs-pets-misc_bills"></div>
             <div class="add-doc-area admin-only" id="add-pets-misc_bills">
-              <textarea class="doc-input" id="input-pets-misc_bills" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-misc_bills" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-misc_bills" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','misc_bills')">+ Add</button>
@@ -2255,7 +2267,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-identification_documents" style="display:none;">
             <div class="doc-list" id="docs-pets-identification_documents"></div>
             <div class="add-doc-area admin-only" id="add-pets-identification_documents">
-              <textarea class="doc-input" id="input-pets-identification_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-identification_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-identification_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','identification_documents')">+ Add</button>
@@ -2273,7 +2285,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-tax_documents" style="display:none;">
             <div class="doc-list" id="docs-pets-tax_documents"></div>
             <div class="add-doc-area admin-only" id="add-pets-tax_documents">
-              <textarea class="doc-input" id="input-pets-tax_documents" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-tax_documents" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-tax_documents" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','tax_documents')">+ Add</button>
@@ -2291,7 +2303,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-education" style="display:none;">
             <div class="doc-list" id="docs-pets-education"></div>
             <div class="add-doc-area admin-only" id="add-pets-education">
-              <textarea class="doc-input" id="input-pets-education" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-education" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-education" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','education')">+ Add</button>
@@ -2309,7 +2321,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-occupational" style="display:none;">
             <div class="doc-list" id="docs-pets-occupational"></div>
             <div class="add-doc-area admin-only" id="add-pets-occupational">
-              <textarea class="doc-input" id="input-pets-occupational" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-occupational" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-occupational" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','occupational')">+ Add</button>
@@ -2327,7 +2339,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-legal" style="display:none;">
             <div class="doc-list" id="docs-pets-legal"></div>
             <div class="add-doc-area admin-only" id="add-pets-legal">
-              <textarea class="doc-input" id="input-pets-legal" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-legal" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-legal" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','legal')">+ Add</button>
@@ -2345,7 +2357,7 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
           <div class="section-body" id="body-pets-miscellaneous" style="display:none;">
             <div class="doc-list" id="docs-pets-miscellaneous"></div>
             <div class="add-doc-area admin-only" id="add-pets-miscellaneous">
-              <textarea class="doc-input" id="input-pets-miscellaneous" placeholder="Paste or type document content here..."></textarea>
+              <div class="doc-input" id="input-pets-miscellaneous" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>
               <div class="doc-form-row">
                 <input type="text" class="doc-title-input" id="title-pets-miscellaneous" placeholder="Document title...">
                 <button class="doc-add-btn" onclick="addDoc('pets','miscellaneous')">+ Add</button>
@@ -2423,7 +2435,7 @@ function buildPanel(pid, name) {
       '<div class="section-body" id="body-'+pid+'-'+sid+'" style="display:none;">' +
         '<div class="doc-list" id="docs-'+pid+'-'+sid+'"></div>' +
         (ADMIN ? '<div class="add-doc-area" id="add-'+pid+'-'+sid+'">' +
-          '<textarea class="doc-input" id="input-'+pid+'-'+sid+'" placeholder="Paste or type document content here..."></textarea>' +
+          '<div class="doc-input" id="input-'+pid+'-'+sid+'" contenteditable="true" data-placeholder="Paste or type document content here... (images supported)"></div>' +
           '<div class="doc-form-row">' +
             '<input type="text" class="doc-title-input" id="title-'+pid+'-'+sid+'" placeholder="Document title...">' +
             '<button class="doc-add-btn" onclick="addDoc(\''+pid+'\',\''+sid+'\')">+ Add</button>' +
@@ -2553,7 +2565,7 @@ function renderSection(pid, sid, docs) {
           '</div>' +
         '</div>' +
       '</div>' +
-      '<div class="doc-card-body" id="docbody-'+pid+'-'+sid+'-'+i+'">' + escHtml(d.body||'') + '</div>' +
+      '<div class="doc-card-body" id="docbody-'+pid+'-'+sid+'-'+i+'">' + (d.isHtml ? (d.body||'') : escHtml(d.body||'')) + '</div>' +
       (preview ? '<button class="doc-expand-btn" onclick="toggleExpand(\''+pid+'\',\''+sid+'\','+i+')">▼ Show more</button>' : '') +
     '</div>';
   });
@@ -2573,18 +2585,19 @@ function addDoc(pid, sid) {
   var titleEl = document.getElementById('title-' + pid + '-' + sid);
   var inputEl = document.getElementById('input-' + pid + '-' + sid);
   var title = titleEl ? titleEl.value.trim() : '';
-  var body = inputEl ? inputEl.value.trim() : '';
-  if (!title && !body) { alert('Please enter a title or content.'); return; }
+  var body = inputEl ? inputEl.innerHTML.trim() : '';
+  var bodyText = inputEl ? inputEl.innerText.trim() : '';
+  if (!title && !bodyText) { alert('Please enter a title or content.'); return; }
   var c = window._docsCache;
   if (!c[pid]) c[pid] = {};
   if (!c[pid][sid]) c[pid][sid] = [];
   var now = new Date();
   var dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-  c[pid][sid].push({ id: Date.now().toString(), title: title || 'Untitled', body: body, date: dateStr });
+  c[pid][sid].push({ id: Date.now().toString(), title: title || 'Untitled', body: body, isHtml: true, date: dateStr });
   window._scheduleSave();
   renderPerson(pid);
   if (titleEl) titleEl.value = '';
-  if (inputEl) inputEl.value = '';
+  if (inputEl) inputEl.innerHTML = '';
 }
 
 function delDoc(pid, sid, i) {
@@ -2619,7 +2632,7 @@ function openEditModal(pid, sid, i) {
   if (!d) return;
   _editCtx = { pid: pid, sid: sid, i: i };
   document.getElementById('edit-title-input').value = d.title || '';
-  document.getElementById('edit-body-input').value = d.body || '';
+  document.getElementById('edit-body-input').innerHTML = d.body || '';
   document.getElementById('edit-modal').classList.add('open');
   setTimeout(function() { document.getElementById('edit-title-input').focus(); }, 100);
 }
@@ -2634,7 +2647,8 @@ function saveEdit() {
   var d = (c[pid][sid]||[])[i];
   if (!d) return;
   d.title = document.getElementById('edit-title-input').value.trim() || 'Untitled';
-  d.body  = document.getElementById('edit-body-input').value;
+  d.body  = document.getElementById('edit-body-input').innerHTML;
+  d.isHtml = true;
   d.edited = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
   window._scheduleSave();
   renderPerson(pid);
@@ -2667,7 +2681,7 @@ function escHtml(s) {
   <div class="edit-modal">
     <h3>✏️ Edit Document</h3>
     <input type="text" id="edit-title-input" placeholder="Document title...">
-    <textarea id="edit-body-input" placeholder="Document content..."></textarea>
+    <div id="edit-body-input" contenteditable="true" data-placeholder="Document content... (images supported)" style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:13px;padding:10px 12px;font-family:'Nunito Sans',sans-serif;min-height:200px;line-height:1.6;overflow-y:auto;word-break:break-word;flex:1;"></div>
     <div class="edit-modal-btns">
       <button class="edit-cancel" onclick="closeEditModal()">Cancel</button>
       <button class="edit-save" onclick="saveEdit()">Save Changes</button>
