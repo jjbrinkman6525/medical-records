@@ -240,13 +240,17 @@ mark{background:rgba(96,165,250,.25);color:var(--ac);padding:0 2px;border-radius
 .pm-msg:first-child{margin-top:14px}
 .pm-msg.msg-blue{background:linear-gradient(135deg,rgba(96,165,250,.07) 0%,rgba(129,140,248,.05) 100%);border-color:rgba(96,165,250,.35);box-shadow:0 0 18px rgba(96,165,250,.18),0 0 6px rgba(96,165,250,.12),inset 0 0 20px rgba(96,165,250,.04)}
 .pm-msg.msg-orange{background:linear-gradient(135deg,rgba(251,146,60,.07) 0%,rgba(251,191,36,.04) 100%);border-color:rgba(251,146,60,.35);box-shadow:0 0 18px rgba(251,146,60,.18),0 0 6px rgba(251,146,60,.12),inset 0 0 20px rgba(251,146,60,.04)}
-.pm-msg-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-.pm-msg-from{font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.pm-msg-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.pm-msg-participants{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.pm-msg-from-row{display:flex;align-items:baseline;gap:7px}
+.pm-msg-from-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-family:'IBM Plex Mono',monospace;color:var(--tx3);font-weight:500;min-width:28px}
+.pm-msg-from{font-size:22px;font-family:'IBM Plex Mono',monospace;font-weight:700;line-height:1.15}
 .pm-msg-from.sent{color:var(--ac)}
 .pm-msg-from.recv{color:var(--gn)}
-.pm-msg-arrow{color:var(--tx3);font-size:11px}
-.pm-msg-to{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--tx3)}
-.pm-msg-ts{font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-left:auto}
+.pm-msg-to-row{display:flex;align-items:baseline;gap:7px}
+.pm-msg-to-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-family:'IBM Plex Mono',monospace;color:var(--tx3);font-weight:500;min-width:28px}
+.pm-msg-to{font-size:18px;font-family:'IBM Plex Mono',monospace;color:var(--tx2);font-weight:600;line-height:1.15}
+.pm-msg-ts{font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap;padding-top:3px}
 .pm-msg-body{font-size:13px;color:var(--tx);line-height:1.7;word-break:break-word}
 .pm-msg-body ul,.pm-msg-body ol{padding-left:20px;margin:4px 0}
 .pm-msg-body blockquote{border-left:3px solid var(--ac2);padding-left:10px;color:var(--tx2);margin:4px 0}
@@ -2311,9 +2315,11 @@ function rPM(){
       var glowCls=mi%2===0?'msg-blue':'msg-orange';
       h+='<div class="pm-msg '+glowCls+'" id="pmm-'+m.id+'">';
       h+='<div class="pm-msg-hd">';
-      h+='<span class="pm-msg-from '+(isSent?'sent':'recv')+'">'+esc(m.from||'—')+'</span>';
-      if(m.to)h+='<span class="pm-msg-arrow">→</span><span class="pm-msg-to">'+esc(m.to)+'</span>';
-      h+='<span class="pm-msg-ts">'+esc(m.date||'')+(m.time?' '+esc(m.time):'')+'</span>';
+      h+='<div class="pm-msg-participants">';
+      h+='<div class="pm-msg-from-row"><span class="pm-msg-from-label">From</span><span class="pm-msg-from '+(isSent?'sent':'recv')+'">'+esc(m.from||'—')+'</span></div>';
+      if(m.to)h+='<div class="pm-msg-to-row"><span class="pm-msg-to-label">To</span><span class="pm-msg-to">'+esc(m.to)+'</span></div>';
+      h+='</div>';
+      h+='<span class="pm-msg-ts">'+esc(m.date||'')+(m.time?'<br>'+esc(m.time):'')+'</span>';
       h+='</div>';
       h+='<div class="pm-msg-body">'+(m.body||'')+'</div>';
       if(m.imgs&&m.imgs.length){h+='<div class="pm-msg-imgs">';m.imgs.forEach(function(u){if(u)h+='<img src="'+esc(u)+'" class="img-thumb" onclick="openLightbox(this)" alt="image">'});h+='</div>';}
