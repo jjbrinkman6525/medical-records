@@ -2595,6 +2595,12 @@ function addDoc(pid, sid) {
   if (!c[pid][sid]) c[pid][sid] = [];
   var now = new Date();
   var dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  // Warn if content is very large (Firestore doc limit ~1MB total)
+  var bodySizeKB = Math.round((new TextEncoder().encode(JSON.stringify(body)).length) / 1024);
+  if (bodySizeKB > 700) {
+    alert('This entry is very large (' + bodySizeKB + 'KB). Try using fewer or smaller images to ensure it saves reliably.');
+    return;
+  }
   c[pid][sid].push({ id: Date.now().toString(), title: title || 'Untitled', body: body, isHtml: true, date: dateStr });
   window._scheduleSave();
   renderPerson(pid);
@@ -2691,30 +2697,44 @@ document.addEventListener('paste', function(e) {
   var blob = imageItem.getAsFile();
   if (!blob) return;
 
+  // Compress image before inserting to keep Firestore under 1MB limit
   var reader = new FileReader();
   reader.onload = function(ev) {
-    var dataUrl = ev.target.result;
-    // Insert image at cursor position inside the contenteditable
-    var img = document.createElement('img');
-    img.src = dataUrl;
-    img.style.maxWidth = '100%';
-    img.style.borderRadius = '6px';
-    img.style.margin = '8px 0';
-    img.style.display = 'block';
+    var original = ev.target.result;
+    var tempImg = new Image();
+    tempImg.onload = function() {
+      var canvas = document.createElement('canvas');
+      // Max 1200px wide, maintain aspect ratio
+      var maxW = 1200;
+      var scale = tempImg.width > maxW ? maxW / tempImg.width : 1;
+      canvas.width = Math.round(tempImg.width * scale);
+      canvas.height = Math.round(tempImg.height * scale);
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+      // Compress to JPEG at 75% quality
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.75);
 
-    var sel = window.getSelection();
-    if (sel && sel.rangeCount) {
-      var range = sel.getRangeAt(0);
-      range.deleteContents();
-      range.insertNode(img);
-      // Move cursor after image
-      range.setStartAfter(img);
-      range.setEndAfter(img);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    } else {
-      target.appendChild(img);
-    }
+      var img = document.createElement('img');
+      img.src = dataUrl;
+      img.style.maxWidth = '100%';
+      img.style.borderRadius = '6px';
+      img.style.margin = '8px 0';
+      img.style.display = 'block';
+
+      var sel = window.getSelection();
+      if (sel && sel.rangeCount) {
+        var range = sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(img);
+        range.setStartAfter(img);
+        range.setEndAfter(img);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        target.appendChild(img);
+      }
+    };
+    tempImg.src = original;
   };
   reader.readAsDataURL(blob);
 });
