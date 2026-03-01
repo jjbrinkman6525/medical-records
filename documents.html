@@ -324,6 +324,78 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
   .folder-body { padding: 16px; border-radius: 0 8px 8px 8px; }
   .panel-name { font-size: 18px; }
 }
+
+/* ── Doc action buttons ── */
+.doc-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.doc-action-btn {
+  background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px;
+  color: var(--tx3); font-size: 11px; padding: 3px 8px; cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif; white-space: nowrap;
+  transition: all 0.15s; opacity: 0;
+}
+.doc-card:hover .doc-action-btn { opacity: 1; }
+.doc-action-btn:hover { color: var(--tx); border-color: var(--ac); }
+.doc-action-btn.del:hover { color: var(--rd); border-color: var(--rd); }
+.doc-action-btn.print:hover { color: var(--gn); border-color: var(--gn); }
+.doc-action-btn.edit:hover { color: var(--yl); border-color: var(--yl); }
+
+/* ── Edit modal ── */
+.edit-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 500;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.edit-modal-overlay.open { display: flex; }
+.edit-modal {
+  background: linear-gradient(to bottom, #1a1208 0%, #3a2c1c 100%);
+  border: 1px solid var(--bd); border-radius: 14px;
+  padding: 24px; width: 100%; max-width: 600px;
+  display: flex; flex-direction: column; gap: 12px;
+  max-height: 90vh;
+}
+.edit-modal h3 { font-family: 'Nunito', sans-serif; font-size: 16px; color: var(--ac); }
+.edit-modal input {
+  background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px;
+  color: var(--tx); font-size: 14px; padding: 10px 12px;
+  font-family: 'Nunito Sans', sans-serif; width: 100%;
+}
+.edit-modal textarea {
+  background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px;
+  color: var(--tx); font-size: 13px; padding: 10px 12px;
+  font-family: 'Nunito Sans', sans-serif; width: 100%;
+  min-height: 200px; resize: vertical; line-height: 1.6; flex: 1;
+  overflow-y: auto;
+}
+.edit-modal input:focus, .edit-modal textarea:focus { outline: none; border-color: var(--ac); }
+.edit-modal-btns { display: flex; gap: 10px; }
+.edit-modal-btns button {
+  flex: 1; padding: 10px; border-radius: 8px;
+  font-size: 14px; font-weight: 700; cursor: pointer; border: none;
+  font-family: 'Nunito', sans-serif;
+}
+.edit-save { background: var(--ac); color: #1a1510; }
+.edit-cancel { background: var(--sf2); color: var(--tx2); }
+
+/* ── Print styles ── */
+@media print {
+  body > *:not(#print-frame) { display: none !important; }
+  #print-frame { display: block !important; }
+}
+#print-frame {
+  display: none;
+  position: fixed; inset: 0; background: white; z-index: 9999;
+  padding: 40px; font-family: Georgia, serif; color: #000;
+  overflow: auto;
+}
+#print-frame h2 { font-size: 20px; margin-bottom: 4px; }
+#print-frame .print-meta { font-size: 12px; color: #666; margin-bottom: 20px; }
+#print-frame .print-body { font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
+#print-frame .print-close {
+  position: fixed; top: 16px; right: 16px;
+  background: #333; color: #fff; border: none; border-radius: 6px;
+  padding: 8px 14px; cursor: pointer; font-size: 13px;
+}
+
 </style>
 </head>
 <body>
@@ -2472,8 +2544,14 @@ function renderSection(pid, sid, docs) {
     html += '<div class="doc-card">' +
       '<div class="doc-card-header">' +
         '<div class="doc-card-title">📄 ' + escHtml(d.title||'Untitled') + '</div>' +
-        '<div class="doc-card-date">' + (d.date||'') + '</div>' +
-        (ADMIN ? '<button class="doc-del-btn" onclick="delDoc(\''+pid+'\',\''+sid+'\','+i+')" title="Delete">✕</button>' : '') +
+        '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
+          '<div class="doc-card-date">' + (d.date||'') + '</div>' +
+          '<div class="doc-actions">' +
+            '<button class="doc-action-btn print" onclick="printDoc(\''+pid+'\',\''+sid+'\','+i+')">🖨 Print</button>' +
+            (ADMIN ? '<button class="doc-action-btn edit" onclick="openEditModal(\''+pid+'\',\''+sid+'\','+i+')">✏️ Edit</button>' : '') +
+            (ADMIN ? '<button class="doc-action-btn del" onclick="delDoc(\''+pid+'\',\''+sid+'\','+i+')">✕ Delete</button>' : '') +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="doc-card-body" id="docbody-'+pid+'-'+sid+'-'+i+'">' + escHtml(d.body||'') + '</div>' +
       (preview ? '<button class="doc-expand-btn" onclick="toggleExpand(\''+pid+'\',\''+sid+'\','+i+')">▼ Show more</button>' : '') +
@@ -2517,10 +2595,85 @@ function delDoc(pid, sid, i) {
   renderPerson(pid);
 }
 
+
+// ── Print ─────────────────────────────────────────────────────────────────
+function printDoc(pid, sid, i) {
+  var c = window._docsCache;
+  var d = (c[pid][sid]||[])[i];
+  if (!d) return;
+  document.getElementById('print-title').textContent = d.title || 'Untitled';
+  document.getElementById('print-meta').textContent = sid.replace(/_/g,' ') + '  ·  ' + (d.date||'');
+  document.getElementById('print-body').textContent = d.body || '';
+  document.getElementById('print-frame').style.display = 'block';
+  setTimeout(function() { window.print(); }, 200);
+}
+function closePrint() {
+  document.getElementById('print-frame').style.display = 'none';
+}
+
+// ── Edit modal ────────────────────────────────────────────────────────────
+var _editCtx = null;
+function openEditModal(pid, sid, i) {
+  var c = window._docsCache;
+  var d = (c[pid][sid]||[])[i];
+  if (!d) return;
+  _editCtx = { pid: pid, sid: sid, i: i };
+  document.getElementById('edit-title-input').value = d.title || '';
+  document.getElementById('edit-body-input').value = d.body || '';
+  document.getElementById('edit-modal').classList.add('open');
+  setTimeout(function() { document.getElementById('edit-title-input').focus(); }, 100);
+}
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  _editCtx = null;
+}
+function saveEdit() {
+  if (!_editCtx) return;
+  var pid = _editCtx.pid, sid = _editCtx.sid, i = _editCtx.i;
+  var c = window._docsCache;
+  var d = (c[pid][sid]||[])[i];
+  if (!d) return;
+  d.title = document.getElementById('edit-title-input').value.trim() || 'Untitled';
+  d.body  = document.getElementById('edit-body-input').value;
+  d.edited = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  window._scheduleSave();
+  renderPerson(pid);
+  closeEditModal();
+}
+// Close edit modal on overlay click
+document.addEventListener('DOMContentLoaded', function() {
+  var overlay = document.getElementById('edit-modal');
+  if (overlay) overlay.addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+  });
+});
+
 // ── Util ──────────────────────────────────────────────────────────────────
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
+
+<!-- Print Frame -->
+<div id="print-frame">
+  <button class="print-close" onclick="closePrint()">✕ Close</button>
+  <h2 id="print-title"></h2>
+  <div class="print-meta" id="print-meta"></div>
+  <div class="print-body" id="print-body"></div>
+</div>
+
+<!-- Edit Modal -->
+<div class="edit-modal-overlay" id="edit-modal">
+  <div class="edit-modal">
+    <h3>✏️ Edit Document</h3>
+    <input type="text" id="edit-title-input" placeholder="Document title...">
+    <textarea id="edit-body-input" placeholder="Document content..."></textarea>
+    <div class="edit-modal-btns">
+      <button class="edit-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="edit-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
