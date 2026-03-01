@@ -110,6 +110,14 @@ background:rgba(251,191,36,.15);color:var(--yl)}.cat-Neurological{background:rgb
 .cc h3{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--tx2);margin-bottom:12px}
 .cc canvas{max-height:280px}
 .imr{color:var(--tx2);font-size:13px;white-space:pre-wrap;word-break:break-word;font-family:'IBM Plex Mono',monospace;line-height:1.7}
+
+.paste-zone{border:2px dashed var(--bd);border-radius:8px;padding:16px;text-align:center;color:var(--tx3);font-size:13px;font-family:'IBM Plex Mono',monospace;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:8px;min-height:60px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+.paste-zone:hover,.paste-zone.drag-over{border-color:var(--ac);background:rgba(96,165,250,.06);color:var(--ac)}
+.paste-zone.has-images{border-style:solid;border-color:rgba(167,139,250,.5)}
+.pasted-img-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.pasted-img-item{position:relative;width:80px;height:80px}
+.pasted-img-item img{width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid var(--bd)}
+.pasted-img-item button{position:absolute;top:-6px;right:-6px;background:var(--rd);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
 mark{background:rgba(96,165,250,.25);color:var(--ac);padding:0 2px;border-radius:2px}
 .badge{background:var(--sf3);color:var(--tx3);font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px;font-family:'IBM Plex Mono',monospace}
 .img-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -314,10 +322,16 @@ mark{background:rgba(96,165,250,.25);color:var(--ac);padding:0 2px;border-radius
 <div class="ir"><input id="i-f" placeholder="Facility" style="flex:1"><input id="i-dr" placeholder="Radiologist" style="flex:1"></div>
 <textarea class="fi" id="i-rpt" placeholder="Full imaging report" style="min-height:120px"></textarea>
 <textarea class="fi" id="i-nt" placeholder="YOUR NOTES"></textarea>
-<div style="margin-bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Images (Google Drive links)</div>
-<div style="font-size:11px;color:var(--tx3);margin-bottom:8px">In Drive: right-click image → Share → Copy link. Paste below. Visible to all viewers.</div>
+<div style="margin-bottom:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Images</div>
+<div class="pasted-img-wrap" id="i-pasted-wrap"></div>
+<div class="paste-zone" id="i-paste-zone" tabindex="0" onclick="document.getElementById('i-file-input').click()" onpaste="handleImgPaste(event,'i-pasted-wrap','i-paste-zone')" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleImgDrop(event,'i-pasted-wrap','i-paste-zone')">
+  <span>&#128203; Paste screenshot here (Ctrl+V) or click to upload</span>
+  <span style="font-size:11px;opacity:.6">PNG, JPG, GIF supported</span>
+</div>
+<input type="file" id="i-file-input" accept="image/*" multiple style="display:none" onchange="handleImgFileInput(event,'i-pasted-wrap','i-paste-zone')">
+<div style="margin-bottom:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--tx3)">— or paste a Google Drive link —</div>
 <div id="i-imgs-wrap"></div>
-<button class="img-add-btn" onclick="addImgRow('i-imgs-wrap')">+ Add Image URL</button>
+<button class="img-add-btn" onclick="addImgRow('i-imgs-wrap')">+ Add Drive URL</button>
 <div><button class="bt" onclick="aI()">Save Report</button><span class="sm" id="sv-i">Saved</span></div></div></div>
 <div id="il"></div></div>
 <div class="tc on" id="tab-timeline"><div class="adm ia cl" id="ia-e"><h3 onclick="tia('ia-e')">+ ADD EVENT</h3><div class="ib">
@@ -561,7 +575,7 @@ function sSr(){var t1,t2,t3;document.getElementById('si').addEventListener('inpu
 
 function aV(){if(!ADMIN)return;var d=document.getElementById('v-d').value;if(!d){alert('Date required');return}var e={d:d,t:document.getElementById('v-t').value,f:document.getElementById('v-f').value,dr:document.getElementById('v-dr').value,dn:document.getElementById('v-dn').value,lb:document.getElementById('v-lb').value,im:document.getElementById('v-im').value,vt:document.getElementById('v-vt').value,mx:document.getElementById('v-mx').value,dx:document.getElementById('v-dx').value,mr:document.getElementById('v-mr').value,nt:document.getElementById('v-nt').value,id:Date.now()};var a=gU('v');a.push(e);sU('v',a);['v-t','v-f','v-dr','v-dn','v-lb','v-im','v-vt','v-mx','v-dx','v-mr','v-nt'].forEach(function(x){document.getElementById(x).value=''});fl('sv-v');rV();bSt()}
 function aL(){if(!ADMIN)return;var d=document.getElementById('l-d').value;if(!d){alert('Date required');return}var e={date:d,source:document.getElementById('l-src').value,id:Date.now()};['hgb','hct','wbc','plt','rdw','mcv','mch','iron','ferritin','fe_sat','esr','crp','anc','potassium','glucose','lactic'].forEach(function(k){var v=parseFloat(document.getElementById('l-'+k).value);if(!isNaN(v))e[k]=v});if(Object.keys(e).length<=3){alert('Enter at least one value');return}var a=gU('l');a.push(e);sU('l',a);['l-src','l-hgb','l-hct','l-wbc','l-plt','l-rdw','l-mcv','l-mch','l-iron','l-ferritin','l-fe_sat','l-esr','l-crp','l-anc','l-potassium','l-glucose','l-lactic'].forEach(function(x){document.getElementById(x).value=''});fl('sv-l');bSt()}
-function aI(){if(!ADMIN)return;var d=document.getElementById('i-d').value,rpt=document.getElementById('i-rpt').value;if(!d||!rpt){alert('Date and report required');return}var imgs=collectImgUrls('i-imgs-wrap');var e={date:d,type:document.getElementById('i-t').value,facility:document.getElementById('i-f').value,doctor:document.getElementById('i-dr').value,report:rpt,notes:document.getElementById('i-nt').value,id:Date.now()};if(imgs.length)e.imgs=imgs;var a=gU('i');a.push(e);sU('i',a);['i-t','i-f','i-dr','i-rpt','i-nt'].forEach(function(x){document.getElementById(x).value=''});document.getElementById('i-imgs-wrap').innerHTML='';fl('sv-i');rI();bSt()}
+function aI(){if(!ADMIN)return;var d=document.getElementById('i-d').value,rpt=document.getElementById('i-rpt').value;if(!d||!rpt){alert('Date and report required');return}var imgs=collectImgUrls('i-imgs-wrap').concat(collectPastedImgUrls('i-pasted-wrap'));var e={date:d,type:document.getElementById('i-t').value,facility:document.getElementById('i-f').value,doctor:document.getElementById('i-dr').value,report:rpt,notes:document.getElementById('i-nt').value,id:Date.now()};if(imgs.length)e.imgs=imgs;var a=gU('i');a.push(e);sU('i',a);['i-t','i-f','i-dr','i-rpt','i-nt'].forEach(function(x){document.getElementById(x).value=''});document.getElementById('i-imgs-wrap').innerHTML='';clearPastedImgs('i-pasted-wrap','i-paste-zone');fl('sv-i');rI();bSt()}
 function aE(){if(!ADMIN)return;var d=document.getElementById('e-d').value,lb=document.getElementById('e-lb').value;if(!d||!lb){alert('Date and description required');return}var e={date:d,type:document.getElementById('e-t').value,label:lb,id:Date.now()};var a=gU('e');a.push(e);sU('e',a);document.getElementById('e-lb').value='';fl('sv-e');rTL()}
 function aJ(){if(!ADMIN)return;var d=document.getElementById('j-d').value,tx=document.getElementById('j-tx').value.trim();if(!d||!tx){alert('Date and text required');return}var tempToday=document.getElementById('j-temp-today').value,baroToday=document.getElementById('j-baro-today').value,tempPrior=document.getElementById('j-temp-prior').value,baroPrior=document.getElementById('j-baro-prior').value,loc=document.getElementById('j-loc').value.trim(),wx=document.getElementById('j-wx').value.trim();var imgs=collectImgUrls('j-imgs-wrap');var e={date:d,time:document.getElementById('j-tm').value,category:document.getElementById('j-c').value,message:tx,platform:'Dashboard',id:Date.now()};if(loc)e.location=loc;if(tempToday!=='')e.tempToday=parseFloat(tempToday);if(baroToday!=='')e.baroToday=parseFloat(baroToday);if(tempPrior!=='')e.tempPrior=parseFloat(tempPrior);if(baroPrior!=='')e.baroPrior=parseFloat(baroPrior);if(wx)e.wxNarrative=wx;if(imgs.length)e.imgs=imgs;var a=gU('j');a.push(e);sU('j',a);document.getElementById('j-tx').value='';document.getElementById('j-tm').value=nt();document.getElementById('j-loc').value='';document.getElementById('j-temp-today').value='';document.getElementById('j-baro-today').value='';document.getElementById('j-temp-prior').value='';document.getElementById('j-baro-prior').value='';document.getElementById('j-baro-prior').value='';document.getElementById('j-wx').value='';document.getElementById('j-imgs-wrap').innerHTML='';fl('sv-j');rJ();bSt()}
 
@@ -647,6 +661,112 @@ function closeModal(){document.getElementById('modal-root').innerHTML=''}
 
 function driveUrl(u){if(!u)return u;var m=u.match(/\/d\/([a-zA-Z0-9_-]+)/);if(m)return'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w800';return u}
 function showImg(url){var lb=document.createElement('div');lb.className='img-lightbox';lb.innerHTML='<span class="img-lightbox-close" onclick="this.parentNode.remove()">&#10005;</span><img src="'+url+'" alt="Attachment">';lb.addEventListener('click',function(e){if(e.target===lb)lb.remove()});document.body.appendChild(lb)}
+
+// ---- Paste / drag-drop image support ----
+var pastedImgData = {}; // wrapId -> [{dataUrl, id}]
+
+function initPasteZone(zoneId, wrapId) {
+  var zone = document.getElementById(zoneId);
+  if (!zone) return;
+  zone.addEventListener('paste', function(e) { handleImgPaste(e, wrapId, zoneId); });
+  // Also listen on document for paste when zone is focused or in tab
+  document.addEventListener('paste', function(e) {
+    var tab = document.querySelector('.tc.on');
+    if (tab && tab.id === 'tab-imaging') {
+      // Only if not pasting into a text input/textarea
+      var active = document.activeElement;
+      var isText = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT');
+      if (!isText) {
+        handleImgPaste(e, wrapId, zoneId);
+      }
+    }
+  });
+}
+
+function handleImgPaste(e, wrapId, zoneId) {
+  var items = (e.clipboardData || window.clipboardData).items;
+  var found = false;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].type.indexOf('image') !== -1) {
+      found = true;
+      var file = items[i].getAsFile();
+      readImgFile(file, wrapId, zoneId);
+    }
+  }
+  if (found) e.preventDefault();
+}
+
+function handleImgDrop(e, wrapId, zoneId) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.remove('drag-over');
+  var files = e.dataTransfer.files;
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].type.indexOf('image') !== -1) {
+      readImgFile(files[i], wrapId, zoneId);
+    }
+  }
+}
+
+function handleImgFileInput(e, wrapId, zoneId) {
+  var files = e.target.files;
+  for (var i = 0; i < files.length; i++) {
+    readImgFile(files[i], wrapId, zoneId);
+  }
+  e.target.value = '';
+}
+
+function readImgFile(file, wrapId, zoneId) {
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    addPastedImg(ev.target.result, wrapId, zoneId);
+  };
+  reader.readAsDataURL(file);
+}
+
+function addPastedImg(dataUrl, wrapId, zoneId) {
+  if (!pastedImgData[wrapId]) pastedImgData[wrapId] = [];
+  var id = 'pi' + Date.now() + Math.random().toString(36).slice(2);
+  pastedImgData[wrapId].push({dataUrl: dataUrl, id: id});
+  renderPastedImgs(wrapId, zoneId);
+}
+
+function removePastedImg(imgId, wrapId, zoneId) {
+  if (!pastedImgData[wrapId]) return;
+  pastedImgData[wrapId] = pastedImgData[wrapId].filter(function(x) { return x.id !== imgId; });
+  renderPastedImgs(wrapId, zoneId);
+}
+
+function renderPastedImgs(wrapId, zoneId) {
+  var wrap = document.getElementById(wrapId);
+  var zone = document.getElementById(zoneId);
+  if (!wrap) return;
+  var imgs = pastedImgData[wrapId] || [];
+  wrap.innerHTML = imgs.map(function(img) {
+    var rmCall = 'removePastedImg("' + img.id + '","' + wrapId + '","' + zoneId + '")';
+    return '<div class="pasted-img-item">'
+      + '<img src="' + img.dataUrl + '" onclick="showImg(this.src)" title="Click to enlarge">'
+      + '<button onclick="' + rmCall + '" title="Remove">&#215;</button>'
+      + '</div>';
+  }).join('');
+  if (zone) {
+    zone.classList.toggle('has-images', imgs.length > 0);
+    var hint = zone.querySelector('span');
+    if (hint) hint.textContent = imgs.length > 0 
+      ? '\u2713 ' + imgs.length + ' image' + (imgs.length > 1 ? 's' : '') + ' — paste more or click to add'
+      : '\uD83D\uDCCB Paste screenshot here (Ctrl+V) or click to upload';
+  }
+}
+
+function collectPastedImgUrls(wrapId) {
+  return (pastedImgData[wrapId] || []).map(function(x) { return x.dataUrl; });
+}
+
+function clearPastedImgs(wrapId, zoneId) {
+  pastedImgData[wrapId] = [];
+  renderPastedImgs(wrapId, zoneId);
+}
+// ---- end paste support ----
+
 function addImgRow(wrapId){var wrap=document.getElementById(wrapId);if(!wrap)return;var row=document.createElement('div');row.className='img-url-row';row.innerHTML='<input placeholder="Paste Google Drive share link here"><button onclick="this.parentNode.remove()">remove</button>';wrap.appendChild(row);wrap.lastElementChild.querySelector('input').focus()}
 function collectImgUrls(wrapId){var wrap=document.getElementById(wrapId);if(!wrap)return[];var urls=[];wrap.querySelectorAll('input').forEach(function(inp){var v=inp.value.trim();if(v)urls.push(v)});return urls}
 
@@ -2786,6 +2906,7 @@ function renderDxTimeline(){
   var origInit=window.onload;
   window.addEventListener('DOMContentLoaded', function(){
     dxLoad();
+    initPasteZone('i-paste-zone','i-pasted-wrap');
   });
 })();
 
