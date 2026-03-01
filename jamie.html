@@ -125,14 +125,26 @@ window.RESTORE_ALL_DATA = {"visits": [{"d": "Sept 17, 2", "t": "OB Office Visit 
 window.restoreAllFromIndex = async function() {
     if (!confirm('This will REPLACE all current data in Firestore with the data from index.html.\n\nVisits: 83\nLabs: 26\nJournal: 217\nDiagnoses: 38\nImaging: 22\nTimeline: 45\n\nContinue?')) return;
     try {
-        await setDoc(PATIENT_DOC, window.RESTORE_ALL_DATA);
-        window._dbCache = window.RESTORE_ALL_DATA;
+        // Set local cache FIRST before any Firestore write or alert,
+        // so onSnapshot cannot overwrite it with stale data
+        window._dbCache = JSON.parse(JSON.stringify(window.RESTORE_ALL_DATA));
         localStorage.setItem('jamie_records_cache', JSON.stringify(window.RESTORE_ALL_DATA));
-        alert('All data restored successfully!');
+        // Render immediately from local data - no waiting on Firestore
         const renders = [window.renderVisits, window.renderLabs, window.renderImaging,
                          window.renderJournal, window.renderDX, window.renderOverview];
         renders.forEach(fn => { try { if(fn) fn(); } catch(e) {} });
+        // Now write to Firestore in background - suppress onSnapshot for 10s during write
+        window._suppressSnapshot = true;
+        await setDoc(PATIENT_DOC, window.RESTORE_ALL_DATA);
+        // Re-render one more time from our known-good local copy
+        window._dbCache = JSON.parse(JSON.stringify(window.RESTORE_ALL_DATA));
+        renders.forEach(fn => { try { if(fn) fn(); } catch(e) {} });
+        setTimeout(() => { window._suppressSnapshot = false; }, 5000);
+        alert('All data restored!\nVisits: ' + window.RESTORE_ALL_DATA.visits.length +
+              '\nLabs: ' + window.RESTORE_ALL_DATA.labs.length +
+              '\nJournal: ' + window.RESTORE_ALL_DATA.journal.length);
     } catch(e) {
+        window._suppressSnapshot = false;
         alert('Restore failed: ' + e.message);
     }
 };
@@ -197,6 +209,7 @@ window.saveProfile = function(p) {
 // ── Real-time listener — updates all connected devices instantly ───────────
 function startRealtimeSync() {
     onSnapshot(PATIENT_DOC, (snap) => {
+        if (window._suppressSnapshot) return; // suppress during restore
         if (!snap.exists()) return;
         const data = snap.data();
         Object.keys(EMPTY).forEach(k => { if (!data[k]) data[k] = []; });
