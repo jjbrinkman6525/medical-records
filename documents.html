@@ -269,9 +269,10 @@ body { background: var(--bg); color: var(--tx); font-family: 'Nunito Sans', sans
 .doc-card-body {
   font-size: 13px; color: var(--tx2); white-space: pre-wrap;
   word-break: break-word; line-height: 1.6;
-  max-height: 200px; overflow: hidden; transition: max-height 0.3s;
 }
-.doc-card-body img { max-width: 100%; border-radius: 6px; margin: 4px 0; display: block; }
+.doc-card-body img { max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0; display: block; }
+.doc-card-body.collapsed { max-height: 80px; overflow: hidden; }
+.doc-card-body.collapsed img { display: none; }
 .doc-card-body.expanded { max-height: 2000px; }
 .doc-expand-btn {
   background: none; border: none; color: var(--tx3); font-size: 12px;
@@ -2553,6 +2554,7 @@ function renderSection(pid, sid, docs) {
   var html = '';
   docs.forEach(function(d, i) {
     var preview = (d.body||'').length > 200;
+    var hasImg = (d.body||'').indexOf('<img') !== -1;
     html += '<div class="doc-card">' +
       '<div class="doc-card-header">' +
         '<div class="doc-card-title">📄 ' + escHtml(d.title||'Untitled') + '</div>' +
@@ -2565,8 +2567,8 @@ function renderSection(pid, sid, docs) {
           '</div>' +
         '</div>' +
       '</div>' +
-      '<div class="doc-card-body" id="docbody-'+pid+'-'+sid+'-'+i+'">' + (d.isHtml ? (d.body||'') : escHtml(d.body||'')) + '</div>' +
-      (preview ? '<button class="doc-expand-btn" onclick="toggleExpand(\''+pid+'\',\''+sid+'\','+i+')">▼ Show more</button>' : '') +
+      '<div class="doc-card-body' + (preview && !hasImg ? ' collapsed' : '') + '" id="docbody-'+pid+'-'+sid+'-'+i+'">' + (d.isHtml ? (d.body||'') : escHtml(d.body||'')) + '</div>' +
+      (preview && !hasImg ? '<button class="doc-expand-btn" onclick="toggleExpand(\''+pid+'\',\''+sid+'\','+i+')">▼ Show more</button>' : '') +
     '</div>';
   });
   listEl.innerHTML = html;
@@ -2576,8 +2578,8 @@ function toggleExpand(pid, sid, i) {
   var el = document.getElementById('docbody-'+pid+'-'+sid+'-'+i);
   var btn = el ? el.nextElementSibling : null;
   if (!el) return;
-  var expanded = el.classList.toggle('expanded');
-  if (btn) btn.textContent = expanded ? '▲ Show less' : '▼ Show more';
+  var collapsed = el.classList.toggle('collapsed');
+  if (btn) btn.textContent = collapsed ? '▼ Show more' : '▲ Show less';
 }
 
 // ── Add / Delete ──────────────────────────────────────────────────────────
