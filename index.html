@@ -2338,12 +2338,25 @@ function editPM(id){
   var m=gU('pm').find(function(x){return x.id===id});
   if(!m)return;
   var existingImgs=(m.imgs||[]).map(function(u,i){return'<div class="img-url-row"><input id="epm-img-'+i+'" value="'+esc(u)+'" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>'}).join('');
+  /* build thread options — exclude threads where this message is the only member (its own solo thread) */
+  var threads=pmGetThreads();
+  var currentTid=m.threadId||String(m.id);
+  var threadOpts='<option value="__own__"'+(currentTid===String(m.id)?' selected':'')+'>— Own thread (standalone) —</option>';
+  threads.forEach(function(t){
+    /* include threads that: (a) have >1 msg, OR (b) are not this message\'s solo thread */
+    var isSolo=(t.msgs.length===1 && t.msgs[0].id===m.id);
+    if(!isSolo){
+      var sel=(t.threadId===currentTid && currentTid!==String(m.id))?' selected':'';
+      threadOpts+='<option value="'+esc(t.threadId)+'"'+sel+'>['+t.msgs.length+'] '+esc(t.subject)+'</option>';
+    }
+  });
   showModal('<h2>Edit Portal Message</h2>'
     +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">Date</label><input id="epm-d" type="date" value="'+esc(m.date||'')+'" style="flex:1"><input id="epm-tm" type="time" value="'+esc(m.time||'')+'" style="min-width:110px"></div>'
     +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">From</label><input id="epm-from" value="'+esc(m.from||'')+'" style="flex:1"></div>'
     +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">To</label><input id="epm-to" value="'+esc(m.to||'')+'" style="flex:1"></div>'
     +'<div class="ir"><label style="min-width:60px;color:var(--tx3)">Facility</label><input id="epm-fac" value="'+esc(m.facility||'')+'" style="flex:1"></div>'
     +'<div class="ir"><label style="min-width:60px;color:var(--tx3)">Subject</label><input id="epm-subj" value="'+esc(m.subject||'')+'" style="flex:1"></div>'
+    +'<div class="ir" style="margin-bottom:8px"><label style="min-width:60px;color:var(--tx3);font-size:12px">Thread</label><select id="epm-thread" style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-family:\'IBM Plex Mono\',monospace;font-size:12px;padding:5px 8px">'+threadOpts+'</select></div>'
     +'<label style="color:var(--tx3);font-size:12px;display:block;margin-bottom:4px">Message</label>'
     +pmRteToolbarHTML('epm-body')
     +'<div class="pm-rte-editor" id="epm-body" contenteditable="true" style="border-radius:0 0 6px 6px;min-height:160px">'+(m.body||'')+'</div>'
@@ -2363,6 +2376,21 @@ function saveEditPM(id){
   msgs[idx].to=document.getElementById('epm-to').value;
   msgs[idx].facility=document.getElementById('epm-fac').value;
   msgs[idx].subject=document.getElementById('epm-subj').value;
+  /* thread reassignment */
+  var threadSel=document.getElementById('epm-thread');
+  if(threadSel){
+    var chosen=threadSel.value;
+    if(chosen==='__own__'){
+      /* make it its own standalone thread */
+      msgs[idx].threadId=String(msgs[idx].id);
+    } else {
+      /* join an existing thread — copy that thread\'s subject if this msg has none */
+      msgs[idx].threadId=chosen;
+      var threads=pmGetThreads();
+      var targetThread=threads.find(function(t){return t.threadId===chosen});
+      if(targetThread && !msgs[idx].subject) msgs[idx].subject=targetThread.subject;
+    }
+  }
   var bodyEl=document.getElementById('epm-body');
   msgs[idx].body=bodyEl?bodyEl.innerHTML:'';
   msgs[idx].imgs=getImgUrls('epm-imgs-wrap');
