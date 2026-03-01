@@ -758,6 +758,11 @@ function mJ(){
   return user.concat(base.map(function(s){s.ua=false;return s})).sort(function(a,b){return(b.date+(b.time||'99')).localeCompare(a.date+(a.time||'99'))})}
 
 function init(){
+  // Wait for Firebase cache to be ready before rendering
+  if (!window._firebaseReady) {
+    setTimeout(init, 100);
+    return;
+  }
   BV=JSON.parse(atob(document.getElementById('d-v').textContent));
   BL=JSON.parse(atob(document.getElementById('d-l').textContent));
   BS=JSON.parse(atob(document.getElementById('d-s').textContent));
