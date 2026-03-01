@@ -207,7 +207,53 @@ mark{background:rgba(96,165,250,.25);color:var(--ac);padding:0 2px;border-radius
 .pm-to strong{color:var(--tx2);font-size:13px;display:block}
 .pm-meta{font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;text-align:right}
 .pm-subj{padding:10px 16px 4px;font-size:13px;font-weight:600;color:var(--tx2)}
-.pm-body{padding:4px 16px 16px;font-size:13px;color:var(--tx);line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.pm-body{padding:4px 16px 12px;font-size:13px;color:var(--tx);line-height:1.7;word-break:break-word}
+.pm-imgs{padding:0 16px 14px;display:flex;flex-wrap:wrap;gap:8px}
+.pm-rte-toolbar{display:flex;gap:4px;flex-wrap:wrap;padding:6px 10px;background:var(--sf3);border:1px solid var(--bd);border-bottom:none;border-radius:6px 6px 0 0}
+.pm-rte-toolbar button{background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 8px;cursor:pointer;font-family:'IBM Plex Mono',monospace;line-height:1.4}
+.pm-rte-toolbar button:hover{background:var(--sf3);color:var(--tx)}.pm-rte-toolbar button.active{background:var(--ac);color:#000;border-color:var(--ac)}
+.pm-rte-toolbar select{background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 6px;cursor:pointer;font-family:'IBM Plex Mono',monospace}
+.pm-rte-editor{width:100%;min-height:130px;background:var(--sf);border:1px solid var(--bd);border-radius:0 0 6px 6px;color:var(--tx);font-size:13px;padding:10px 12px;outline:none;line-height:1.7;word-break:break-word}
+.pm-rte-editor:focus{border-color:var(--ac)}
+.pm-rte-editor:empty:before{content:attr(data-placeholder);color:var(--tx3);pointer-events:none}
+.pm-rte-editor b,.pm-rte-editor strong{font-weight:700}
+.pm-rte-editor ul,.pm-rte-editor ol{padding-left:20px;margin:4px 0}
+.pm-rte-editor blockquote{border-left:3px solid var(--ac2);padding-left:10px;color:var(--tx2);margin:4px 0}
+.pm-card-toggle{cursor:pointer;font-size:16px;color:var(--tx3);padding:0 4px;transition:transform .2s;user-select:none;flex-shrink:0}
+.pm-card.pm-collapsed .pm-card-toggle{transform:rotate(-90deg)}
+.pm-card.pm-collapsed .pm-body-wrap,.pm-card.pm-collapsed .pm-imgs{display:none}
+.pm-card.pm-collapsed .pm-subj{padding-bottom:10px;border-bottom:none}
+/* Thread wrapper */
+.pm-thread{background:var(--sf);border:1px solid var(--bd);border-radius:10px;margin-bottom:16px;overflow:hidden}
+.pm-thread-hd{padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid transparent;transition:border-color .15s}
+.pm-thread-hd:hover{background:var(--sf2)}
+.pm-thread.thread-open .pm-thread-hd{border-bottom-color:var(--bd)}
+.pm-thread-subj{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--ac);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-thread-meta{font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;white-space:nowrap;flex-shrink:0}
+.pm-thread-count{display:inline-flex;align-items:center;justify-content:center;background:var(--ac);color:#000;font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace;border-radius:10px;padding:1px 7px;margin-left:6px;flex-shrink:0}
+.pm-thread-body{display:none}
+.pm-thread.thread-open .pm-thread-body{display:block}
+.pm-thread-toggle{font-size:15px;color:var(--tx3);flex-shrink:0;transition:transform .2s;user-select:none}
+.pm-thread.thread-open .pm-thread-toggle{transform:rotate(180deg)}
+/* Individual message bubble inside thread */
+.pm-msg{border-top:1px solid var(--bd);padding:14px 16px}
+.pm-msg:first-child{border-top:none}
+.pm-msg-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.pm-msg-from{font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.pm-msg-from.sent{color:var(--ac)}
+.pm-msg-from.recv{color:var(--gn)}
+.pm-msg-arrow{color:var(--tx3);font-size:11px}
+.pm-msg-to{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--tx3)}
+.pm-msg-ts{font-size:11px;color:var(--tx3);font-family:'IBM Plex Mono',monospace;margin-left:auto}
+.pm-msg-body{font-size:13px;color:var(--tx);line-height:1.7;word-break:break-word}
+.pm-msg-body ul,.pm-msg-body ol{padding-left:20px;margin:4px 0}
+.pm-msg-body blockquote{border-left:3px solid var(--ac2);padding-left:10px;color:var(--tx2);margin:4px 0}
+.pm-msg-imgs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.pm-msg-acts{display:flex;gap:6px;margin-top:8px}
+.pm-thread-reply-bar{padding:10px 14px;background:var(--sf2);border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+/* Form thread selector */
+.pm-thread-sel{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:6px 10px;width:100%;margin-bottom:8px}
+.pm-thread-sel:focus{border-color:var(--ac);outline:none}
 </style>
 </head>
 <body>
@@ -302,12 +348,31 @@ mark{background:rgba(96,165,250,.25);color:var(--ac);padding:0 2px;border-radius
   <input id="pm-to" placeholder="To (name / role)" style="flex:1">
   <input id="pm-fac" placeholder="Facility / Portal" style="flex:1">
 </div>
-<input class="fi" id="pm-subj" placeholder="Subject">
-<textarea class="fi" id="pm-body" placeholder="Message body" style="min-height:120px"></textarea>
-<div><button class="bt" onclick="aPM()">Save Message</button><span class="sm" id="sv-pm">Saved</span></div>
+<select class="pm-thread-sel" id="pm-thread-sel" onchange="pmThreadSelChange()">
+  <option value="">— Start new thread / subject —</option>
+</select>
+<input class="fi" id="pm-subj" placeholder="Subject (required for new threads)" style="transition:opacity .2s">
+<div class="pm-rte-toolbar" id="pm-rte-tb">
+  <select onchange="pmRteFormat('formatBlock',this.value);this.value=''"><option value="">Paragraph</option><option value="h3">Heading</option><option value="blockquote">Quote</option></select>
+  <button onmousedown="event.preventDefault();pmRteCmd('bold')" title="Bold"><b>B</b></button>
+  <button onmousedown="event.preventDefault();pmRteCmd('italic')" title="Italic"><i>I</i></button>
+  <button onmousedown="event.preventDefault();pmRteCmd('underline')" title="Underline"><u>U</u></button>
+  <button onmousedown="event.preventDefault();pmRteCmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
+  <button onmousedown="event.preventDefault();pmRteCmd('insertUnorderedList')" title="Bullet list">• List</button>
+  <button onmousedown="event.preventDefault();pmRteCmd('insertOrderedList')" title="Numbered list">1. List</button>
+  <button onmousedown="event.preventDefault();pmRteCmd('removeFormat')" title="Clear formatting">✕ fmt</button>
+</div>
+<div class="pm-rte-editor" id="pm-body-rte" contenteditable="true" data-placeholder="Message body..."></div>
+<div style="margin-top:10px;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Images (Google Drive links)</div>
+<div style="font-size:11px;color:var(--tx3);margin-bottom:8px">In Drive: right-click image → Share → Copy link. Paste below.</div>
+<div id="pm-imgs-wrap"></div>
+<button class="img-add-btn" onclick="addImgRow('pm-imgs-wrap')">+ Add Image URL</button>
+<div style="margin-top:10px"><button class="bt" onclick="aPM()">Save Message</button><span class="sm" id="sv-pm">Saved</span></div>
 </div></div>
 <div class="sb"><input id="pms" placeholder="Search portal messages..." oninput="rPM()">
-<select id="pmf" onchange="rPM()"><option value="">All</option><option value="from-me">Sent by Me</option><option value="to-me">Received by Me</option></select></div>
+<select id="pmf" onchange="rPM()"><option value="">All</option><option value="from-me">Sent by Me</option><option value="to-me">Received by Me</option></select>
+<button onclick="pmCollapseAll()" style="font-size:11px;padding:4px 10px;border-radius:4px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx2);cursor:pointer;white-space:nowrap;font-family:'IBM Plex Mono',monospace">Collapse All</button>
+<button onclick="pmExpandAll()" style="font-size:11px;padding:4px 10px;border-radius:4px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx2);cursor:pointer;white-space:nowrap;font-family:'IBM Plex Mono',monospace">Expand All</button></div>
 <div class="ec" id="pmec"></div>
 <div id="pml"></div></div>
 
@@ -2077,6 +2142,90 @@ function rLR(){var q=(document.getElementById('lrs').value||'').toLowerCase(),ff
 
 function showLabHistory(name){var all=gU('lr').slice().sort(function(a,b){return(a.date||'').localeCompare(b.date||'')});var rows=[];all.forEach(function(p){p.rows.forEach(function(r){if(r.name.toLowerCase()===name.toLowerCase())rows.push({date:p.date,facility:p.facility||'',result:r.result,ref:r.ref,flag:r.flag})})});var h='<h2>History: '+esc(name)+'</h2>';if(!rows.length){h+='<div class="empty" style="padding:20px 0">No recorded results for this test.</div>'}else{h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">';h+='<tr style="background:var(--sf2)"><th style="padding:8px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Date</th><th style="padding:8px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Facility</th><th style="padding:8px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Result</th><th style="padding:8px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Reference</th><th style="padding:8px 12px;text-align:left;font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--ac2);text-transform:uppercase;letter-spacing:1px">Flag</th></tr>';rows.forEach(function(r){var fc=flagCls(r.flag);h+='<tr style="border-top:1px solid var(--bd)"><td style="padding:8px 12px;font-family:IBM Plex Mono,monospace;font-size:12px;color:var(--ac);white-space:nowrap">'+esc(r.date)+'</td><td style="padding:8px 12px;font-size:12px;color:var(--tx3)">'+esc(r.facility)+'</td><td style="padding:8px 12px;font-family:IBM Plex Mono,monospace;font-size:13px;color:var(--tx)">'+esc(r.result)+'</td><td style="padding:8px 12px;font-size:12px;color:var(--tx3)">'+esc(r.ref)+'</td><td style="padding:8px 12px;font-family:IBM Plex Mono,monospace;font-size:12px" class="'+fc+'">'+esc(r.flag)+'</td></tr>'});h+='</table></div>'}h+='<div class="modal-acts"><button class="b2" onclick="closeModal()">Close</button></div>';showModal(h)}
 // ── Portal Messages ──────────────────────────────────────────────────────────
+function pmRteCmd(cmd){document.execCommand(cmd,false,null)}
+function pmRteFormat(cmd,val){if(val)document.execCommand(cmd,false,val)}
+function getImgUrls(wrapId){var wrap=document.getElementById(wrapId);if(!wrap)return[];return Array.from(wrap.querySelectorAll('input')).map(function(i){return i.value.trim()}).filter(Boolean)}
+
+/* ── Thread helpers ─────────────────────────────────────── */
+function pmGetThreads(){
+  /* Returns array of thread objects: {threadId, subject, facility, msgs:[]} sorted newest-first by last message */
+  var all=gU('pm');
+  var map={};
+  all.forEach(function(m){
+    var tid=m.threadId||String(m.id);
+    if(!map[tid])map[tid]={threadId:tid,subject:m.subject||'(no subject)',facility:m.facility||'',msgs:[]};
+    map[tid].msgs.push(m);
+  });
+  var threads=Object.values(map);
+  threads.forEach(function(t){
+    t.msgs.sort(function(a,b){var ad=(a.date||'')+(a.time?'T'+a.time:'');var bd=(b.date||'')+(b.time?'T'+b.time:'');return ad.localeCompare(bd)});
+    t.lastDate=t.msgs[t.msgs.length-1].date||'';
+    t.lastTime=t.msgs[t.msgs.length-1].time||'';
+  });
+  threads.sort(function(a,b){var ad=a.lastDate+(a.lastTime?'T'+a.lastTime:'');var bd=b.lastDate+(b.lastTime?'T'+b.lastTime:'');return bd.localeCompare(ad)});
+  return threads;
+}
+
+function pmPopulateThreadSel(keepVal){
+  var sel=document.getElementById('pm-thread-sel');
+  if(!sel)return;
+  var threads=pmGetThreads();
+  var cur=keepVal||sel.value;
+  sel.innerHTML='<option value="">— Start new thread / subject —</option>';
+  threads.forEach(function(t){
+    var opt=document.createElement('option');
+    opt.value=t.threadId;
+    opt.textContent='['+t.msgs.length+'] '+t.subject+(t.facility?' · '+t.facility:'');
+    sel.appendChild(opt);
+  });
+  if(cur)sel.value=cur;
+}
+
+function pmThreadSelChange(){
+  var sel=document.getElementById('pm-thread-sel');
+  var subjEl=document.getElementById('pm-subj');
+  var facEl=document.getElementById('pm-fac');
+  if(!sel.value){
+    // new thread
+    if(subjEl)subjEl.disabled=false;
+    return;
+  }
+  var threads=pmGetThreads();
+  var t=threads.find(function(x){return x.threadId===sel.value});
+  if(!t)return;
+  if(subjEl){subjEl.value=t.subject;subjEl.disabled=true;}
+  if(facEl&&t.facility&&!facEl.value)facEl.value=t.facility;
+}
+
+function pmRteToolbarHTML(editorId){
+  return '<div class="pm-rte-toolbar">'
+    +'<select onchange="pmRteFormat(\'formatBlock\',this.value);this.value=\'\'" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 6px;cursor:pointer"><option value="">Para</option><option value="h3">Heading</option><option value="blockquote">Quote</option></select>'
+    +'<button onmousedown="event.preventDefault();pmRteCmd(\'bold\')" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 8px;cursor:pointer"><b>B</b></button>'
+    +'<button onmousedown="event.preventDefault();pmRteCmd(\'italic\')" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 8px;cursor:pointer"><i>I</i></button>'
+    +'<button onmousedown="event.preventDefault();pmRteCmd(\'underline\')" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 8px;cursor:pointer"><u>U</u></button>'
+    +'<button onmousedown="event.preventDefault();pmRteCmd(\'insertUnorderedList\')" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 8px;cursor:pointer">• List</button>'
+    +'<button onmousedown="event.preventDefault();pmRteCmd(\'insertOrderedList\')" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 8px;cursor:pointer">1. List</button>'
+    +'<button onmousedown="event.preventDefault();pmRteCmd(\'removeFormat\')" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);border-radius:4px;font-size:12px;padding:3px 8px;cursor:pointer">✕ fmt</button>'
+    +'</div>';
+}
+
+/* ── Collapse / Expand all threads ──────────────────────── */
+function pmCollapseAll(){document.querySelectorAll('#pml .pm-thread').forEach(function(t){t.classList.remove('thread-open')})}
+function pmExpandAll(){document.querySelectorAll('#pml .pm-thread').forEach(function(t){t.classList.add('thread-open')})}
+function pmThreadToggle(tid){var el=document.getElementById('pmt-'+tid);if(el)el.classList.toggle('thread-open')}
+
+/* ── Reply-from-thread shortcut ─────────────────────────── */
+function pmReplyTo(threadId){
+  var sel=document.getElementById('pm-thread-sel');
+  if(sel){sel.value=threadId;pmThreadSelChange();}
+  var ia=document.getElementById('ia-pm');
+  if(ia&&ia.classList.contains('cl')){ia.classList.remove('cl');}
+  var bodyEl=document.getElementById('pm-body-rte');
+  if(bodyEl)bodyEl.focus();
+  ia && ia.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── Save new message ────────────────────────────────────── */
 function aPM(){
   if(!ADMIN)return;
   var d=document.getElementById('pm-d').value;
@@ -2084,32 +2233,111 @@ function aPM(){
   var from=document.getElementById('pm-from').value.trim();
   var to=document.getElementById('pm-to').value.trim();
   var fac=document.getElementById('pm-fac').value.trim();
-  var subj=document.getElementById('pm-subj').value.trim();
-  var body=document.getElementById('pm-body').value.trim();
-  if(!d||!body){alert('Date and message body required');return}
+  var subjEl=document.getElementById('pm-subj');
+  var subj=(subjEl?subjEl.value.trim():'');
+  var bodyEl=document.getElementById('pm-body-rte');
+  var body=bodyEl?bodyEl.innerHTML.trim():'';
+  if(!d||!body||body==='<br>'||body===''){alert('Date and message body required');return}
+  var selEl=document.getElementById('pm-thread-sel');
+  var threadId=selEl&&selEl.value?selEl.value:'';
+  /* if new thread, need a subject */
+  if(!threadId&&!subj){alert('Please enter a subject for the new thread.');return}
+  var imgs=getImgUrls('pm-imgs-wrap');
+  var newId=Date.now();
+  if(!threadId)threadId=String(newId); /* first message in thread becomes the threadId */
   var msgs=gU('pm');
-  msgs.push({id:Date.now(),date:d,time:tm,from:from,to:to,facility:fac,subject:subj,body:body});
+  msgs.push({id:newId,threadId:threadId,date:d,time:tm,from:from,to:to,facility:fac,subject:subj||undefined,body:body,imgs:imgs});
   sU('pm',msgs);
+  /* reset form */
   document.getElementById('pm-d').value='';
   document.getElementById('pm-tm').value='';
   document.getElementById('pm-from').value='';
   document.getElementById('pm-to').value='';
   document.getElementById('pm-fac').value='';
-  document.getElementById('pm-subj').value='';
-  document.getElementById('pm-body').value='';
+  if(subjEl){subjEl.value='';subjEl.disabled=false;}
+  if(selEl)selEl.value='';
+  if(bodyEl)bodyEl.innerHTML='';
+  var wrap=document.getElementById('pm-imgs-wrap');if(wrap)wrap.innerHTML='';
   fl('sv-pm');rPM();
 }
-function rPM(){var q=(document.getElementById('pms')?document.getElementById('pms').value||'':'').toLowerCase();var filt=(document.getElementById('pmf')?document.getElementById('pmf').value:'');var all=gU('pm').slice().sort(function(a,b){var ad=(a.date||'')+(a.time?'T'+a.time:'');var bd=(b.date||'')+(b.time?'T'+b.time:'');return bd.localeCompare(ad)});var filtered=all.filter(function(m){if(filt==='from-me'&&!((m.from||'').toLowerCase().includes('kelsey')||(m.to||'').toLowerCase().includes('doctor')||(m.from||'').toLowerCase().includes('patient')))return false;if(filt==='to-me'&&!((m.to||'').toLowerCase().includes('kelsey')||(m.from||'').toLowerCase().includes('doctor')))return false;if(q){var blob=(m.date+' '+(m.from||'')+' '+(m.to||'')+' '+(m.facility||'')+' '+(m.subject||'')+' '+(m.body||'')).toLowerCase();return blob.includes(q)}return true;});var ec=document.getElementById('pmec');if(ec)ec.textContent='Showing '+filtered.length+' of '+all.length+' message'+(all.length!==1?'s':'');var cntEl=document.getElementById('cnt-pm');if(cntEl)cntEl.textContent=all.length;if(!filtered.length){document.getElementById('pml').innerHTML='<div class="empty">'+(all.length?'No messages match.':'No portal messages yet. Use the form above to add one.')+'</div>';return;}var g=yrGroup(filtered,function(m){return m.date||''});var h=yrOpen();g.years.forEach(function(yr){h+=yrHeader(yr);g.byYear[yr].forEach(function(m){h+='<div class="pm-card">';h+='<div class="pm-card-hd">';h+='<div class="pm-from"><span style="text-transform:uppercase;letter-spacing:.5px;font-size:10px">From</span><strong>'+esc(m.from||'—')+'</strong></div>';h+='<div class="pm-to"><span style="text-transform:uppercase;letter-spacing:.5px;font-size:10px">To</span><strong>'+esc(m.to||'—')+'</strong></div>';h+='<div class="pm-meta">'+esc(m.date||'')+(m.time?'<span style="margin-left:6px;font-size:11px;color:var(--tx3)">'+esc(m.time)+'</span>':'')+(m.facility?'<br>'+esc(m.facility):'')+'</div>';if(ADMIN)h+='<div style="display:flex;gap:6px"><button class="abtn" onclick="editPM('+m.id+')">edit</button><button class="abtn del" onclick="delPM('+m.id+')">del</button></div>';h+='</div>';if(m.subject)h+='<div class="pm-subj">'+esc(m.subject)+'</div>';h+='<div class="pm-body">'+esc(m.body||'')+'</div>';h+='</div>'});});h+=yrClose();document.getElementById('pml').innerHTML=h;}
 
+/* ── Render ──────────────────────────────────────────────── */
+function rPM(){
+  pmPopulateThreadSel();
+  var q=(document.getElementById('pms')?document.getElementById('pms').value||'':'').toLowerCase();
+  var filt=(document.getElementById('pmf')?document.getElementById('pmf').value:'');
+  var threads=pmGetThreads();
+
+  /* filter */
+  threads=threads.filter(function(t){
+    var anyMsg=t.msgs.some(function(m){
+      if(filt==='from-me'&&!((m.from||'').toLowerCase().includes('kelsey')||(m.to||'').toLowerCase().includes('doctor')||(m.from||'').toLowerCase().includes('patient')))return false;
+      if(filt==='to-me'&&!((m.to||'').toLowerCase().includes('kelsey')||(m.from||'').toLowerCase().includes('doctor')))return false;
+      if(q){var div=document.createElement('div');div.innerHTML=m.body||'';var blob=(m.date+' '+(m.from||'')+' '+(m.to||'')+' '+(m.facility||'')+' '+(m.subject||'')+' '+div.textContent+' '+t.subject).toLowerCase();return blob.includes(q);}
+      return true;
+    });
+    return anyMsg;
+  });
+
+  var totalMsgs=0;threads.forEach(function(t){totalMsgs+=t.msgs.length;});
+  var ec=document.getElementById('pmec');
+  if(ec)ec.textContent='Showing '+threads.length+' thread'+(threads.length!==1?'s':'')+' · '+totalMsgs+' message'+(totalMsgs!==1?'s':'');
+  var cntEl=document.getElementById('cnt-pm');if(cntEl)cntEl.textContent=totalMsgs;
+
+  if(!threads.length){
+    document.getElementById('pml').innerHTML='<div class="empty">'+(gU('pm').length?'No messages match.':'No portal messages yet. Use the form above to add one.')+'</div>';
+    return;
+  }
+
+  var h='';
+  threads.forEach(function(t){
+    var participants=[];
+    t.msgs.forEach(function(m){if(m.from&&!participants.includes(m.from))participants.push(m.from);if(m.to&&!participants.includes(m.to))participants.push(m.to);});
+    var dateRange=t.msgs[0].date===t.lastDate?t.msgs[0].date:(t.msgs[0].date+' → '+t.lastDate);
+    h+='<div class="pm-thread" id="pmt-'+t.threadId+'">';
+    /* thread header */
+    h+='<div class="pm-thread-hd" onclick="pmThreadToggle(\''+t.threadId+'\')">';
+    h+='<span class="pm-thread-toggle">▾</span>';
+    h+='<span class="pm-thread-subj">'+esc(t.subject)+'</span>';
+    h+='<span class="pm-thread-count">'+t.msgs.length+'</span>';
+    h+='<span class="pm-thread-meta" style="margin-left:8px">'+esc(dateRange)+(t.facility?'<br>'+esc(t.facility):'')+'</span>';
+    h+='</div>';
+    /* thread body */
+    h+='<div class="pm-thread-body">';
+    t.msgs.forEach(function(m,mi){
+      var isSent=(m.from||'').toLowerCase().includes('kelsey')||(m.from||'').toLowerCase().includes('patient')||(m.from||'').toLowerCase().includes('jamie');
+      h+='<div class="pm-msg" id="pmm-'+m.id+'">';
+      h+='<div class="pm-msg-hd">';
+      h+='<span class="pm-msg-from '+(isSent?'sent':'recv')+'">'+esc(m.from||'—')+'</span>';
+      if(m.to)h+='<span class="pm-msg-arrow">→</span><span class="pm-msg-to">'+esc(m.to)+'</span>';
+      h+='<span class="pm-msg-ts">'+esc(m.date||'')+(m.time?' '+esc(m.time):'')+'</span>';
+      h+='</div>';
+      h+='<div class="pm-msg-body">'+(m.body||'')+'</div>';
+      if(m.imgs&&m.imgs.length){h+='<div class="pm-msg-imgs">';m.imgs.forEach(function(u){if(u)h+='<img src="'+esc(u)+'" class="img-thumb" onclick="openLightbox(this)" alt="image">'});h+='</div>';}
+      if(ADMIN)h+='<div class="pm-msg-acts"><button class="abtn" onclick="editPM('+m.id+')">edit</button><button class="abtn del" onclick="delPM('+m.id+')">del</button></div>';
+      h+='</div>';
+    });
+    /* reply bar */
+    if(ADMIN)h+='<div class="pm-thread-reply-bar"><span style="font-size:11px;color:var(--tx3);font-family:\'IBM Plex Mono\',monospace">'+esc(t.subject)+'</span><button class="abtn" style="margin-left:auto" onclick="pmReplyTo(\''+t.threadId+'\')">+ Reply</button></div>';
+    h+='</div></div>';
+  });
+
+  document.getElementById('pml').innerHTML=h;
+}
+
+/* ── Delete ──────────────────────────────────────────────── */
 function delPM(id){
   if(!ADMIN)return;
   var msgs=gU('pm').filter(function(m){return m.id!==id});
   sU('pm',msgs);rPM();
 }
+
+/* ── Edit / Save ─────────────────────────────────────────── */
 function editPM(id){
   if(!ADMIN)return;
   var m=gU('pm').find(function(x){return x.id===id});
   if(!m)return;
+  var existingImgs=(m.imgs||[]).map(function(u,i){return'<div class="img-url-row"><input id="epm-img-'+i+'" value="'+esc(u)+'" placeholder="Google Drive image URL"><button onclick="this.parentNode.remove()">remove</button></div>'}).join('');
   showModal('<h2>Edit Portal Message</h2>'
     +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">Date</label><input id="epm-d" type="date" value="'+esc(m.date||'')+'" style="flex:1"><input id="epm-tm" type="time" value="'+esc(m.time||'')+'" style="min-width:110px"></div>'
     +'<div class="ir"><label style="min-width:50px;color:var(--tx3)">From</label><input id="epm-from" value="'+esc(m.from||'')+'" style="flex:1"></div>'
@@ -2117,7 +2345,11 @@ function editPM(id){
     +'<div class="ir"><label style="min-width:60px;color:var(--tx3)">Facility</label><input id="epm-fac" value="'+esc(m.facility||'')+'" style="flex:1"></div>'
     +'<div class="ir"><label style="min-width:60px;color:var(--tx3)">Subject</label><input id="epm-subj" value="'+esc(m.subject||'')+'" style="flex:1"></div>'
     +'<label style="color:var(--tx3);font-size:12px;display:block;margin-bottom:4px">Message</label>'
-    +'<textarea class="fi" id="epm-body" rows="8" style="min-height:160px">'+esc(m.body||'')+'</textarea>'
+    +pmRteToolbarHTML('epm-body')
+    +'<div class="pm-rte-editor" id="epm-body" contenteditable="true" style="border-radius:0 0 6px 6px;min-height:160px">'+(m.body||'')+'</div>'
+    +'<label style="color:var(--tx3);font-size:12px;display:block;margin:10px 0 4px">Images (Google Drive links)</label>'
+    +'<div id="epm-imgs-wrap">'+existingImgs+'</div>'
+    +'<button class="img-add-btn" onclick="addImgRow(\'epm-imgs-wrap\')">+ Add Image URL</button>'
     +'<div class="modal-acts"><button class="b2" onclick="closeModal()">Cancel</button>'
     +'<button class="bt" onclick="saveEditPM('+id+')">Save</button></div>');
 }
@@ -2131,10 +2363,11 @@ function saveEditPM(id){
   msgs[idx].to=document.getElementById('epm-to').value;
   msgs[idx].facility=document.getElementById('epm-fac').value;
   msgs[idx].subject=document.getElementById('epm-subj').value;
-  msgs[idx].body=document.getElementById('epm-body').value;
+  var bodyEl=document.getElementById('epm-body');
+  msgs[idx].body=bodyEl?bodyEl.innerHTML:'';
+  msgs[idx].imgs=getImgUrls('epm-imgs-wrap');
   sU('pm',msgs);closeModal();rPM();
 }
-
 // ── AI Analysis (admin only) ─────────────────────────────────────────────────
 var aiCtx={};
 var AI_PROMPTS={
