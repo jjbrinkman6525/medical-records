@@ -137,37 +137,35 @@ body {
    Trunk: 55–92% of page
    ══════════════════════════════════════════ */
 
-/* 1 Jamie — upper left branch */
-#b-jamie  { left: 28%; top: 16%; }
-/* 2 Marc — upper right branch */
-#b-marc   { left: 72%; top: 14%; }
-/* 3 Jesse — mid-left branch */
-#b-jesse  { left: 18%; top: 33%; }
-/* 4 Raina — upper center-right canopy */
-#b-raina  { left: 60%; top: 26%; }
-/* 5 Liam — mid-right branch */
-#b-liam   { left: 79%; top: 37%; }
-/* 6 Killian — lower-left branch */
-#b-killian { left: 33%; top: 46%; }
+/* Row 1: Jamie & Marc — top of canopy, symmetrical */
+#b-jamie   { left: 35%; top: 14%; }
+#b-marc    { left: 65%; top: 14%; }
 
-/* 7 Devon — top of trunk, left side */
-#b-devon  { left: 40%; top: 58%; }
-/* 8 Lane — top of trunk, right side */
-#b-lane   { left: 60%; top: 60%; }
-/* 9 Austin — trunk upper-mid */
-#b-austin { left: 47%; top: 67%; }
-/* 10 Financial — trunk center-left */
-#b-fin    { left: 36%; top: 74%; }
-/* 11 Assets — trunk center-right */
-#b-assets { left: 62%; top: 73%; }
-/* 12 Documents — trunk lower-left */
-#b-docs   { left: 38%; top: 81%; }
-/* 13 Ancestry — trunk lower-right */
-#b-anc    { left: 63%; top: 80%; }
-/* 14 Home-Schooling — trunk base left */
-#b-hs     { left: 40%; top: 88%; }
-/* 15 Library — trunk base right */
-#b-lib    { left: 60%; top: 87%; }
+/* Row 2: Jesse & Raina — balanced second tier */
+#b-jesse   { left: 26%; top: 26%; }
+#b-raina   { left: 74%; top: 26%; }
+
+/* Row 3: Liam & Killian — third tier */
+#b-liam    { left: 20%; top: 39%; }
+#b-killian { left: 80%; top: 39%; }
+
+/* Trunk vertical column: Devon, Lane, Austin — centered */
+#b-devon   { left: 50%; top: 54%; }
+#b-lane    { left: 50%; top: 62%; }
+#b-austin  { left: 50%; top: 70%; }
+
+/* Bottom section: 3 pairs + row of 2 */
+/* Row 1 bottom: Financial & Assets */
+#b-fin     { left: 33%; top: 79%; }
+#b-assets  { left: 67%; top: 79%; }
+
+/* Row 2 bottom: Documents & Ancestry */
+#b-docs    { left: 33%; top: 86%; }
+#b-anc     { left: 67%; top: 86%; }
+
+/* Row 3 bottom: Home-Schooling & Library */
+#b-hs      { left: 38%; top: 93%; }
+#b-lib     { left: 62%; top: 93%; }
 
 /* ── Mobile layout ── */
 @media (max-width: 600px) {
