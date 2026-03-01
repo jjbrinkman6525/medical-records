@@ -2664,6 +2664,61 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+
+// ── Paste handler for contenteditable areas ───────────────────────────────
+document.addEventListener('paste', function(e) {
+  var target = e.target;
+  // Only intercept paste in our contenteditable doc inputs and edit modal
+  if (!target || !target.isContentEditable) return;
+
+  var items = e.clipboardData && e.clipboardData.items;
+  if (!items) return;
+
+  // Check if any clipboard item is an image
+  var imageItem = null;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].type.indexOf('image') !== -1) {
+      imageItem = items[i];
+      break;
+    }
+  }
+
+  if (!imageItem) return; // No image — let default paste handle text
+
+  // We have an image — prevent default and handle it ourselves
+  e.preventDefault();
+
+  var blob = imageItem.getAsFile();
+  if (!blob) return;
+
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var dataUrl = ev.target.result;
+    // Insert image at cursor position inside the contenteditable
+    var img = document.createElement('img');
+    img.src = dataUrl;
+    img.style.maxWidth = '100%';
+    img.style.borderRadius = '6px';
+    img.style.margin = '8px 0';
+    img.style.display = 'block';
+
+    var sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      var range = sel.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(img);
+      // Move cursor after image
+      range.setStartAfter(img);
+      range.setEndAfter(img);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      target.appendChild(img);
+    }
+  };
+  reader.readAsDataURL(blob);
+});
+
 // ── Util ──────────────────────────────────────────────────────────────────
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
