@@ -38,7 +38,7 @@
 //   ev/ee/ej=base record edits, dv/de/dj=base record deletions, dx_data=dx timeline
 //   s=social notes*   (* = stored in chunks subcollection, not root doc)
 //
-//   CHUNK_KEYS = ['v', 's']  — add keys here if other fields grow too large
+//   CHUNK_KEYS = ARRAY_KEYS  — ALL arrays go to chunks, root doc only holds ev/ee/ej
 //
 //   SYNC STATUS: injected as <span id="sync-status"> next to the h1 header
 //   window._scheduleSave and window._saveToFirebase exposed for main script use
@@ -70,7 +70,7 @@ const OBJ_KEYS   = ['ev','ee','ej'];
 // ── Keys too large for the root doc — stored as subcollection chunks ───────
 //   patients/jamie/chunks/v   → { items: [...] }
 //   patients/jamie/chunks/s   → { items: [...] }
-const CHUNK_KEYS = ['v', 's'];
+const CHUNK_KEYS = ARRAY_KEYS; // ALL arrays go to chunks — root doc only holds OBJ_KEYS
 
 function chunkDoc(key) {
     return doc(db, 'patients', DOC_ID, 'chunks', key);
