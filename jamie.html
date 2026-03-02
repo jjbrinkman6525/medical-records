@@ -12,32 +12,40 @@
 //
 // HISTORY / DEV NOTES (for Claude):
 //   Original portal used localStorage only (keys: jb5v, jb5l, jb5i, etc.)
-//   This module was added to migrate Jamie's portal to Firestore sync,
-//   matching the pattern already working in raina.html.
+//   First Firestore version stored all keys in one root doc → hit 1MB limit.
+//   Current version splits large keys into subcollection chunk docs.
 //
-//   Firestore path: patients/jamie  (same project as raina → patients/raina)
-//   Cache key: 'jamie_records_cache' in localStorage (offline fallback)
+//   Firestore structure:
+//     patients/jamie                → root doc (small keys only)
+//     patients/jamie/chunks/v       → { items: [...] }  visits (was ~378KB)
+//     patients/jamie/chunks/s       → { items: [...] }  social notes (was ~72KB)
+//
+//   Cache key: 'jamie_records_cache' in localStorage (offline fallback, full data)
 //   Migration flag: 'jb_migrated_to_firebase' in localStorage
 //
 //   HOW IT WORKS:
-//   - window._jbCache holds all data in memory (flat object, same shape as Firestore doc)
-//   - Main script's gU(k) / gE(k) / sU(k,d) check _jbCache first, fall back to localStorage
-//   - sU() writes to _jbCache + schedules a debounced Firestore save (800ms)
-//   - onSnapshot keeps all open devices in sync in real time
+//   - window._jbCache holds all data in memory (flat object, same shape as before)
+//   - loadFromFirebase() fetches root doc + chunk docs in parallel, merges into _jbCache
+//   - saveToFirebase() splits CHUNK_KEYS out to their chunk docs, rest to root doc
+//   - onSnapshot listeners on root doc AND each chunk doc keep all devices in sync
+//   - Main script's gU(k) / gE(k) / sU(k,d) are unchanged — still read/write _jbCache
 //   - dxSave/dxLoad also wired to _jbCache under key 'dx_data'
-//   - Migration banner appears once if localStorage has un-synced data
+//   - Migration banner splits data correctly on first migrate
 //
 //   DATA KEYS (ALL_KEYS):
-//   v=visits, l=labs(legacy), i=imaging, e=events/timeline, j=journal,
+//   v=visits*, l=labs(legacy), i=imaging, e=events/timeline, j=journal,
 //   lr=lab results panels, pm=portal messages, mx=mesh evidence,
 //   ev/ee/ej=base record edits, dv/de/dj=base record deletions, dx_data=dx timeline
+//   s=social notes*   (* = stored in chunks subcollection, not root doc)
+//
+//   CHUNK_KEYS = ['v', 's']  — add keys here if other fields grow too large
 //
 //   SYNC STATUS: injected as <span id="sync-status"> next to the h1 header
 //   window._scheduleSave and window._saveToFirebase exposed for main script use
 //
 // ══════════════════════════════════════════════════════════════════════════
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0iBz1JmRb59JclYbz506KbBI6hkithP0",
@@ -55,9 +63,18 @@ const PATIENT_DOC = doc(db, 'patients', DOC_ID);
 const CACHE_KEY = 'jamie_records_cache';
 
 // All localStorage keys used by this portal
-const ALL_KEYS = ['v','l','i','e','j','lr','pm','mx','ev','ee','ej','dv','de','dj','dx_data'];
+const ALL_KEYS  = ['v','l','i','e','j','lr','pm','mx','ev','ee','ej','dv','de','dj','dx_data'];
 const ARRAY_KEYS = ['v','l','i','e','j','lr','pm','mx','dv','de','dj','dx_data'];
 const OBJ_KEYS   = ['ev','ee','ej'];
+
+// ── Keys too large for the root doc — stored as subcollection chunks ───────
+//   patients/jamie/chunks/v   → { items: [...] }
+//   patients/jamie/chunks/s   → { items: [...] }
+const CHUNK_KEYS = ['v', 's'];
+
+function chunkDoc(key) {
+    return doc(db, 'patients', DOC_ID, 'chunks', key);
+}
 
 // ── Sync status indicator ──────────────────────────────────────────────────
 function setSyncStatus(state) {
@@ -93,8 +110,22 @@ function mergeEmpty(data) {
 // ── Load ───────────────────────────────────────────────────────────────────
 async function loadFromFirebase() {
     try {
-        const snap = await getDoc(PATIENT_DOC);
+        // Load root doc (small fields) and chunk docs (large fields) in parallel
+        const [snap, ...chunkSnaps] = await Promise.all([
+            getDoc(PATIENT_DOC),
+            ...CHUNK_KEYS.map(k => getDoc(chunkDoc(k)))
+        ]);
+
         const data = snap.exists() ? mergeEmpty(snap.data()) : emptyCache();
+
+        // Merge chunk data back into cache under its key
+        CHUNK_KEYS.forEach((k, i) => {
+            const cs = chunkSnaps[i];
+            if (cs.exists() && cs.data().items) {
+                data[k] = cs.data().items;
+            }
+        });
+
         window._jbCache = data;
         localStorage.setItem(CACHE_KEY, JSON.stringify(data));
         return data;
@@ -115,7 +146,17 @@ async function saveToFirebase() {
     const data = window._jbCache;
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
     try {
-        await setDoc(PATIENT_DOC, data);
+        // Split: large keys go to their own chunk docs, rest go to root doc
+        const rootData = {};
+        ALL_KEYS.forEach(k => {
+            if (!CHUNK_KEYS.includes(k)) rootData[k] = data[k];
+        });
+
+        await Promise.all([
+            setDoc(PATIENT_DOC, rootData),
+            ...CHUNK_KEYS.map(k => setDoc(chunkDoc(k), { items: data[k] || [] }))
+        ]);
+
         setSyncStatus('saved');
         setTimeout(() => setSyncStatus('live'), 2000);
     } catch(e) {
@@ -131,31 +172,46 @@ function scheduleSave() {
 window._scheduleSave = scheduleSave;
 window._saveToFirebase = saveToFirebase;
 
-// ── gMX / sMX overrides (handled in main script via _jbCache) ─────────────
-
 // ── Real-time listener ─────────────────────────────────────────────────────
 function startRealtimeSync() {
+    // Listen to root doc
     onSnapshot(PATIENT_DOC, (snap) => {
         if (!snap.exists()) return;
         const data = mergeEmpty(snap.data());
+        // Preserve chunk keys already loaded into cache
+        CHUNK_KEYS.forEach(k => {
+            if (window._jbCache && window._jbCache[k]) data[k] = window._jbCache[k];
+        });
         window._jbCache = data;
         localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        // Re-render current tab
-        const renders = {
-            visits:   window.rV,
-            labs:     window.rLR,
-            imaging:  window.rI,
-            journal:  window.rJ,
-            timeline: window.rTL,
-            mesh:     window.rMX,
-            portal:   window.rPM
-        };
-        if (window.currentView && renders[window.currentView]) renders[window.currentView]();
+        triggerRender();
         setSyncStatus('live');
-    }, (err) => {
-        console.warn('Snapshot error:', err);
-        setSyncStatus('error');
+    }, (err) => { console.warn('Snapshot error:', err); setSyncStatus('error'); });
+
+    // Listen to each chunk doc
+    CHUNK_KEYS.forEach(k => {
+        onSnapshot(chunkDoc(k), (snap) => {
+            if (!snap.exists()) return;
+            if (window._jbCache) {
+                window._jbCache[k] = snap.data().items || [];
+                localStorage.setItem(CACHE_KEY, JSON.stringify(window._jbCache));
+                triggerRender();
+            }
+        }, (err) => console.warn(`Chunk snapshot error (${k}):`, err));
     });
+}
+
+function triggerRender() {
+    const renders = {
+        visits:   window.rV,
+        labs:     window.rLR,
+        imaging:  window.rI,
+        journal:  window.rJ,
+        timeline: window.rTL,
+        mesh:     window.rMX,
+        portal:   window.rPM
+    };
+    if (window.currentView && renders[window.currentView]) renders[window.currentView]();
 }
 
 // ── One-time migration from localStorage to Firebase ──────────────────────
@@ -204,18 +260,27 @@ function checkMigration() {
                 try {
                     const local = JSON.parse(localStorage.getItem(lk) || (OBJ_KEYS.includes(k) ? '{}' : '[]'));
                     if (ARRAY_KEYS.includes(k)) {
-                        // Merge: add local items not already in Firebase (by id)
                         const fbIds = new Set((merged[k] || []).map(x => x.id));
                         const newItems = local.filter(x => x.id && !fbIds.has(x.id));
                         merged[k] = (merged[k] || []).concat(newItems);
                     } else {
-                        // Merge objects: Firebase keys win
                         merged[k] = Object.assign({}, local, merged[k] || {});
                     }
                 } catch(e) {}
             });
+
+            // Split large keys to chunk docs, rest to root doc
+            const rootData = {};
+            ALL_KEYS.forEach(k => {
+                if (!CHUNK_KEYS.includes(k)) rootData[k] = merged[k];
+            });
+
+            await Promise.all([
+                setDoc(PATIENT_DOC, rootData),
+                ...CHUNK_KEYS.map(k => setDoc(chunkDoc(k), { items: merged[k] || [] }))
+            ]);
+
             window._jbCache = merged;
-            await setDoc(PATIENT_DOC, merged);
             localStorage.setItem(CACHE_KEY, JSON.stringify(merged));
             localStorage.setItem('jb_migrated_to_firebase', '1');
             statusEl.style.color = '#34d399';
