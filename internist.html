@@ -1385,9 +1385,9 @@ async function callAI(prompt, boxId) {
   box.className = 'ai-box on';
   box.innerHTML = '<div class="ai-spin-row"><div class="ai-spin"></div><span>Consulting internist AI…</span></div>';
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://anthropic-proxy.twistedgypsychild.workers.dev', {
       method: 'POST',
-      headers: {'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1396,7 +1396,11 @@ async function callAI(prompt, boxId) {
       })
     });
     var data = await res.json();
-    var text = (data.content && data.content[0]) ? data.content[0].text : 'No response.';
+    if (!res.ok) {
+      box.innerHTML = '<div style="color:var(--rd)">API Error ' + res.status + ': ' + JSON.stringify(data) + '</div>';
+      return;
+    }
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'No response.';
     box.innerHTML = '<div class="ai-lbl">&#9651; Internist AI</div>' + fmtAI(text);
   } catch(e) {
     box.innerHTML = '<div style="color:var(--rd)">Error: ' + e.message + '</div>';
