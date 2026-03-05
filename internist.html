@@ -641,7 +641,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         </div>
         <div class="nav-row">
           <button class="btn btn-s" onclick="goStep(7)">&larr;</button>
-          <button class="btn btn-p" onclick="window.print()">&#128438; Print</button>
+          <button class="btn btn-p" onclick="printReport()">&#128438; Print Report</button>
           <button class="btn btn-s" onclick="startOver()">&#8635; New Workup</button>
         </div>
       </div>
@@ -1524,6 +1524,127 @@ window.generateReport = function() {
 
   document.getElementById('report-content').innerHTML = h;
   saveToFirebase();
+};
+
+window.printReport = function() {
+  var pivs = getPivotals().filter(Boolean);
+  var ros = getROS();
+  var rf = getRedFlags();
+  var allDx = []; Object.values(ST.vcDx).forEach(function(a){ allDx = allDx.concat(a); });
+  var specs = getSelectedSpecs();
+  var finalAI = document.getElementById('final-ai-box') ? document.getElementById('final-ai-box').innerText : '';
+  var date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+  function pr(label, value) {
+    if (!value) return '';
+    return '<tr><td class="label">'+label+'</td><td class="value">'+value+'</td></tr>';
+  }
+  function sec(title, content) {
+    return '<div class="section"><div class="section-title">'+title+'</div>'+content+'</div>';
+  }
+
+  var body = '';
+
+  // Header
+  body += '<div class="report-header"><div class="report-title">INTERNAL MEDICINE CLINICAL WORKUP</div><div class="report-subtitle">Diagnostic Reasoning Report &nbsp;·&nbsp; '+date+'</div></div>';
+
+  // Triage
+  var triageRows = pr('Chief Complaint', gv('t-chief')) + pr('Stability', gv('t-stability')) +
+    pr('Blood Pressure', gv('t-bp')) + pr('Heart Rate', gv('t-hr')) +
+    pr('Temperature', gv('t-temp')) + pr('O₂ Saturation', gv('t-o2'));
+  if (rf.length) triageRows += '<tr><td class="label" style="color:#c0392b">Red Flags</td><td class="value" style="color:#c0392b">'+rf.join(' · ')+'</td></tr>';
+  if (triageRows) body += sec('TRIAGE & VITALS', '<table>'+triageRows+'</table>');
+
+  // Demographics
+  var demoRows = pr('Age / Sex / BMI', (gv('hp-age')||'?')+' y/o '+(gv('hp-sex')||'?')+', BMI '+(gv('hp-bmi')||'?'));
+  if (demoRows) body += sec('PATIENT DEMOGRAPHICS', '<table>'+demoRows+'</table>');
+
+  // HPI
+  var hpiRows = pr('Onset', gv('hp-onset')) + pr('Location', gv('hp-location')) +
+    pr('Duration', gv('hp-duration')) + pr('Character', gv('hp-character')) +
+    pr('Timing', gv('hp-timing')) + pr('Aggravating / Alleviating', gv('hp-factors')) +
+    pr('Severity', gv('hp-severity'));
+  if (ros.length) hpiRows += pr('Review of Systems (positive)', ros.join(', '));
+  if (hpiRows) body += sec('HISTORY OF PRESENT ILLNESS', '<table>'+hpiRows+'</table>');
+
+  // Background
+  var bgRows = pr('Past Medical History', gv('hp-pmh')) + pr('Medications', gv('hp-meds')) +
+    pr('Allergies', gv('hp-allergies')) + pr('Family History', gv('hp-fhx')) +
+    pr('Exposures', gv('hp-exposures'));
+  if (bgRows) body += sec('PAST HISTORY & BACKGROUND', '<table>'+bgRows+'</table>');
+
+  // Pivotals
+  if (pivs.length) body += sec('PIVOTAL FINDINGS', '<ol>'+pivs.map(function(p){ return '<li>'+p+'</li>'; }).join('')+'</ol>');
+
+  // DDx
+  if (allDx.length) {
+    var ddx = VC.map(function(v,i){
+      if (!ST.vcDx[i]||!ST.vcDx[i].length) return '';
+      return '<tr><td class="label">'+v.L+' — '+v.name+'</td><td class="value">'+ST.vcDx[i].join(', ')+'</td></tr>';
+    }).join('');
+    body += sec('DIFFERENTIAL DIAGNOSIS (VINDICATE)', '<table>'+ddx+'</table>');
+  }
+
+  // Working Dx
+  if (gv('tt-working-dx')) {
+    body += sec('WORKING DIAGNOSIS', '<div class="working-dx">'+esc(gv('tt-working-dx'))+'</div>'+
+      (gv('tt-confidence') ? '<div class="confidence">Confidence: '+esc(gv('tt-confidence'))+'</div>' : '')+
+      (gv('tt-rationale') ? '<div class="rationale">'+esc(gv('tt-rationale'))+'</div>' : ''));
+  }
+
+  // Treatment trials
+  if (ST.trials.length) {
+    var trials = ST.trials.map(function(t,i){
+      return '<tr><td class="label">Trial #'+(i+1)+'</td><td class="value"><strong>'+esc(t.treatment||'—')+'</strong>'+
+        (t.response ? ' — '+esc(t.response) : '')+
+        (t.duration ? '<br><span style="color:#666">Duration: '+esc(t.duration)+'</span>' : '')+
+        (t.notes ? '<br>'+esc(t.notes) : '')+'</td></tr>';
+    }).join('');
+    body += sec('TREATMENT TRIALS', '<table>'+trials+'</table>');
+  }
+
+  // Specialists
+  if (specs.length) {
+    body += sec('SPECIALIST CONSULTATIONS', '<p>'+specs.join(' · ')+'</p>'+
+      (gv('spec-notes') ? '<p style="margin-top:8px">'+esc(gv('spec-notes'))+'</p>' : ''));
+  }
+
+  // Final AI opinion
+  if (finalAI && finalAI.trim() && finalAI !== 'Consulting internist AI…') {
+    body += sec('FINAL CLINICAL OPINION (AI-ASSISTED)', '<div class="ai-opinion">'+finalAI.replace(/\n/g,'<br>')+'</div>');
+  }
+
+  // Footer
+  body += '<div class="footer">Generated by Internist Clinical Reasoning Workup &nbsp;·&nbsp; '+date+'<br><span style="font-size:9px;color:#999">This report is for clinical reference only and does not replace physician judgment.</span></div>';
+
+  var win = window.open('', '_blank');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Clinical Workup Report — '+date+'</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    'body{font-family:Georgia,serif;font-size:12px;color:#1a1a1a;background:#fff;padding:40px;max-width:780px;margin:0 auto}'+
+    '@media print{body{padding:20px}@page{margin:1.5cm;size:letter}}'+
+    '.report-header{border-bottom:3px double #1a1a1a;padding-bottom:16px;margin-bottom:24px;text-align:center}'+
+    '.report-title{font-size:18px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase}'+
+    '.report-subtitle{font-size:11px;color:#555;margin-top:4px;font-style:italic}'+
+    '.section{margin-bottom:22px;page-break-inside:avoid}'+
+    '.section-title{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#2c3e7a;border-bottom:1px solid #2c3e7a;padding-bottom:4px;margin-bottom:10px}'+
+    'table{width:100%;border-collapse:collapse}'+
+    'td{padding:5px 8px;vertical-align:top;border-bottom:1px solid #eee;line-height:1.5}'+
+    '.label{width:35%;font-weight:600;color:#333;font-size:11px}'+
+    '.value{color:#1a1a1a;font-size:12px}'+
+    'ol{padding-left:20px;line-height:2}'+
+    'ol li{margin-bottom:2px}'+
+    '.working-dx{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px}'+
+    '.confidence{font-size:11px;color:#555;margin-bottom:6px;font-style:italic}'+
+    '.rationale{font-size:12px;color:#333;line-height:1.7}'+
+    '.ai-opinion{font-size:12px;line-height:1.8;color:#1a1a1a;background:#f8f8f8;border-left:3px solid #2c3e7a;padding:12px 16px;white-space:pre-wrap}'+
+    '.footer{margin-top:32px;padding-top:12px;border-top:1px solid #ccc;font-size:10px;color:#666;text-align:center;font-family:Arial,sans-serif}'+
+    '.print-btn{position:fixed;top:16px;right:16px;background:#2c3e7a;color:#fff;border:none;padding:10px 20px;font-size:13px;cursor:pointer;border-radius:6px;font-family:Arial,sans-serif}'+
+    '.print-btn:hover{background:#1a2a5a}'+
+    '@media print{.print-btn{display:none}}'+
+  '</style></head><body>'+
+  '<button class="print-btn" onclick="window.print()">&#128438; Print / Save PDF</button>'+
+  body+'</body></html>');
+  win.document.close();
 };
 
 function rsec(color, title, body) {
