@@ -126,6 +126,12 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .btn-p{background:var(--ac);color:#060810}
 .btn-s{background:var(--sf3);color:var(--tx2);border:1px solid var(--bd2)}
 .btn-ai{background:linear-gradient(135deg,rgba(124,111,255,.18),rgba(74,158,255,.12));color:var(--ac2);border:1px solid rgba(124,111,255,.3)}
+.pat-card{background:var(--sf2);border:2px solid var(--bd);border-radius:10px;padding:12px 10px;cursor:pointer;text-align:center;font-family:var(--mono);font-size:12px;color:var(--tx2);transition:all .15s}
+.pat-card:hover{border-color:var(--ac);color:var(--tx)}
+.pat-card.selected{border-color:var(--ac);background:rgba(74,158,255,.12);color:var(--tx)}
+.pat-card .pat-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.pat-card .pat-sub{font-size:10px;color:var(--tx3)}
+.pat-ai-type-btn.active-type{background:rgba(74,158,255,.15);border-color:var(--ac);color:var(--ac)}
 .btn-sm{padding:7px 12px;font-size:11px}
 .btn-full{width:100%;justify-content:center}
 
@@ -274,6 +280,15 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
       <a href="index.html" style="display:flex;align-items:center;gap:8px;padding:9px 14px;font-family:var(--mono);font-size:11px;color:var(--tx2);text-decoration:none;transition:background .12s;" onmouseover="this.style.background='var(--sf2)'" onmouseout="this.style.background='none'">&#8592; Home</a>
+      <button class="sb" id="sb-ruleout" onclick="showRuleoutPanel()" style="width:100%;text-align:left;">
+        <span class="sb-num">&#9940;</span>
+        <span class="sb-title">Rule Out Tracker</span>
+        <span class="sb-tag" id="ruleout-count-badge">0</span>
+      </button>
+      <button class="sb" onclick="showPatientAIPanel()" style="width:100%;text-align:left;">
+        <span class="sb-num">&#129302;</span>
+        <span class="sb-title">Patient AI Analysis</span>
+      </button>
       <div style="height:1px;background:var(--bd);margin:4px 0 8px"></div>
       <div class="sl">Workup Steps</div>
       <!-- JS fills steps -->
@@ -686,6 +701,58 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     </div>
   </div>
 
+  <!-- Rule Out Tracker overlay -->
+  <div class="arc-overlay" id="ruleout-overlay" onclick="if(event.target===this)hideRuleoutPanel()">
+    <div class="arc-drawer" style="width:min(700px,98vw);max-height:92vh">
+      <div class="arc-hdr">
+        <div class="arc-title">&#9940; Rule Out Tracker</div>
+        <button class="arc-close" onclick="hideRuleoutPanel()">&times;</button>
+      </div>
+      <div style="padding:12px 16px 8px;border-bottom:1px solid var(--bd)">
+        <p style="font-size:12px;color:var(--tx3);font-family:var(--mono);margin-bottom:10px">Track every diagnosis that has been considered and ruled out, along with the evidence that eliminated it.</p>
+        <button class="btn btn-p" onclick="addRuleout()" style="font-size:11px;padding:8px 14px">+ Add Ruled-Out Diagnosis</button>
+      </div>
+      <div id="ruleout-list" style="overflow-y:auto;flex:1;padding:12px 16px"></div>
+    </div>
+  </div>
+
+  <!-- Patient AI Analysis overlay -->
+  <div class="arc-overlay" id="patient-ai-overlay" onclick="if(event.target===this)hidePatientAIPanel()">
+    <div class="arc-drawer" style="width:min(760px,98vw);max-height:94vh;display:flex;flex-direction:column">
+      <div class="arc-hdr">
+        <div class="arc-title">&#129302; Patient AI Analysis</div>
+        <button class="arc-close" onclick="hidePatientAIPanel()">&times;</button>
+      </div>
+
+      <!-- Patient selector -->
+      <div style="padding:16px;border-bottom:1px solid var(--bd);flex-shrink:0">
+        <div class="sl" style="margin:0 0 10px">Select Patient</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="patient-select-grid">
+          <!-- filled by JS -->
+        </div>
+        <div id="patient-ai-status" style="font-family:var(--mono);font-size:11px;color:var(--tx3);margin-top:10px;min-height:16px"></div>
+      </div>
+
+      <!-- Controls -->
+      <div style="padding:14px 16px;border-bottom:1px solid var(--bd);flex-shrink:0">
+        <div class="sl" style="margin:0 0 10px">Analysis Type</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-s pat-ai-type-btn active-type" data-type="next-tests" onclick="setAnalysisType('next-tests',this)">&#128269; What to Test Next</button>
+          <button class="btn btn-s pat-ai-type-btn" data-type="cross-reference" onclick="setAnalysisType('cross-reference',this)">&#128101; Cross-Reference with Rule Outs</button>
+          <button class="btn btn-s pat-ai-type-btn" data-type="full" onclick="setAnalysisType('full',this)">&#128203; Full Diagnostic Report</button>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-p" onclick="runPatientAI()" id="run-patient-ai-btn" disabled style="opacity:.4">&#129302; Run Analysis</button>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div style="flex:1;overflow-y:auto;padding:16px" id="patient-ai-output">
+        <div style="color:var(--tx3);font-family:var(--mono);font-size:12px;text-align:center;padding:40px 0">Select a patient above to begin.</div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /app -->
 
 <script>
@@ -734,6 +801,7 @@ var ST = {
   vcActive: null,
   specialties: {},
   trials: [],
+  ruleouts: [],
   _dirty: false
 };
 
@@ -975,7 +1043,8 @@ function collectState() {
     symptoms: ST.symptoms,
     vcDx: ST.vcDx,
     specialties: ST.specialties,
-    trials: ST.trials
+    trials: ST.trials,
+    ruleouts: ST.ruleouts
   };
 }
 
@@ -1001,6 +1070,7 @@ function restoreState(data) {
   if (data.vcDx) { ST.vcDx = data.vcDx; buildVcGrid(); }
   if (data.specialties) { ST.specialties = data.specialties; buildSpecGrid(); }
   if (data.trials) { ST.trials = data.trials; renderTrials(); }
+  if (data.ruleouts) { ST.ruleouts = data.ruleouts; renderRuleouts(); }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -1248,6 +1318,95 @@ window.removeTrial = function(id) {
   ST.trials = ST.trials.filter(function(t){ return t.id !== id; });
   renderTrials(); markDirty();
 };
+
+// ── Rule Out Tracker ──────────────────────────────────────────────────────────
+window.showRuleoutPanel = function() {
+  renderRuleouts();
+  document.getElementById('ruleout-overlay').classList.add('on');
+};
+window.hideRuleoutPanel = function() {
+  document.getElementById('ruleout-overlay').classList.remove('on');
+};
+
+window.addRuleout = function() {
+  ST.ruleouts.push({
+    id: Date.now(),
+    diagnosis: '',
+    status: 'Ruled Out',
+    date: '',
+    reason: '',
+    labs: '',
+    imaging: '',
+    doctorReport: '',
+    notes: ''
+  });
+  renderRuleouts();
+  markDirty();
+};
+
+window.updateRuleout = function(id, key, val) {
+  var r = ST.ruleouts.find(function(x){ return x.id === id; });
+  if (r) { r[key] = val; updateRuleoutBadge(); markDirty(); }
+};
+
+window.removeRuleout = function(id) {
+  if (!confirm('Remove this entry?')) return;
+  ST.ruleouts = ST.ruleouts.filter(function(r){ return r.id !== id; });
+  renderRuleouts(); markDirty();
+};
+
+function updateRuleoutBadge() {
+  var badge = document.getElementById('ruleout-count-badge');
+  if (badge) badge.textContent = ST.ruleouts.length;
+}
+
+var STATUS_COLORS = {
+  'Ruled Out': 'var(--rd)',
+  'Still Considering': 'var(--yl)',
+  'Confirmed': 'var(--gn)'
+};
+
+function renderRuleouts() {
+  updateRuleoutBadge();
+  var list = document.getElementById('ruleout-list');
+  if (!list) return;
+  if (!ST.ruleouts.length) {
+    list.innerHTML = '<div style="color:var(--tx3);font-family:var(--mono);font-size:12px;padding:20px 0;text-align:center">No entries yet. Click "+ Add Ruled-Out Diagnosis" to begin.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  ST.ruleouts.forEach(function(r, idx) {
+    var statusColor = STATUS_COLORS[r.status] || 'var(--tx3)';
+    var d = document.createElement('div');
+    d.style.cssText = 'background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px;border-left:3px solid '+statusColor;
+    d.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
+        '<span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--tx3)">ENTRY #'+(idx+1)+'</span>' +
+        '<select onchange="updateRuleout('+r.id+',\'status\',this.value)" style="margin-left:auto;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;color:'+statusColor+';font-family:var(--mono);font-size:10px;font-weight:700;padding:4px 8px;cursor:pointer">' +
+        ['Ruled Out','Still Considering','Confirmed'].map(function(s){
+          return '<option'+(r.status===s?' selected':'')+' style="color:var(--tx)">'+s+'</option>';
+        }).join('') + '</select>' +
+        '<button onclick="removeRuleout('+r.id+')" style="background:none;border:none;color:var(--tx3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1">&times;</button>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
+        '<div><label class="fl">Diagnosis / Condition</label>' +
+        '<input type="text" value="'+esc(r.diagnosis||'')+'" oninput="updateRuleout('+r.id+',\'diagnosis\',this.value)" placeholder="e.g. Lupus, MS, Celiac..."></div>' +
+        '<div><label class="fl">Date Ruled Out</label>' +
+        '<input type="date" value="'+esc(r.date||'')+'" oninput="updateRuleout('+r.id+',\'date\',this.value)"></div>' +
+      '</div>' +
+      '<div style="margin-bottom:10px"><label class="fl">Reason / Clinical Rationale</label>' +
+      '<textarea rows="2" oninput="updateRuleout('+r.id+',\'reason\',this.value)" placeholder="Why was this ruled out? e.g. ANA negative x2, no response to steroids...">'+esc(r.reason||'')+'</textarea></div>' +
+      '<div style="margin-bottom:10px"><label class="fl">Labs / Test Results Used</label>' +
+      '<textarea rows="2" oninput="updateRuleout('+r.id+',\'labs\',this.value)" placeholder="e.g. ANA 1:40, CBC normal, TSH 2.1...">'+esc(r.labs||'')+'</textarea></div>' +
+      '<div style="margin-bottom:10px"><label class="fl">Imaging / Procedures</label>' +
+      '<textarea rows="2" oninput="updateRuleout('+r.id+',\'imaging\',this.value)" placeholder="e.g. MRI brain unremarkable, echo EF 65%...">'+esc(r.imaging||'')+'</textarea></div>' +
+      '<div style="margin-bottom:10px"><label class="fl">Doctor / Specialist Report</label>' +
+      '<textarea rows="2" oninput="updateRuleout('+r.id+',\'doctorReport\',this.value)" placeholder="e.g. Rheumatology: does not meet criteria for SLE...">'+esc(r.doctorReport||'')+'</textarea></div>' +
+      '<div><label class="fl">Additional Notes</label>' +
+      '<textarea rows="2" oninput="updateRuleout('+r.id+',\'notes\',this.value)" placeholder="Any other context...">'+esc(r.notes||'')+'</textarea></div>';
+    list.appendChild(d);
+  });
+}
 
 // ── Can't miss defaults ───────────────────────────────────────────────────────
 function buildDefaultCantMiss() {
@@ -1609,6 +1768,25 @@ window.printReport = function() {
       (gv('spec-notes') ? '<p style="margin-top:8px">'+esc(gv('spec-notes'))+'</p>' : ''));
   }
 
+  // Rule Outs
+  if (ST.ruleouts && ST.ruleouts.length) {
+    var roRows = ST.ruleouts.map(function(r, i) {
+      var sc = r.status === 'Ruled Out' ? '#c0392b' : r.status === 'Confirmed' ? '#27ae60' : '#e67e22';
+      return '<tr><td class="label" style="vertical-align:top;padding-top:8px">' +
+        '<strong>'+(r.diagnosis||'—')+'</strong><br>' +
+        '<span style="font-size:10px;color:'+sc+';font-weight:700">'+r.status+'</span>' +
+        (r.date ? '<br><span style="font-size:10px;color:#888">'+r.date+'</span>' : '') +
+        '</td><td class="value" style="padding-top:8px">' +
+        (r.reason ? '<div><strong>Rationale:</strong> '+esc(r.reason)+'</div>' : '') +
+        (r.labs ? '<div style="margin-top:4px"><strong>Labs/Tests:</strong> '+esc(r.labs)+'</div>' : '') +
+        (r.imaging ? '<div style="margin-top:4px"><strong>Imaging/Procedures:</strong> '+esc(r.imaging)+'</div>' : '') +
+        (r.doctorReport ? '<div style="margin-top:4px"><strong>Doctor/Specialist Report:</strong> '+esc(r.doctorReport)+'</div>' : '') +
+        (r.notes ? '<div style="margin-top:4px"><em>'+esc(r.notes)+'</em></div>' : '') +
+        '</td></tr>';
+    }).join('');
+    body += sec('RULE OUT TRACKER', '<table>'+roRows+'</table>');
+  }
+
   // Final AI opinion
   if (finalAI && finalAI.trim() && finalAI !== 'Consulting internist AI…') {
     body += sec('FINAL CLINICAL OPINION (AI-ASSISTED)', '<div class="ai-opinion">'+finalAI.replace(/\n/g,'<br>')+'</div>');
@@ -1658,6 +1836,309 @@ function kv(k, v) {
 window.startOver = function() {
   if (!confirm('Start a new workup? This will clear all saved data.')) return;
   WORKUP_DOC.set({}).then(function(){ location.reload(); });
+};
+
+// ── Patient AI Analysis ───────────────────────────────────────────────────────
+var PATIENTS = [
+  { id:'jamie', name:'Jamie',   sub:'Brinkman (Lambertz)', chunk:true  },
+  { id:'marc',  name:'Marc',    sub:'Patient Portal',      chunk:false },
+  { id:'jesse', name:'Jesse',   sub:'Patient Portal',      chunk:false },
+  { id:'raina', name:'Raina',   sub:'Patient Portal',      chunk:false },
+  { id:'liam',  name:'Liam',    sub:'Patient Portal',      chunk:false },
+  { id:'killian',name:'Killian',sub:'Patient Portal',      chunk:false }
+];
+
+var selectedPatient = null;
+var analysisType = 'next-tests';
+
+window.showPatientAIPanel = function() {
+  buildPatientGrid();
+  document.getElementById('patient-ai-overlay').classList.add('on');
+};
+window.hidePatientAIPanel = function() {
+  document.getElementById('patient-ai-overlay').classList.remove('on');
+};
+
+function buildPatientGrid() {
+  var grid = document.getElementById('patient-select-grid');
+  grid.innerHTML = PATIENTS.map(function(p) {
+    var sel = selectedPatient && selectedPatient.id === p.id ? ' selected' : '';
+    return '<div class="pat-card'+sel+'" onclick="selectPatient(\''+p.id+'\')">' +
+      '<div class="pat-name">'+p.name+'</div>' +
+      '<div class="pat-sub">'+p.sub+'</div>' +
+      '</div>';
+  }).join('');
+}
+
+window.selectPatient = function(id) {
+  selectedPatient = PATIENTS.find(function(p){ return p.id === id; });
+  buildPatientGrid();
+  document.getElementById('run-patient-ai-btn').disabled = false;
+  document.getElementById('run-patient-ai-btn').style.opacity = '1';
+  document.getElementById('patient-ai-status').textContent = selectedPatient.name + ' selected — choose analysis type and run.';
+};
+
+window.setAnalysisType = function(type, btn) {
+  analysisType = type;
+  document.querySelectorAll('.pat-ai-type-btn').forEach(function(b){ b.classList.remove('active-type'); });
+  btn.classList.add('active-type');
+};
+
+// Fetch patient data from Firestore
+async function fetchPatientData(patient) {
+  var fbApp2, db2;
+  var firebaseConfig = {
+    apiKey: 'AIzaSyD0iBz1JmRb59JclYbz506KbBI6hkithP0',
+    authDomain: 'jjbrinkman6525-medical-records.firebaseapp.com',
+    projectId: 'jjbrinkman6525-medical-records',
+    storageBucket: 'jjbrinkman6525-medical-records.firebasestorage.app',
+    messagingSenderId: '197582250930',
+    appId: '1:197582250930:web:ba7ac704d7fd412ec77aab'
+  };
+
+  // Reuse existing Firebase app if available
+  try {
+    fbApp2 = firebase.app('internist');
+    db2 = firebase.firestore(fbApp2);
+  } catch(e) {
+    try { fbApp2 = firebase.app('pat-ai'); db2 = firebase.firestore(fbApp2); }
+    catch(e2) { fbApp2 = firebase.initializeApp(firebaseConfig, 'pat-ai'); db2 = firebase.firestore(fbApp2); }
+  }
+
+  var data = {};
+
+  if (patient.chunk) {
+    // Jamie: root doc + chunks subcollection
+    var rootSnap = await db2.doc('patients/'+patient.id).get();
+    if (rootSnap.exists) Object.assign(data, rootSnap.data());
+    var chunkKeys = ['v','l','i','e','j','lr','pm','mx','dv','de','dj','dx_data'];
+    var chunkSnaps = await Promise.all(chunkKeys.map(function(k){
+      return db2.doc('patients/'+patient.id+'/chunks/'+k).get();
+    }));
+    chunkSnaps.forEach(function(snap, idx) {
+      if (snap.exists && snap.data().items) data[chunkKeys[idx]] = snap.data().items;
+    });
+  } else {
+    // Marc/Jesse/Raina/Liam/Killian: single doc
+    var snap = await db2.doc('patients/'+patient.id).get();
+    if (snap.exists) data = snap.data();
+  }
+  return data;
+}
+
+function summarizePatientData(patient, data) {
+  var lines = ['PATIENT: ' + patient.name + ' (' + patient.sub + ')'];
+
+  // Visits / encounters
+  var visits = data.visits || data.v || [];
+  if (visits.length) {
+    lines.push('\n--- VISITS & ENCOUNTERS (most recent 15) ---');
+    visits.slice(-15).forEach(function(v) {
+      var d = v.date || v.Date || '';
+      var type = v.type || v.Type || v.visitType || '';
+      var notes = v.notes || v.Notes || v.summary || v.description || '';
+      var dx = v.diagnoses || v.diagnosis || v.Diagnosis || '';
+      var meds = v.medications || v.Medications || v.prescriptions || '';
+      lines.push('['+d+'] '+type+(dx?' | Dx: '+dx:'')+(meds?' | Meds: '+meds:'')+(notes?' | '+String(notes).slice(0,200):''));
+    });
+  }
+
+  // Labs
+  var labs = data.labs || data.l || data.lr || [];
+  if (labs.length) {
+    lines.push('\n--- LAB RESULTS (most recent 10) ---');
+    labs.slice(-10).forEach(function(l) {
+      var d = l.date || l.Date || '';
+      var name = l.name || l.test || l.panel || l.Name || '';
+      var result = l.result || l.value || l.Result || l.findings || '';
+      lines.push('['+d+'] '+name+': '+String(result).slice(0,150));
+    });
+  }
+
+  // Imaging
+  var imaging = data.imaging || data.i || [];
+  if (imaging.length) {
+    lines.push('\n--- IMAGING & PROCEDURES (most recent 8) ---');
+    imaging.slice(-8).forEach(function(im) {
+      var d = im.date || im.Date || '';
+      var type = im.type || im.Type || im.modality || '';
+      var findings = im.findings || im.result || im.notes || im.Findings || '';
+      lines.push('['+d+'] '+type+': '+String(findings).slice(0,200));
+    });
+  }
+
+  // Journal / symptoms
+  var journal = data.journal || data.j || [];
+  if (journal.length) {
+    lines.push('\n--- SYMPTOM JOURNAL (most recent 8 entries) ---');
+    journal.slice(-8).forEach(function(j) {
+      var d = j.date || j.Date || '';
+      var entry = j.entry || j.notes || j.text || j.content || '';
+      lines.push('['+d+'] '+String(entry).slice(0,200));
+    });
+  }
+
+  // Diagnoses / dx timeline
+  var dx = data.dx || data.dx_data || [];
+  if (dx.length) {
+    lines.push('\n--- DIAGNOSES / DX TIMELINE ---');
+    dx.slice(-20).forEach(function(d) {
+      var date = d.date || d.Date || '';
+      var name = d.name || d.diagnosis || d.label || d.Name || '';
+      var status = d.status || d.Status || '';
+      lines.push('['+date+'] '+name+(status?' ('+status+')':''));
+    });
+  }
+
+  // Mental health
+  var mh = data.mentalhealth || [];
+  if (mh.length) {
+    lines.push('\n--- MENTAL HEALTH NOTES ---');
+    mh.slice(-5).forEach(function(m) {
+      lines.push(String(m.date||'')+ ' '+String(m.notes||m.entry||'').slice(0,150));
+    });
+  }
+
+  return lines.join('\n');
+}
+
+function buildRuleoutSummary() {
+  if (!ST.ruleouts || !ST.ruleouts.length) return 'No rule-out entries recorded.';
+  return ST.ruleouts.map(function(r, i) {
+    return 'RULE-OUT #'+(i+1)+': '+r.diagnosis+' ['+r.status+']' +
+      (r.date ? ' ('+r.date+')' : '') +
+      (r.reason ? '\n  Rationale: '+r.reason : '') +
+      (r.labs ? '\n  Labs/Tests: '+r.labs : '') +
+      (r.imaging ? '\n  Imaging: '+r.imaging : '') +
+      (r.doctorReport ? '\n  Doctor Report: '+r.doctorReport : '') +
+      (r.notes ? '\n  Notes: '+r.notes : '');
+  }).join('\n\n');
+}
+
+function buildWorkupSummary() {
+  var lines = [];
+  var chief = gv('t-chief'); if (chief) lines.push('Chief Complaint: '+chief);
+  var age = gv('hp-age'), sex = gv('hp-sex');
+  if (age || sex) lines.push('Patient: '+(age||'?')+' y/o '+(sex||'?'));
+  var pmh = gv('hp-pmh'); if (pmh) lines.push('PMH: '+pmh);
+  var meds = gv('hp-meds'); if (meds) lines.push('Medications: '+meds);
+  var pivs = getPivotals().filter(Boolean);
+  if (pivs.length) lines.push('Pivotal Findings:\n'+pivs.map(function(p,i){ return '  '+(i+1)+'. '+p; }).join('\n'));
+  var allDx = []; Object.values(ST.vcDx).forEach(function(a){ allDx = allDx.concat(a); });
+  if (allDx.length) lines.push('Current Differential: '+allDx.join(', '));
+  var wdx = gv('tt-working-dx'); if (wdx) lines.push('Working Diagnosis: '+wdx);
+  return lines.join('\n') || 'No workup data entered yet.';
+}
+
+var ANALYSIS_PROMPTS = {
+  'next-tests': function(patSummary, ruleoutSummary, workupSummary) {
+    return 'You are a board-certified internist and diagnostician. You have been given a patient\'s complete medical history from their records, the current diagnostic workup, and a list of diagnoses that have already been ruled out.\n\n' +
+      '=== PATIENT MEDICAL HISTORY ===\n'+patSummary+'\n\n' +
+      '=== CURRENT INTERNIST WORKUP ===\n'+workupSummary+'\n\n' +
+      '=== RULED OUT DIAGNOSES ===\n'+ruleoutSummary+'\n\n' +
+      'TASK: Based on ALL of this information, generate a prioritized list of what to test for next. For each recommended test or investigation:\n' +
+      '1. Name the test/panel/study\n2. Why it\'s indicated given this specific patient\'s history\n3. What you\'re looking for (expected findings if positive)\n4. Priority level (Urgent / High / Medium / Low)\n\n' +
+      'Organize by: ### Urgent Tests, ### High Priority, ### Next-Tier Testing, ### Consider If Above Negative\n' +
+      'Be specific, actionable, and clinical. Reference specific findings from the patient history.';
+  },
+  'cross-reference': function(patSummary, ruleoutSummary, workupSummary) {
+    return 'You are a board-certified internist. Cross-reference this patient\'s medical history against the list of ruled-out diagnoses to identify:\n' +
+      '1. Whether any ruled-out diagnoses may have been ruled out prematurely\n2. Patterns in the history that were not accounted for in the rule-outs\n3. New diagnoses suggested by the combined history + failed rule-outs\n\n' +
+      '=== PATIENT MEDICAL HISTORY ===\n'+patSummary+'\n\n' +
+      '=== CURRENT INTERNIST WORKUP ===\n'+workupSummary+'\n\n' +
+      '=== RULED OUT DIAGNOSES ===\n'+ruleoutSummary+'\n\n' +
+      'TASK: Analyze the rule-outs critically.\n' +
+      'Headings: ### Rule-Outs That May Warrant Re-Evaluation, ### Patterns Not Yet Explained, ### New Diagnostic Hypotheses, ### Recommended Next Steps';
+  },
+  'full': function(patSummary, ruleoutSummary, workupSummary) {
+    return 'You are a board-certified internist preparing a formal diagnostic consultation report. You have the patient\'s complete medical history, current diagnostic workup, and ruled-out diagnoses.\n\n' +
+      '=== PATIENT MEDICAL HISTORY ===\n'+patSummary+'\n\n' +
+      '=== CURRENT INTERNIST WORKUP ===\n'+workupSummary+'\n\n' +
+      '=== RULED OUT DIAGNOSES ===\n'+ruleoutSummary+'\n\n' +
+      'Generate a comprehensive diagnostic report with the following sections:\n' +
+      '### Clinical Summary\n### Key Findings from History\n### Pattern Analysis\n### Current Differential Diagnosis\n### Rule-Out Review\n### Recommended Next Investigations (prioritized)\n### 3–6 Month Diagnostic Roadmap\n### Clinical Impression\n\n' +
+      'Be thorough, specific, and reference actual data from the patient history. This report will be used by the care team.';
+  }
+};
+
+window.runPatientAI = async function() {
+  if (!selectedPatient) return;
+  var output = document.getElementById('patient-ai-output');
+  var status = document.getElementById('patient-ai-status');
+  output.innerHTML = '<div class="ai-box on"><div class="ai-spin-row"><div class="ai-spin"></div><span>Loading '+selectedPatient.name+'\'s records from database…</span></div></div>';
+  status.textContent = 'Fetching patient data…';
+
+  try {
+    var patData = await fetchPatientData(selectedPatient);
+    status.textContent = 'Records loaded. Running AI analysis…';
+    output.innerHTML = '<div class="ai-box on"><div class="ai-spin-row"><div class="ai-spin"></div><span>Analyzing history and generating report…</span></div></div>';
+
+    var patSummary = summarizePatientData(selectedPatient, patData);
+    var ruleoutSummary = buildRuleoutSummary();
+    var workupSummary = buildWorkupSummary();
+    var prompt = ANALYSIS_PROMPTS[analysisType](patSummary, ruleoutSummary, workupSummary);
+
+    var res = await fetch('https://anthropic-proxy.twistedgypsychild.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role:'user', content: prompt }]
+      })
+    });
+
+    var data = await res.json();
+    if (!res.ok) {
+      output.innerHTML = '<div style="color:var(--rd);font-family:var(--mono);font-size:12px">API Error '+res.status+': '+JSON.stringify(data)+'</div>';
+      status.textContent = 'Error.';
+      return;
+    }
+
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'No response.';
+    var typeLabels = {'next-tests':'What to Test Next','cross-reference':'Rule-Out Cross-Reference','full':'Full Diagnostic Report'};
+    output.innerHTML =
+      '<div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bd)">' +
+        '<div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--ac);text-transform:uppercase">'+typeLabels[analysisType]+'</div>' +
+        '<div style="font-family:var(--mono);font-size:12px;color:var(--tx2);margin-top:2px">'+selectedPatient.name+' &mdash; '+new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'</div>' +
+      '</div>' +
+      '<div class="ai-box on" style="background:transparent;border:none;padding:0">' +
+        '<div class="ai-lbl">&#9651; Internist AI Analysis</div>' +
+        fmtAI(text) +
+      '</div>' +
+      '<div style="margin-top:16px;display:flex;gap:8px">' +
+        '<button class="btn btn-s" style="font-size:11px" onclick="printPatientAIReport(\''+selectedPatient.name+'\',\''+typeLabels[analysisType]+'\')">&#128438; Print Report</button>' +
+      '</div>';
+
+    status.textContent = 'Analysis complete.';
+  } catch(e) {
+    output.innerHTML = '<div style="color:var(--rd);font-family:var(--mono);font-size:12px">Error: '+e.message+'</div>';
+    status.textContent = 'Failed.';
+  }
+};
+
+window.printPatientAIReport = function(patName, typeName) {
+  var content = document.getElementById('patient-ai-output');
+  var date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var win = window.open('','_blank');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+patName+' — '+typeName+'</title><style>'+
+    'body{font-family:Georgia,serif;font-size:13px;color:#1a1a1a;max-width:780px;margin:40px auto;padding:0 20px}'+
+    '@media print{body{margin:0}@page{margin:1.5cm}}'+
+    'h1{font-size:18px;text-transform:uppercase;letter-spacing:.08em;border-bottom:3px double #1a1a1a;padding-bottom:12px;margin-bottom:6px}'+
+    'h2{font-size:11px;color:#555;font-weight:normal;margin-bottom:24px;font-style:italic}'+
+    'h3{font-size:13px;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:.1em;color:#2c3e7a;border-bottom:1px solid #2c3e7a;padding-bottom:3px;margin:20px 0 8px}'+
+    'p,li{line-height:1.8}ol,ul{padding-left:20px}'+
+    '.footer{margin-top:40px;padding-top:12px;border-top:1px solid #ccc;font-size:10px;color:#888;font-family:Arial,sans-serif;text-align:center}'+
+    '.print-btn{position:fixed;top:16px;right:16px;background:#2c3e7a;color:#fff;border:none;padding:10px 20px;font-size:13px;cursor:pointer;border-radius:6px;font-family:Arial}'+
+    '@media print{.print-btn{display:none}}'+
+  '</style></head><body>'+
+  '<button class="print-btn" onclick="window.print()">&#128438; Print / Save PDF</button>'+
+  '<h1>'+patName+' — '+typeName+'</h1>'+
+  '<h2>Generated '+date+' &nbsp;·&nbsp; Internist Clinical Reasoning Workup</h2>'+
+  content.innerHTML.replace(/<button[^>]*>.*?<\/button>/gi,'').replace(/class="[^"]*"/g,'').replace(/style="[^"]*"/g,'')+
+  '<div class="footer">This report is AI-assisted and for clinical reference only. It does not replace physician judgment.</div>'+
+  '</body></html>');
+  win.document.close();
 };
 
 </script>
